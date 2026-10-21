@@ -1,0 +1,13 @@
+[package]
+name = "mushaf-layout"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+mushaf-model.workspace = true
+mushaf-resolve.workspace = true
+
+[lints]
+workspace = true

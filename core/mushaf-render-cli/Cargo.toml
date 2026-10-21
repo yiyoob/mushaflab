@@ -1,0 +1,17 @@
+[package]
+name = "mushaf-render-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+mushaf-model.workspace = true
+mushaf-resolve.workspace = true
+mushaf-layout.workspace = true
+mushaf-shape.workspace = true
+mushaf-justify.workspace = true
+mushaf-draw.workspace = true
+
+[lints]
+workspace = true

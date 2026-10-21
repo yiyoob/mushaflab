@@ -1,0 +1,21 @@
+# Pinned third-party sources: never tracked (CLAUDE.md rules 2 and 10)
+data/sources/raw/*
+!data/sources/raw/.gitkeep
+
+# Build artifacts
+build/
+target/
+*.db
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Generated images are only tracked under tests/golden/
+*.png
+!tests/golden/**/*.png
+
+.DS_Store

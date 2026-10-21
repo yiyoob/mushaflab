@@ -1,0 +1,25 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: brew install rustup uv just
+      - name: Rust toolchain (version from rust-toolchain.toml)
+        run: |
+          echo "/opt/homebrew/opt/rustup/bin" >> "$GITHUB_PATH"
+          /opt/homebrew/opt/rustup/bin/rustup show active-toolchain || /opt/homebrew/opt/rustup/bin/rustup toolchain install
+      - name: Python
+        run: uv python install 3.12 && uv sync --directory data --locked
+      - name: Lint and test
+        run: just lint core-test data-test

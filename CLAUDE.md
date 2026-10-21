@@ -38,6 +38,7 @@ just data-fetch      # download pinned sources, verify checksums
 just data-archive    # dated private backup of raw sources + manifest (outside git)
 just data-build      # run the full ETL, produce build/mushaf.db and exports
 just data-verify     # integrity tests on spine, layout, ayah maps
+just data-test       # pytest for the Python pipeline
 just core-test       # cargo test --workspace
 just roundtrip       # patch round-trip vs KFGQPC for all riwāyāt in scope
 just render PAGE=1 RIWAYAH=hafs   # SVG + PNG via reference renderer
