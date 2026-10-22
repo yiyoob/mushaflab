@@ -22,7 +22,7 @@ Consequences: what follows, what it rules out
 | D1 | Line policy for non-Ḥafṣ riwāyāt | accepted: native layouts (finalized P5) |
 | D2 | Font per riwāyah | accepted: hybrid (DigitalKhatt + KFGQPC) |
 | D3 | Justification implementation | accepted: Rust port on harfrust |
-| D4 | Draw path | open (P3) |
+| D4 | Draw path | accepted with the Phase 3 plan: positioned glyph outlines |
 | D5 | First platform | accepted (website first) |
 | D6 | Ḥafṣ edition: text + layout + font | accepted: 1441H digital layout (reconfirmed 2026-10-22) |
 | D7 | Licensing and distribution | accepted (owner-declared) |
@@ -32,6 +32,7 @@ Consequences: what follows, what it rules out
 | D11 | Spine file format and item IDs | accepted (Phase 1 plan) |
 | D12 | Core model: formats, patch semantics, DB access | accepted (Phase 2 plan); P2 addendum approved (2026-10-22) |
 | D13 | Phase 4 inputs: Bazzi source, single-source, encoding handling | accepted (2026-10-22) |
+| D16 | Manual overrides, header text, and the "edited" marker in draw output | accepted with the Phase 3 plan |
 | D15 | Page geometry, short lines and overflow (Ḥafṣ, 1441H) | accepted with the Phase 3 plan; numbers for review at G1 |
 | D14 | KFGQPC to DigitalKhatt Madina encoding table (Ḥafṣ) | accepted (approach with the Phase 3 plan; lossy and owner rows decided 2026-10-22) |
 
@@ -506,4 +507,54 @@ Consequences: page scale depends on the resolved page, so an edit or a riwāyah 
 a whole page's size (deterministically). Wide spaces on loose lines are the price of few
 squeezes; the owner judges the balance on the G1 pages. The constants are data: changing them
 changes goldens, not code.
+
+## D4 — Draw path
+Status: accepted (approved with the Phase 3 plan, 2026-10-22); revisit for performance in
+Phase 8
+Date: 2026-10-22
+Context: The core must return something every platform can draw identically (rule 7, rule 8):
+the CLI and website now, iOS and Android later.
+Options:
+- A: positioned glyph outlines. The core returns each used glyph's outline once and a list of
+  glyph placements; platforms fill paths (SVG, Canvas `Path2D`, CoreGraphics, Android `Path`).
+- B: glyph ids and positions; platforms draw with their own font APIs. Browsers cannot draw a
+  font's glyph by id, and platform rasterisers differ.
+- C: the core rasterises. Blurry when zoomed, heavy, no hit-testing by cluster.
+Decision: **A**. `mushaf-draw::DrawPage`: outlines in 26.6 font units (y up) for the glyphs
+on the page; items in 26.6 page units (y down): `Glyph { glyph, x, y, sx, sy, line, cluster }`
+(16.16 scales; `cluster` is the source cluster id) and `Stroke { role, width, path }`
+(surah-header frames, the edited marker). Outlines come from the font's CFF2 table through
+`read-fonts` (the version harfrust uses), whose charstring evaluator reports 16.16 fixed-point
+coordinates; they are rounded to 26.6 with integers only, so no floating point is involved
+anywhere in `core/` (better than the plan's proposal, which expected one float step via
+skrifa). Checked against fontTools on 150 glyphs: identical within 1/64 unit. The SVG backend
+writes every number as an exact decimal of its integer.
+Consequences: a page carries its own glyph table (no font needed on the platform); per-glyph
+colour, resize and hit-testing are straightforward. Size and speed of the draw list are
+measured in T3.6 and revisited for the web in Phase 8.
+
+## D16 — Manual overrides, header text, and the "edited" marker in draw output
+Status: accepted (approved with the Phase 3 plan, 2026-10-22)
+Date: 2026-10-22
+Context: D12 left the meaning of `stretch` to T3.2; rule 11 needs the "edited" marker in every
+render; header lines need text that is not spine text.
+Decision:
+- **`width_em_delta`** (1/1000 em) on a cluster: exactly that much extra advance after the
+  cluster's last glyph, counted in the line's width. On an item: after its last cluster.
+- **`stretch`** (1/1000 em) on a cluster: extra width made with the font's own stretch
+  features on that letter, the smallest level that reaches it (a kashida towards the next
+  joined letter, or the wider final form of a sub-word's last letter, up to the justifier's
+  limits). Unreachable requests are reported (`StretchUnreachable`, with what was reached);
+  `stretch` on a non-letter or on a whole item is reported (`StretchNotOnLetter`).
+- Letters carrying an override are locked: the automatic justifier never changes them, and
+  the line still closes around them.
+- **Canonical / edited:** `Resolved::canonical()` is false when the stack has any user-layer
+  patch (`Resolved::user_patches`) or the resolver reported anything. A non-canonical page
+  always gets the edited marker as its last draw items (a red frame and the word EDITED as
+  strokes, no font needed); `draw_page` has no way to leave it out. Phase 7's lint refines what
+  counts as non-canonical; the mechanism stays.
+- **Header text:** the surah-name line shows KFGQPC's `sura_name_ar` (1441H source, metadata,
+  shaped as stored: DigitalKhatt Madina maps its plain letters) inside a frame; the print's
+  ornamental header and the word "surah" are not reproduced (no source). The basmalah line is
+  the spine's 1:1:1 to 1:1:4, converted, which equals all 112 DigitalKhatt basmalah lines.
 

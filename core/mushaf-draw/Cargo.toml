@@ -9,6 +9,15 @@ publish.workspace = true
 mushaf-model.workspace = true
 mushaf-layout.workspace = true
 mushaf-justify.workspace = true
+read-fonts.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+mushaf-db.workspace = true
+mushaf-resolve.workspace = true
+mushaf-shape.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
 
 [lints]
 workspace = true

@@ -385,9 +385,16 @@ dependencies = [
 name = "mushaf-draw"
 version = "0.0.0"
 dependencies = [
+ "mushaf-db",
  "mushaf-justify",
  "mushaf-layout",
  "mushaf-model",
+ "mushaf-resolve",
+ "mushaf-shape",
+ "read-fonts",
+ "serde",
+ "serde_json",
+ "sha2",
 ]
 
 [[package]]
