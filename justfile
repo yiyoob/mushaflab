@@ -27,8 +27,9 @@ data-build:
     {{uv}} run python -m pipeline.ingest_layout build
     {{uv}} run python -m pipeline.compile_db
 
-# Integrity tests on spine, layout, ayah maps
-data-verify: (_todo "T1.5")
+# Integrity tests on spine, layout, ayah maps (needs `just data-build` first)
+data-verify:
+    {{uv}} run python -m pipeline.verify
 
 # Python pipeline unit tests
 data-test:
