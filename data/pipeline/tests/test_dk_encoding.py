@@ -149,3 +149,10 @@ def test_conversion_reproduces_digitalkhatt_text_except_listed_differences() -> 
     sheet = enc.REVIEW_PATH.read_text(encoding="utf-8")
     for d in report["differences"]:
         assert d["word"] in sheet
+
+
+@needs_sources
+def test_every_digitalkhatt_basmalah_line_equals_the_converted_spine_basmalah() -> None:
+    _, report = enc.build()
+    assert report["basmalah_lines"] == 112  # QUL 1421H basmallah lines
+    assert report["basmalah_lines_equal"] == report["basmalah_lines"]

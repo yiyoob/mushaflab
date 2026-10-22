@@ -32,6 +32,7 @@ Consequences: what follows, what it rules out
 | D11 | Spine file format and item IDs | accepted (Phase 1 plan) |
 | D12 | Core model: formats, patch semantics, DB access | accepted (Phase 2 plan); P2 addendum approved (2026-10-22) |
 | D13 | Phase 4 inputs: Bazzi source, single-source, encoding handling | accepted (2026-10-22) |
+| D15 | Page geometry, short lines and overflow (Ḥafṣ, 1441H) | accepted with the Phase 3 plan; numbers for review at G1 |
 | D14 | KFGQPC to DigitalKhatt Madina encoding table (Ḥafṣ) | accepted (approach with the Phase 3 plan; lossy and owner rows decided 2026-10-22) |
 
 ---
@@ -464,4 +465,45 @@ Decisions (owner, 2026-10-22):
 Consequences: free-mode edits that create a cluster form with no row cannot be converted yet;
 the edit API (Phase 7) must handle that (reported, never silently passed through). Marks that
 occur only in other riwāyāt still need owner-approved rows (D2), in Phase 5.
+
+## D15 — Page geometry, short lines and overflow (Ḥafṣ, 1441H)
+Status: accepted (policies approved with the Phase 3 plan, 2026-10-22); the constants are for
+the owner to judge on rendered pages at GATE G1
+Date: 2026-10-22
+Context: DigitalKhatt Madina's natural widths on the 1441H lines spread widely (p1 11,797,
+median 15,530, p99 19,820 font units; the font's own 1421H lines spread the same way), so one
+line width cannot fit every line without stretching some a lot and squeezing others (G-021).
+DigitalKhatt gives target widths only for its 1421H short lines (G-020).
+Decision:
+- **Profile** `data/render/hafs-uthmani-1441h.json`: font, encoding table, line widths, surah
+  names, and design constants: `line_width` 17,800 font units (about p90 of the natural
+  widths), `line_pitch` 1,900, margins, `page_scale_floor` 900 per mille, `space_stretch` 1,000
+  per mille (DigitalKhatt's reference value), `min_space` 600 per mille.
+- **Short lines (G-020)** come from the print itself: `quran-qcf4` (pinned, 1441H) gives each
+  line's glyph advances; a line under 90% of the median full line is short and gets its own
+  ratio (`data/render/uthmani-1441h.line-widths.json`, `pipeline/line_widths.py`). Short lines
+  are justified to that share of the line width and centred. This finds the layout's 29
+  `centered` lines plus page 2 line 5, which QUL marks not centred but which prints at 0.83 of
+  a full line (G-041).
+- **Overflow (G-021):** one font scale per page, `clamp(target / widest line at minimum
+  spacing, floor, 1)`; every line is justified to `target / scale` in font units. A line still
+  too wide tightens its simple spaces to 60% and is then squeezed horizontally by exactly
+  `target / width`; each such line is reported. Spaces next to ayah numbers keep their width.
+- **Justifier** (T3.2): the DigitalKhatt reference (stops at the first overflow; not the
+  "exhaustive" variant of quran-madina-html). Its overflow path is ours, as above.
+- **Header lines**: surah names (KFGQPC `sura_name_ar`) and the basmalah (spine 1:1:1–4,
+  converted; equal to all 112 DigitalKhatt basmalah lines) keep their natural width, centred.
+Evidence (all 604 pages, `cargo run --release -p mushaf-layout --example fit_report`):
+
+| line_width | pages scaled | at floor | squeezed lines | min squeeze | widest space, median / p95 / max (× normal) |
+|---|---|---|---|---|---|
+| **17,800 (chosen)** | 209 | 32 | 65 | 0.879 | 2.85 / 3.79 / 5.87 |
+| 17,000 | 323 | 84 | 223 | 0.839 | 2.37 / 3.78 / 5.28 |
+| 16,500 | 401 | 131 | 419 | 0.814 | 2.28 / 3.78 / 5.54 |
+
+With 17,800, 6,785 of 8,820 text lines stretch letters (median gain 1,845 font units).
+Consequences: page scale depends on the resolved page, so an edit or a riwāyah change can change
+a whole page's size (deterministically). Wide spaces on loose lines are the price of few
+squeezes; the owner judges the balance on the G1 pages. The constants are data: changing them
+changes goldens, not code.
 

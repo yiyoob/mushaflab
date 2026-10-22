@@ -1,4 +1,4 @@
-//! Line mapping (T2.6) and, later, overflow policy (T5.2).
+//! Line mapping (T2.6) and page fitting with the overflow policy (`fit`, T3.2, D15).
 //!
 //! A layout gives each text line its first and last spine item. A resolved item belongs to the
 //! line holding its spine anchor: a spine item's own position, or for an inserted item the
@@ -8,6 +8,8 @@
 //! anchor contributes nothing, so its line starts (or ends) at the next surviving item.
 //! Because anchors never decrease in reading order, each line holds a contiguous run of
 //! resolved items, and the runs cover all of them in order.
+
+pub mod fit;
 
 use std::fmt;
 use std::ops::Range;

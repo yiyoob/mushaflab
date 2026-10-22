@@ -53,6 +53,8 @@ REVIEW_PATH = DATA_DIR.parent / "docs" / "review" / "g024-dk-text-diff.html"
 DK_TEXT = "digitalkhatt-text-madina"
 DK_FONT = "digitalkhatt-hb-madina-font"
 QUL_1421H = "qul-layout-10-v2-1421h"
+# The basmalah line (surah headers) is drawn from these spine words (D16).
+BASMALAH_ITEMS = ("1:1:1", "1:1:2", "1:1:3", "1:1:4")
 HIZB, AYAH_END, SPACE = "\u06de", "\u06dd", " "
 DK_CLASSES = ("base", "mark", "sign", "ayah_number", "digit")
 DK_HEADER = ("codepoint", "class", "category", "name", "gdef", "count", "note")
@@ -507,6 +509,16 @@ def build() -> tuple[Table, dict]:
         except EncodingError:
             unmapped.update(c for c in spine_clusters(r) if c not in table.cluster_rows)
     kfgqpc_cps = {c for r in recs for k in spine_clusters(r) for c in k}
+    basmalah = SPACE.join(
+        convert(spine_clusters(r), table).text for r in recs if r["id"] in BASMALAH_ITEMS
+    )
+    types = qul_line_types(QUL_1421H)
+    dk_basmalah = [
+        line
+        for pno, page in enumerate(dk_pages(text), 1)
+        for lno, line in enumerate(page, 1)
+        if types[(pno, lno)] == "basmallah"
+    ]
     report = {
         "spine_words": len(recs),
         "converted_words": converted,
@@ -522,6 +534,8 @@ def build() -> tuple[Table, dict]:
         ],
         "lossy_rows": [r for r in table.rows if r.lossy],
         "lossy_words": _lossy_words(pairs, table),
+        "basmalah_lines": len(dk_basmalah),
+        "basmalah_lines_equal": sum(line == basmalah for line in dk_basmalah),
     }
     return table, report
 
@@ -630,6 +644,10 @@ def review_html(table: Table, report: dict) -> str:
         ("Rejected (context-dependent) candidates", len(report["rejected"])),
         ("Ambiguous forms (no row)", len(report["ambiguous"])),
         ("Unmapped spine cluster forms", len(report["unmapped"])),
+        (
+            "DigitalKhatt basmalah lines equal to converted 1:1:1-4",
+            f"{report['basmalah_lines_equal']} of {report['basmalah_lines']}",
+        ),
     ]
     for label, n in summary:
         w(f"<tr><td>{label}</td><td>{n}</td></tr>\n")

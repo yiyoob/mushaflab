@@ -24,7 +24,7 @@ pub struct FontData {
 }
 
 /// One feature value on characters `start..end` of the word (end exclusive).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Serialize)]
 pub struct FeatureRange {
     pub tag: [u8; 4],
     pub value: u32,
@@ -45,7 +45,7 @@ impl FeatureRange {
 }
 
 /// A positioned glyph in font units.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, serde::Serialize)]
 pub struct ShapedGlyph {
     pub glyph: u32,
     /// Index of the first character of the glyph's cluster in the word.

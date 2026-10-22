@@ -113,9 +113,19 @@ pub struct Resolved {
     /// Advisory notes; never an error, in any mode.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub lint: Vec<LintNote>,
+    /// Ids of the user-layer (free edit) patches in the stack, sorted. Any of them, or any
+    /// report entry, makes the result non-canonical: every render then carries the "edited"
+    /// marker (rule 11, D16).
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub user_patches: Vec<String>,
 }
 
 impl Resolved {
+    /// False if the text was edited (user patches) or resolution reported anything (rule 11).
+    pub fn canonical(&self) -> bool {
+        self.user_patches.is_empty() && self.report.is_empty()
+    }
+
     pub fn text(&self) -> String {
         self.items.iter().map(RItem::text).collect()
     }

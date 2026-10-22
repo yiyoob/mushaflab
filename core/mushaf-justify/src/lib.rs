@@ -693,7 +693,9 @@ pub fn justify_line(
     let mut simple = space_w;
     let mut current = natural;
     if n_simple > 0 {
-        simple = (space_w * params.min_space / 1000).max(space_w - (natural - target) / n_simple);
+        // ceiling: the spaces absorb the whole excess when they can (close() gives back the rest)
+        let per_space = (natural - target + n_simple - 1) / n_simple;
+        simple = (space_w * params.min_space / 1000).max(space_w - per_space);
         current -= (space_w - simple) * n_simple;
     }
     let word_sum: i64 = words.iter().sum();
@@ -817,6 +819,22 @@ pub fn natural_width(shaper: &Shaper, input: &LineInput) -> Result<i64, Error> {
         };
     }
     Ok(total)
+}
+
+/// Width of a line with simple spaces at their narrowest (`min_space`), aya spaces normal:
+/// the widest a line can be without a horizontal squeeze (26.6).
+pub fn tight_width(shaper: &Shaper, input: &LineInput, params: Params) -> Result<i64, Error> {
+    let space_w = space_width(shaper)?;
+    let simple = i64::try_from(
+        analyze_line(&input.text)
+            .spaces
+            .iter()
+            .filter(|s| s.1 == SpaceKind::Simple)
+            .count(),
+    )
+    .expect("few spaces");
+    let shrink = space_w - space_w * params.min_space / 1000;
+    Ok(natural_width(shaper, input)? - shrink * simple)
 }
 
 /// Character ranges of the words of a line text (start..end, exclusive).

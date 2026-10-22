@@ -27,6 +27,8 @@ data-build:
     {{uv}} run python -m pipeline.spine build
     {{uv}} run python -m pipeline.ingest_layout build
     {{uv}} run python -m pipeline.dk_encoding build
+    {{uv}} run python -m pipeline.line_widths build
+    {{uv}} run python -m pipeline.surah_names build
     {{uv}} run python -m pipeline.compile_db
 
 # Integrity tests on spine, layout, ayah maps (needs `just data-build` first)

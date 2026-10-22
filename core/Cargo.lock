@@ -419,8 +419,10 @@ name = "mushaf-layout"
 version = "0.0.0"
 dependencies = [
  "mushaf-db",
+ "mushaf-justify",
  "mushaf-model",
  "mushaf-resolve",
+ "mushaf-shape",
  "proptest",
  "serde",
  "serde_json",
