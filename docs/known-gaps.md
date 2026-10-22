@@ -19,4 +19,8 @@ by omission. Remove an entry only when its resolution is committed, and cite the
 | G-012 | Segmentation | KFGQPC writes 15:7, 27:20 and 36:22 with one word where QUL, Tanzil and DigitalKhatt have two. QUL layouts reference the split words, so T1.3 must map these explicitly. | T0.3 | T1.3 |
 | G-013 | Encoding | KFGQPC v2.0 writes ayah numbers as U+FC00+(n−1) (presentation-form codepoints its font draws as ayah signs), not digits. The ingest must decode this explicitly (one documented function), and other fonts will not render it. | T0.3 | T1.1 |
 | G-014 | Sources | QUL's "KFGQPC Hafs" word list matches KFGQPC v18 (it keeps the tatweel in كلا), not v2.0. | T0.3 | T1.3 (map by location, compare text with that difference known) |
+| G-015 | Rendering | In KFGQPC Ḥafṣ-family fonts a pause sign after a small meem (U+06ED/U+06E2) or hamza below has no mark anchor (9 places in Ḥafṣ, e.g. 16:101, 23:70, 34:8) and renders over the middle of the word. Owner to compare with the print; renderer may need a positioning fallback. | T0.4 | T3.5a |
+| G-016 | Source anomaly | Shuʿbah (official v2.0) contains Arabic-Indic digits U+0662, U+0666, U+0668 once each, although its ayah numbers are U+FC00 signs. | T0.4 | T4.1 (locate and report) |
+| G-017 | Source anomaly | Invisible controls in source text: U+200F (RLM) ×14 in Warsh and Qālūn; U+200D (ZWJ) ×1 in Dūrī and Sūsī. Kept as-is (rule: no normalization); the clusterizer must classify them explicitly. | T0.4 | T1.2 / T4.1 |
+| G-018 | Encoding | KFGQPC codepoints do not always carry their Unicode meaning (open tanwīn as U+0657/U+065E/U+0656; U+0652 on alef as the rounded-zero sign). The codepoint class table must record the KFGQPC meaning, not the Unicode name. | T0.4 | T1.2 |
 

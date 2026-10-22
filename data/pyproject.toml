@@ -6,7 +6,12 @@ requires-python = "==3.12.*"
 dependencies = []
 
 [dependency-groups]
-dev = ["pytest", "ruff"]
+dev = [
+    "fonttools>=4.67.0",
+    "pytest",
+    "ruff",
+    "uharfbuzz>=0.56.3",
+]
 
 [build-system]
 requires = ["hatchling"]
