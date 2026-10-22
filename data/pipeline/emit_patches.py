@@ -34,7 +34,7 @@ def source_ref(riwayah: str) -> str:
 
 
 @functools.cache
-def _hafs() -> tuple[list[ingest_riwayah.Item], dict[str, dict]]:
+def hafs() -> tuple[list[ingest_riwayah.Item], dict[str, dict]]:
     return ingest_riwayah.load("hafs").items, {r["id"]: r for r in spine.load_records()}
 
 
@@ -42,7 +42,7 @@ def _hafs() -> tuple[list[ingest_riwayah.Item], dict[str, dict]]:
 def derive(riwayah: str) -> tuple[list[align.Pair], list[differ.Change]]:
     """The alignment (T4.3) and the changes (T4.4) for one riwayah."""
     table = load_table()
-    hafs_items, recs = _hafs()
+    hafs_items, recs = hafs()
     pairs = align.align_text(hafs_items, ingest_riwayah.load(riwayah).items)
     return pairs, differ.diff(pairs, recs, lambda t: clusterize(t, table))
 

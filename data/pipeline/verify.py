@@ -24,6 +24,7 @@ from pipeline import (
     emit_patches,
     ingest_layout,
     ingest_riwayah,
+    phase4_report,
     sources,
     spine,
 )
@@ -61,6 +62,8 @@ def check_tracked_files_current() -> list[str]:
             out.append(f"patches/raw/{path.name} differs from a rebuild")
     if ayah_maps.main(["", "check"]) != 0:
         out.append("ayah maps or docs/review/phase4/ayah-maps.md differ from a rebuild")
+    if phase4_report.main(["", "check"]) != 0:
+        out.append("docs/review/phase4/stats.md differs from a rebuild")
     if drift.REPORT_PATH.read_text(encoding="utf-8") != drift.report():
         out.append("docs/review/phase4/version-drift.md differs from a rebuild")
     return out

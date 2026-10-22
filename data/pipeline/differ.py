@@ -118,7 +118,7 @@ def set_marks_payload(old: str, new: str) -> dict | None:
 # --- cluster alignment --------------------------------------------------------------------
 
 
-def _pair_clusters(
+def pair_clusters(
     hs: list[tuple[str, str, str]], rs: list[Cluster]
 ) -> list[tuple[tuple[str, str, str] | None, Cluster | None]]:
     """(id, kind, text) Hafs clusters against riwayah clusters, by base codepoint."""
@@ -194,7 +194,7 @@ def _cluster_changes(rec: dict, r: Item, clusters_of: Clusterizer, seqs: _Seqs) 
 
     mk = functools.partial(Change, level="cluster", item_kind=r.kind, ref=r.ref, surah=r.surah)
 
-    for h, c in _pair_clusters(hs, rs):
+    for h, c in pair_clusters(hs, rs):
         if h is None:
             if c is None:
                 raise ValueError("empty cluster pair")
