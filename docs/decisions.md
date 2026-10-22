@@ -31,6 +31,7 @@ Consequences: what follows, what it rules out
 | D10 | Numeric determinism | accepted |
 | D11 | Spine file format and item IDs | accepted (Phase 1 plan) |
 | D12 | Core model: formats, patch semantics, DB access | accepted (Phase 2 plan); P2 addendum approved (2026-10-22) |
+| D13 | Phase 4 inputs: Bazzi source, single-source, encoding handling | accepted (2026-10-22) |
 
 ---
 
@@ -396,3 +397,28 @@ other points record what building it showed.
   anchor and `seq` as a riwāyah's insert is reported (`IdCollision`) and not applied.
 - **Whole-spine resolution** (G-035): every call rebuilds the tree for all 84k items. Fine for
   tests and data builds; per-page or incremental resolution belongs to T3.6/T7.4.
+
+## D13 — Phase 4 inputs: Bazzi source, single-source texts, encoding differences
+Status: accepted
+Date: 2026-10-22
+Context: Phase 4 derives raw patches for the 7 non-Ḥafṣ riwāyāt from KFGQPC. Three questions
+had to be settled first (G-003, G-007, G-006).
+Decisions (owner, 2026-10-22):
+- **Bazzi source:** keep KFGQPC Bazzi v7 from the 2022 mirror (`kfgqpc-mirror-bazzi-data`,
+  `kfgqpc-mirror-bazzi-font`). The official v2.0 zip was never archived. If it becomes
+  available, Bazzi's patches are re-derived from it like any source change.
+- **Single-source:** Shuʿbah, Warsh, Qālūn, Bazzi, Qunbul, Dūrī and Sūsī have no
+  independent second text. All their derived data carries `single_source: true`. Their
+  accuracy rests on exact reproduction of KFGQPC (round-trip, T4.6) and the owner's review
+  sheets at GATE G2.
+- **Encoding differences:** raw patches stay codepoint-exact against the Ḥafṣ spine, so the
+  round-trip reproduces each KFGQPC text exactly. Each raw patch is additionally *tagged* with
+  the kind of difference it carries (`encoding`, `spelling`, `reading`, or `unclassified`), so
+  stats (T4.7) and review sheets (T4.8) can separate them. Tags are classifications for
+  review, never applied as transformations, and only the owner confirms them. Any
+  encoding conversion layer is deferred to Phase 6.
+Consequences: the T4.4 differ and T4.5 patch format need a `difference_kind` tag (a
+non-semantic field the resolver ignores); classification rules must be data-driven and
+listed in the review sheets with their evidence, and anything they cannot classify is
+`unclassified`, never guessed.
+
