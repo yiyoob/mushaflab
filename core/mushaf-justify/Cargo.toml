@@ -8,6 +8,12 @@ publish.workspace = true
 [dependencies]
 mushaf-model.workspace = true
 mushaf-shape.workspace = true
+regex.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
+sha2.workspace = true
 
 [lints]
 workspace = true

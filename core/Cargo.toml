@@ -39,6 +39,7 @@ zip = { version = "=9.0.5", default-features = false, features = ["deflate"] }
 # Shaping (D3): pinned exactly; read-fonts is the version harfrust itself uses.
 harfrust = "=0.14.0"
 read-fonts = { version = "=0.45.1", default-features = false, features = ["std"] }
+regex = { version = "=1.13.1", default-features = false, features = ["std", "unicode-perl"] }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
