@@ -79,8 +79,9 @@ golden:
 golden-update:
     MUSHAF_UPDATE_GOLDEN=1 cargo test --release {{manifest}} -p mushaf-render-cli --test golden -- --ignored
 
-# Page resolve+shape+justify timing
-bench: (_todo "T3.6")
+# Page resolve+shape+justify timing (release, this machine; T3.6)
+bench:
+    cargo run --release --quiet {{manifest}} -p mushaf-render-cli --bin mushaf-bench
 
 # rustfmt/clippy, ruff, license check
 lint:

@@ -52,3 +52,20 @@ fn a_lone_mark_is_unattached_because_the_font_has_no_dotted_circle() {
             .any(|v| matches!(v, Violation::UnattachedMark { .. }))
     );
 }
+
+#[test]
+fn the_word_cache_returns_what_shaping_returns() {
+    let font = dk_font();
+    let sh = font.shaper();
+    let word: Vec<char> = "\u{0628}\u{064E}\u{0628}".chars().collect();
+    let first = sh.shape(&word, &[]).unwrap();
+    let again = sh.shape(&word, &[]).unwrap();
+    assert_eq!(first, again);
+    assert_eq!(
+        first,
+        font.shaper().shape(&word, &[]).unwrap(),
+        "a fresh shaper agrees"
+    );
+    let s = sh.cache_stats();
+    assert_eq!((s.hits, s.misses), (1, 1));
+}

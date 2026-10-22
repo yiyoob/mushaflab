@@ -97,22 +97,18 @@ impl Renderer {
     }
 
     pub fn fit(&self, resolved: &Resolved, mapping: &Mapping, page: u32) -> Result<FitPage, Error> {
-        let data = FitData {
+        fit_with(self, &self.font.shaper(), resolved, mapping, page)
+    }
+
+    fn fit_data(&self) -> FitData<'_> {
+        FitData {
             profile: &self.profile,
             table: &self.table,
             widths: &self.widths,
             names: &self.names,
             basmalah: &self.basmalah,
             upem: i64::from(self.font.units_per_em()),
-        };
-        fit_page(
-            &self.font.shaper(),
-            &self.regexps,
-            &data,
-            resolved,
-            mapping,
-            page,
-        )
+        }
     }
 
     pub fn draw(&self, fit: &FitPage) -> Result<DrawPage, Error> {
@@ -131,6 +127,17 @@ impl Renderer {
         let mapping = self.map(&resolved)?;
         self.draw(&self.fit(&resolved, &mapping, page)?)
     }
+}
+
+/// Fit a page with a given shaper (whose word cache may be shared across pages, T3.6).
+pub fn fit_with(
+    r: &Renderer,
+    shaper: &mushaf_shape::Shaper,
+    resolved: &Resolved,
+    mapping: &Mapping,
+    page: u32,
+) -> Result<FitPage, Error> {
+    fit_page(shaper, &r.regexps, &r.fit_data(), resolved, mapping, page)
 }
 
 /// Rasterise an SVG page to PNG at `width_px` (height keeps the page's proportions).

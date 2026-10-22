@@ -9,6 +9,8 @@
 //! matcher then treats as exclusive, so single-character ranges never apply (G-019). Ranged
 //! features are therefore built field by field with HarfBuzz semantics (end exclusive).
 
+use std::cell::RefCell;
+use std::collections::HashMap;
 use std::str::FromStr;
 
 use harfrust::{
@@ -95,16 +97,52 @@ impl FontData {
     pub fn shaper(&self) -> Shaper<'_> {
         Shaper {
             shaper: ShaperFont::new(&self.font),
+            cache: RefCell::new(HashMap::new()),
+            stats: RefCell::new(CacheStats::default()),
         }
     }
 }
 
+/// A word's shaping state (characters, feature ranges) and its shaped glyphs.
+type WordCache = HashMap<(Vec<char>, Vec<FeatureRange>), Vec<ShapedGlyph>>;
+
+/// Shaping results are cached per shaper, keyed by the word's whole shaping state: its
+/// characters and its feature ranges (T3.6). Shaping is pure, so the cache cannot change any
+/// output; the map is only looked up, never iterated.
 pub struct Shaper<'a> {
     shaper: ShaperFont<'a, 'a>,
+    cache: RefCell<WordCache>,
+    stats: RefCell<CacheStats>,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct CacheStats {
+    pub hits: u64,
+    pub misses: u64,
 }
 
 impl Shaper<'_> {
+    pub fn cache_stats(&self) -> CacheStats {
+        *self.stats.borrow()
+    }
+
     pub fn shape(
+        &self,
+        text: &[char],
+        features: &[FeatureRange],
+    ) -> Result<Vec<ShapedGlyph>, Error> {
+        let key = (text.to_vec(), features.to_vec());
+        if let Some(hit) = self.cache.borrow().get(&key) {
+            self.stats.borrow_mut().hits += 1;
+            return Ok(hit.clone());
+        }
+        let out = self.shape_uncached(text, features)?;
+        self.stats.borrow_mut().misses += 1;
+        self.cache.borrow_mut().insert(key, out.clone());
+        Ok(out)
+    }
+
+    fn shape_uncached(
         &self,
         text: &[char],
         features: &[FeatureRange],
