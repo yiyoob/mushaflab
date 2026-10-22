@@ -28,6 +28,7 @@ fn run_with(ds: &DataSet, s: &Selection) -> Result<Resolved, ResolveError> {
         &files,
         &ds.option_groups,
         s,
+        None,
         Mode::Data,
     )
 }

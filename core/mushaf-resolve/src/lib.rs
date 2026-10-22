@@ -140,6 +140,8 @@ pub enum ResolveError {
     },
     /// A patch file was written for another spine.
     SpineMismatch { file: String, spine: String },
+    /// A data patch file contains a user-level patch; user edits live only in the overlay.
+    UserPatchInDataFile { patch: String },
     /// A selection or a patch's `when` names an option group that is not loaded.
     UnknownOption { group: String },
     /// A selection or a patch's `when` names a choice the group does not have.
@@ -182,6 +184,12 @@ impl fmt::Display for ResolveError {
                 write!(
                     f,
                     "patch file for spine {file:?} applied to spine {spine:?}"
+                )
+            }
+            ResolveError::UserPatchInDataFile { patch } => {
+                write!(
+                    f,
+                    "user patch {patch:?} in a data file; user edits belong in the overlay"
                 )
             }
             ResolveError::UnknownOption { group } => write!(f, "unknown option group {group:?}"),

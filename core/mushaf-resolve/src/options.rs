@@ -5,7 +5,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use mushaf_model::{OptionGroup, Patch, PatchFile, Spine};
+use mushaf_model::{EditOverlay, OptionGroup, OwnerLevel, Patch, PatchFile, Spine};
 use serde::Serialize;
 
 use crate::{Mode, ResolveError, Resolved, resolve_patches};
@@ -40,13 +40,15 @@ fn choice_for(g: &OptionGroup, sel: &Selection) -> Result<String, ResolveError> 
         })
 }
 
-/// Resolves a stack of patch files for a selection: picks the active option patches, then
+/// Resolves a stack for a selection: data patch files, then the user's edit overlay (T2.5),
+/// which is the only source of the `user` layer. Picks the active option patches, then
 /// applies everything with `resolve_patches`.
 pub fn resolve(
     spine: &Spine,
     files: &[&PatchFile],
     groups: &BTreeMap<String, OptionGroup>,
     sel: &Selection,
+    overlay: Option<&EditOverlay>,
     mode: Mode,
 ) -> Result<Resolved, ResolveError> {
     let group = |id: &str| {
@@ -70,10 +72,24 @@ pub fn resolve(
             spine: spine.id.clone(),
         });
     }
+    if let Some(o) = overlay.filter(|o| o.spine != spine.id) {
+        return Err(ResolveError::SpineMismatch {
+            file: o.spine.clone(),
+            spine: spine.id.clone(),
+        });
+    }
+    let data = files.iter().flat_map(|f| &f.patches);
+    if let Some(p) = data.clone().find(|p| p.owner.level == OwnerLevel::User) {
+        return Err(ResolveError::UserPatchInDataFile {
+            patch: p.id.clone(),
+        });
+    }
     for (id, c) in &sel.choices {
         known_choice(group(id)?, c)?;
     }
-    let patches: Vec<&Patch> = files.iter().flat_map(|f| &f.patches).collect();
+    let patches: Vec<&Patch> = data
+        .chain(overlay.iter().flat_map(|o| &o.patches))
+        .collect();
     let mut used: BTreeSet<&str> = sel.choices.keys().map(String::as_str).collect();
     for p in &patches {
         if let Some(w) = &p.when {
