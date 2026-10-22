@@ -459,6 +459,42 @@
       "sha256": "b1223f20dd15c18ee0658553926c376278b3a165633928f4b2f48bb12bf81bee",
       "size": 1366252,
       "url": "https://s3.us-east-1.wasabisys.com/static-cdn.tarteel.ai/qul-exports/quran-script/1785253229-9cmu7-qpc-warsh-script-wbw.json.zip"
+    },
+    {
+      "acquire": "http",
+      "file": "digitalkhatt/digitalkhatt-js/hb-madina.otf",
+      "group": "digitalkhatt",
+      "id": "digitalkhatt-hb-madina-font",
+      "note": "DigitalKhatt/digitalkhatt-js @ 78372d7. HarfBuzz build of the Madina font used by DigitalKhatt's web justifier (and by quran-madina-html).",
+      "pinned_on": "2026-10-22",
+      "role": "font-candidate",
+      "sha256": "c99d91d61a17d0a6ecc2f9e7eb565e0977b15ec18b9f4c284c7922c129f4dcbb",
+      "size": 2396336,
+      "url": "https://raw.githubusercontent.com/DigitalKhatt/digitalkhatt-js/78372d7a1e211bbab677cc0304384f278f508657/apps/site-angular/src/assets/fonts/hb/madina.otf"
+    },
+    {
+      "acquire": "http",
+      "file": "digitalkhatt/digitalkhatt-js/hb-oldmadina.otf",
+      "group": "digitalkhatt",
+      "id": "digitalkhatt-hb-oldmadina-font",
+      "note": "DigitalKhatt/digitalkhatt-js @ 78372d7. HarfBuzz build of the Old Madina font used by DigitalKhatt's web justifier.",
+      "pinned_on": "2026-10-22",
+      "role": "font-candidate",
+      "sha256": "86fc18f670aec9de17fe7ad310b8cfd86848c41aa966e09c4bf67f5f083d6174",
+      "size": 2238844,
+      "url": "https://raw.githubusercontent.com/DigitalKhatt/digitalkhatt-js/78372d7a1e211bbab677cc0304384f278f508657/apps/site-angular/src/assets/fonts/hb/oldmadina.otf"
+    },
+    {
+      "acquire": "http",
+      "file": "digitalkhatt/digitalkhatt-js/qurantext.service.ts",
+      "group": "digitalkhatt",
+      "id": "digitalkhatt-line-widths",
+      "note": "DigitalKhatt/digitalkhatt-js @ 78372d7. DigitalKhatt's per-line width ratios (newMadinaLineWidths, oldMadinaLineWidths).",
+      "pinned_on": "2026-10-22",
+      "role": "layout-reference",
+      "sha256": "7b268021f51518bdf1c9d020f2ceb21e081de10166ca5faf2e51540510a19e3f",
+      "size": 10593,
+      "url": "https://raw.githubusercontent.com/DigitalKhatt/digitalkhatt-js/78372d7a1e211bbab677cc0304384f278f508657/apps/site-angular/src/app/services/qurantext.service.ts"
     }
   ]
 }

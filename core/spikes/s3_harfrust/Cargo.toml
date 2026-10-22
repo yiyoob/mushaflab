@@ -1,0 +1,13 @@
+# Spike S3 (T0.5): does harfrust reproduce HarfBuzz exactly on the DigitalKhatt Madina
+# font with per-character justification features? Not part of the core workspace.
+[package]
+name = "s3-harfrust"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+harfrust = "=0.14.0"
+serde_json = "1"
+
+[workspace]

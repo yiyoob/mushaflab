@@ -21,7 +21,7 @@ Consequences: what follows, what it rules out
 |---|---|---|
 | D1 | Line policy for non-Ḥafṣ riwāyāt | open (P0 spike, finalized P5) |
 | D2 | Font per riwāyah | proposed (S2 done; coupled with D3) |
-| D3 | Justification implementation | open (G0) |
+| D3 | Justification implementation | proposed (S3 done) |
 | D4 | Draw path | open (P3) |
 | D5 | First platform | accepted (website first) |
 | D6 | Ḥafṣ edition: text + layout + font | proposed (S1 done; final after S2/S3) |
@@ -167,4 +167,42 @@ Options:
 - C: Hybrid: DigitalKhatt for the Mashriqi-script riwāyāt, KFGQPC fonts for Warsh/Qālūn.
 Leaning: decide with D3 at G0. A is the only option complete for all 8 without new font
 work; B/C win only if S3 shows KFGQPC fonts cannot be justified acceptably.
+
+## D3 — Justification implementation
+Status: proposed (evidence from S3)
+Date: 2026-10-21
+Context: Lines must close calligraphically (by stretching letters, as in the print) and
+re-justify at runtime after riwāyah changes, options and free edits, on web, iOS and
+Android, deterministically (D10).
+Evidence: `docs/spikes/s3-justify.md`.
+- DigitalKhatt's justifier (MIT; its Python port in quran-madina-html used as the oracle)
+  runs on **stock HarfBuzz**: it stretches letters by setting per-character values of the
+  Madina font's `cv01`–`cv18` features, then adjusts spaces. No custom HarfBuzz is needed
+  with the `hb/` fonts from `digitalkhatt-js`.
+- On 162 lines from 12 pages every line closed within 0.1%. Adding a mark (U+06DC) does
+  not change a word's width (marks have zero advance); inserting a letter widened the word
+  by 246 units and the line still closed (spaces absorbed it).
+- **harfrust 0.14.0 (pure Rust, MIT) reproduces HarfBuzz 14.6.0 exactly**: 1559/1559 words,
+  13,915 glyphs with identical ids, clusters, advances and offsets, including all 124 words
+  carrying stretch features. It builds for wasm32, iOS (device and simulator) and Android
+  (arm64, x86_64). It needs one workaround: construct `Feature { start, end }` directly,
+  because `Feature::new(…, s..e)` in 0.14.0 drops single-cluster ranges (off-by-one).
+- Spacing alone cannot close lines like the print: word gaps would need a median 2.4×
+  (KFGQPC font, 1441H lines) to 3.75× (DigitalKhatt, 1421H) normal width, p95 4.3×–7.7×.
+- DigitalKhatt's HarfBuzz fork: 33 commits ahead, 6,173 behind upstream, +13.4k/−11.0k
+  lines of C/C++ across 41 files.
+Options:
+- A: Vendor DigitalKhatt's HarfBuzz fork via FFI. Rejected: not needed for the `hb/` fonts,
+  large divergence, C++ cross-builds for wasm/iOS/Android.
+- B: Precomputed per-word features. Rejected: cannot follow runtime edits, options or
+  riwāyah changes.
+- C: Port DigitalKhatt's justifier to Rust in `mushaf-justify`, using the MIT TypeScript
+  original and the quran-madina-html Python port as references, and the Python port as an
+  executable oracle in tests.
+- D: harfrust for shaping (pure Rust), with variable-axis support available if the
+  variable `madinafont` is used later.
+Recommendation: **C on D**: a Rust port of the DigitalKhatt justifier over harfrust
+(pinned exactly), with the 1,559-word parity set kept as a regression test. Calligraphic
+justification then requires DigitalKhatt fonts (D2 options B/C); with KFGQPC fonts only
+spacing (and optionally flat kashida) is available.
 
