@@ -520,5 +520,10 @@ pub fn resolve_patches(
     if mode == Mode::Data && !report.is_empty() {
         return Err(ResolveError::Strict(report));
     }
-    Ok(Resolved { items, report })
+    Ok(Resolved {
+        items,
+        report,
+        choices: BTreeMap::new(),
+        lint: Vec::new(),
+    })
 }

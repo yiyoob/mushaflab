@@ -7,12 +7,16 @@
 
 use std::fmt;
 
+use std::collections::BTreeMap;
+
 use mushaf_model::{Attrs, ClusterKind, ClusterRef, Cps, ItemKind, ItemRef, Layer, Ref};
 use serde::Serialize;
 
 mod engine;
+mod options;
 
 pub use engine::resolve_patches;
+pub use options::{LintNote, Selection, resolve};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Mode {
@@ -101,6 +105,12 @@ pub struct Resolved {
     pub items: Vec<RItem>,
     /// Sorted, so it does not depend on patch order.
     pub report: Vec<Diagnostic>,
+    /// The choice used for every option group the stack depends on (T2.4).
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub choices: BTreeMap<String, String>,
+    /// Advisory notes; never an error, in any mode.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub lint: Vec<LintNote>,
 }
 
 impl Resolved {
@@ -128,6 +138,20 @@ pub enum ResolveError {
         deleting: String,
         patch: String,
     },
+    /// A patch file was written for another spine.
+    SpineMismatch { file: String, spine: String },
+    /// A selection or a patch's `when` names an option group that is not loaded.
+    UnknownOption { group: String },
+    /// A selection or a patch's `when` names a choice the group does not have.
+    UnknownChoice { group: String, choice: String },
+    /// A group the stack depends on has no selection and no default for this riwayah/tariq.
+    NoChoice {
+        group: String,
+        riwayah: String,
+        tariq: Option<String>,
+    },
+    /// A patch depends on a group whose `affects` list does not name it.
+    NotInAffects { group: String, patch: String },
     /// `Mode::Data` and the report is not empty.
     Strict(Vec<Diagnostic>),
 }
@@ -154,6 +178,30 @@ impl fmt::Display for ResolveError {
                 "patch {patch:?} on {key} is inside an item that {deleting:?} deletes in the same \
                  layer ({layer:?})"
             ),
+            ResolveError::SpineMismatch { file, spine } => {
+                write!(
+                    f,
+                    "patch file for spine {file:?} applied to spine {spine:?}"
+                )
+            }
+            ResolveError::UnknownOption { group } => write!(f, "unknown option group {group:?}"),
+            ResolveError::UnknownChoice { group, choice } => {
+                write!(f, "option group {group:?} has no choice {choice:?}")
+            }
+            ResolveError::NoChoice {
+                group,
+                riwayah,
+                tariq,
+            } => write!(
+                f,
+                "option group {group:?}: no selection and no default for {riwayah} {tariq:?}"
+            ),
+            ResolveError::NotInAffects { group, patch } => {
+                write!(
+                    f,
+                    "patch {patch:?} depends on {group:?} but is not in its affects list"
+                )
+            }
             ResolveError::Strict(report) => {
                 write!(f, "data mode: {} report entries: {report:?}", report.len())
             }
