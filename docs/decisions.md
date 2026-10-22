@@ -25,7 +25,7 @@ Consequences: what follows, what it rules out
 | D4 | Draw path | open (P3) |
 | D5 | First platform | accepted (website first) |
 | D6 | Ḥafṣ edition: text + layout + font | proposed (S1 done; final after S2/S3) |
-| D7 | Licensing and distribution | open (G0) |
+| D7 | Licensing and distribution | accepted (owner-declared) |
 | D8 | Script/layout scope | accepted |
 | D9 | ID and patch model details | accepted (revisit end of P2) |
 | D10 | Numeric determinism | accepted |
@@ -229,4 +229,21 @@ Options:
 Leaning: B (C as a safety net), so each riwāyah looks like its own printed muṣḥaf. This
 makes line anchors per-riwāyah data (T2.6 must map patched and inserted clusters to the
 riwāyah layout, not only to Ḥafṣ anchors).
+
+## D7 — Licensing and distribution
+Status: accepted
+Date: 2026-10-21
+Context: Rule 10 requires a license row before any source is copied into a tracked location.
+Decision (owner, 2026-10-21): all sources are treated as open source and no license research
+is done. `data/sources/LICENSES.md` records this per source group.
+Recorded for the owner, as seen incidentally (not researched):
+- Tanzil's file header says CC BY 3.0, verbatim copies only, text may not be changed. It is
+  used read-only as a cross-check (T1.6) and is not shipped.
+- quran-madina-html (Waqf GPL 2.0) is a reference and test oracle, cloned to /tmp only and
+  never vendored. DigitalKhatt's justifier, which the Rust port (D3) follows, is MIT.
+- visualmetafont and DigitalKhatt's LuaLaTeX package are AGPL-3.0 and are not used.
+- harfrust (shaping, D3) is MIT.
+Consequences: fonts and data may be tracked and bundled where the build needs them.
+Revisit before public release (Phase 10) and before any free-edit feature ships, since some
+upstream terms restrict changing the text.
 
