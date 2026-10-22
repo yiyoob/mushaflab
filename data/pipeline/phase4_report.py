@@ -6,7 +6,8 @@
 Counts are by op, by change shape (`bucket`) and by surah, and by difference kind with its
 rule (D21). The last section lists, as evidence for the owner, every Hafs codepoint that a
 riwayah's text never uses, with what it corresponds to in the aligned clusters: candidates
-for owner-confirmed rows in `difference_kinds.yaml`, never applied automatically.
+for owner-confirmed rows in `data/approvals/difference_kinds.yaml`, never applied automatically.
+Ayah-number signs are left out: their changes have their own rule (`ayah-number`).
 """
 
 import sys
@@ -52,7 +53,7 @@ def evidence(riwayah: str) -> list[tuple[str, int, list[tuple[str, int]]]]:
     occ: Counter = Counter()
     fate: dict[str, Counter] = defaultdict(Counter)
     for p in pairs:
-        if not (p.h and p.r):
+        if not (p.h and p.r) or p.h.kind == "ayah_end":
             continue
         hs = [(c["id"], c["kind"], from_cps(c["cps"])) for c in recs[p.h.ref]["clusters"]]
         for h, c in pair_clusters(hs, clusterize(p.r.text, table)):

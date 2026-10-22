@@ -33,7 +33,7 @@ Consequences: what follows, what it rules out
 | D12 | Core model: formats, patch semantics, DB access | accepted (Phase 2 plan); P2 addendum approved (2026-10-22) |
 | D13 | Phase 4 inputs: Bazzi source, single-source, encoding handling | accepted (2026-10-22) |
 | D20 | Phase 4 derivation pipeline: ingest, aligner, differ, emitter | accepted (Phase 4 plan, 2026-10-22) |
-| D21 | Difference-kind tags: what the data can and cannot classify | proposed (owner at G2) |
+| D21 | Difference-kind tags: what the data can and cannot classify | accepted: C, rows owner-signed (2026-10-22) |
 | D22 | Round-trip check for raw patches | accepted (Phase 4 plan, 2026-10-22) |
 
 ---
@@ -466,7 +466,7 @@ the aligner: a poor alignment can only make patches less readable, never wrong.
   third-party crates are optimized in dev/test builds (`core/Cargo.toml`).
 
 ## D21 — Difference-kind tags: what the data can and cannot classify
-Status: proposed (owner decision at GATE G2); implemented conservatively in T4.5
+Status: accepted (owner, 2026-10-22, before GATE G2)
 Date: 2026-10-22
 Context: D13 asks for a `difference_kind` tag per raw patch (`encoding`, `spelling`,
 `reading`, `unclassified`). The rules must be data-driven, evidence must be shown, and
@@ -491,12 +491,25 @@ Options:
   most aligned places). Same objection, with an arbitrary threshold.
 - C (implemented): no automatic `encoding`, `spelling` or `reading`. Rules are: `ayah-number`
   (any change to an ayah-end item) → `unclassified`; `confirmed` → the kind of an
-  owner-confirmed substitution row in `data/pipeline/difference_kinds.yaml` (riwāyah,
+  owner-confirmed substitution row in `data/approvals/difference_kinds.yaml` (riwāyah,
   `from`, `to`, kind, by, date, evidence), applied only when every codepoint difference of a
   cluster change is a confirmed one-for-one substitution of one kind; `default` →
   `unclassified`. The table has no rows. Stats (T4.7) list the candidate substitutions with
   their counts, so the owner can confirm rows.
-Decision: C for now; owner to confirm or choose at GATE G2.
+Decision (owner, 2026-10-22): **C**, with these choices on the evidence in `stats.md`:
+- Confirmed rows live in **`data/approvals/difference_kinds.yaml`**: only owner-signed commits
+  may change it (CI, rule 4); the pipeline reads it and treats a missing file as no rows;
+  Claude never writes it.
+- **U+06E1 → U+0652 in Warsh and Qālūn: `encoding`.** Evidence: U+06E1 never occurs in either
+  text; 32,383 of 37,122 (Warsh) and 36,538 of 37,121 (Qālūn) aligned occurrences are U+0652;
+  G-006. With these rows, 31,906 Warsh and 35,962 Qālūn patches are tagged `encoding`; the
+  5,238 / 1,182 changes that also alter something else stay `unclassified`.
+- **Pause signs U+06DA, U+06D7, U+06D8 → U+06D6: left `unclassified`.** Several Ḥafṣ signs
+  map to one, so it is not a one-to-one encoding; to be decided with a cited source.
+- **U+0671 (alef waṣla): left `unclassified` for now.** Most occurrences become U+0627 plus
+  added marks, which a one-for-one row cannot express; revisit with the encoding conversion
+  (Phase 6), possibly with cluster-form rows.
+- U+06ED → U+06E2, U+06E0 and U+06E4 were not confirmed.
 Consequences: until rows are confirmed, every raw patch is `unclassified`, and the stats
 separate differences by op shape (marks / letter / word / separator / ayah number), not by
 kind. Adding a confirmed row changes only tags, never text, and is rebuilt by `data-build`.

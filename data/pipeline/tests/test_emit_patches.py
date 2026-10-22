@@ -64,8 +64,21 @@ def test_item_changes_are_never_confirmed() -> None:
     assert classify.classify(sep, {(" ", "\u00a0"): "encoding"}).kind == "unclassified"
 
 
-def test_tracked_rule_table_is_valid_and_has_no_rows_yet() -> None:
-    assert all(rows == {} for rows in load_confirmed().values())
+def test_rows_come_from_the_owner_signed_approvals_dir(tmp_path: Path) -> None:
+    assert classify.RULES_PATH.parent.name == "approvals"
+    assert all(rows == {} for rows in load_confirmed(tmp_path / "missing.yaml").values())
+    load_confirmed()  # the tracked file, if the owner has committed it, must be valid
+
+
+def test_a_valid_row_is_read(tmp_path: Path) -> None:
+    p = tmp_path / "kinds.yaml"
+    p.write_text(
+        'confirmed:\n  - {riwayah: "warsh", from: "U+06E1", to: "U+0652", kind: "encoding",'
+        ' by: "o", date: "2026-10-22", evidence: "stats.md"}\n',
+        encoding="ascii",
+    )
+    assert load_confirmed(p)["warsh"] == {("\u06e1", "\u0652"): "encoding"}
+    assert load_confirmed(p)["qalun"] == {}
 
 
 @pytest.mark.parametrize(

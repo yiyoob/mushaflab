@@ -19,7 +19,7 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from pipeline import ayah_maps, emit_patches, kfgqpc
+from pipeline import ayah_maps, classify, emit_patches, kfgqpc
 from pipeline.align import Pair
 from pipeline.differ import Change
 from pipeline.phase4_report import BUCKETS, bucket
@@ -106,6 +106,8 @@ def sheet(riwayah: str) -> str:
     counts = Counter(pattern(c) for c in changes if pattern(c))
     frequent = {k for k, n in counts.items() if n >= FREQUENT}
     findings = ayah_maps.findings(riwayah)
+    confirmed = classify.load_confirmed()[riwayah]
+    tags = Counter((t.kind, t.rule) for t in (classify.classify(c, confirmed) for c in changes))
     head = [
         "<!doctype html><html lang=en><head><meta charset=utf-8>",
         '<meta name=viewport content="width=device-width, initial-scale=1">',
@@ -119,8 +121,10 @@ def sheet(riwayah: str) -> str:
         " <code>raw-derived</code> and <code>single_source</code>; the text they produce is"
         " checked codepoint for codepoint by <code>just roundtrip</code>. Hafs words use the"
         " KFGQPC Hafs font, riwayah words the KFGQPC font of this riwayah.</p>",
-        "<p><b>Difference kinds (D21, proposed):</b> every patch is <code>unclassified</code>; the"
-        " data cannot tell encoding from spelling or reading. The buckets below describe the"
+        "<p><b>Difference kinds (D21):</b> "
+        + ", ".join(f"{k} ({rule}): {n}" for (k, rule), n in sorted(tags.items()))
+        + ". Only owner-confirmed rows (<code>data/approvals/difference_kinds.yaml</code>) tag a"
+        " patch as anything but <code>unclassified</code>. The buckets below describe the"
         " edit, not its cause.</p>",
     ]
     by_bucket = Counter(bucket(c) for c in changes)

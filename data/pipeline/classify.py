@@ -4,11 +4,22 @@ Rules, in order (the rule id is reported in stats and review sheets):
   * `ayah-number`: any change to an ayah-end item (renumbering, merged or split ayahs)
     -> `unclassified`;
   * `confirmed`: a cluster change whose codepoint differences are all one-for-one
-    substitutions listed for its riwayah in `difference_kinds.yaml` (owner-confirmed rows)
-    -> that row's kind;
+    substitutions confirmed for its riwayah -> that row's kind;
   * `default` -> `unclassified`.
 No other rule exists: the pinned data cannot tell an encoding difference from a spelling or
 reading difference without the owner's judgment (D21, with the evidence in the stats).
+
+Confirmed rows live in `data/approvals/difference_kinds.yaml` (owner decision, D21): only
+owner-signed commits may change that directory (CI, rule 4), and Claude never writes it.
+A missing file means no confirmed rows. Its form:
+
+    confirmed:
+      - {riwayah: "warsh", from: "U+06E1", to: "U+0652", kind: "encoding",
+         by: "<owner>", date: "YYYY-MM-DD", evidence: "<where the evidence is>"}
+
+A row says: in that riwayah, the Hafs codepoint `from`, written as `to` at the same position,
+is a difference of `kind`. A patch is tagged only if every codepoint difference it carries is
+a confirmed row of one kind; otherwise it stays `unclassified`.
 """
 
 import difflib
@@ -20,7 +31,7 @@ from pipeline.compile_db import load_yaml
 from pipeline.differ import Change
 from pipeline.spine import from_cps
 
-RULES_PATH = Path(__file__).with_name("difference_kinds.yaml")
+RULES_PATH = Path(__file__).resolve().parents[1] / "approvals" / "difference_kinds.yaml"
 KINDS = ("encoding", "spelling", "reading", "unclassified")
 ROW_KEYS = frozenset({"riwayah", "from", "to", "kind", "by", "date", "evidence"})
 
@@ -45,6 +56,8 @@ def _one_cp(value: object, where: str) -> str:
 
 
 def load_confirmed(path: Path = RULES_PATH) -> dict[str, Confirmed]:
+    if not path.exists():
+        return {r: {} for r in kfgqpc.RIWAYAT[1:]}
     data = load_yaml(path)
     if not isinstance(data, dict) or set(data) != {"confirmed"}:
         raise RuleError(f"{path}: expected a mapping with only `confirmed`")
