@@ -324,7 +324,9 @@ def letterform_section(all_fonts: dict[str, Font]) -> None:
     sample = next(
         r
         for r in warsh
-        if "ف" in r["aya_text"] and "ق" in r["aya_text"] and len(r["aya_text"].split(" ")) <= 6
+        if "\u0641" in r["aya_text"]
+        and "\u0642" in r["aya_text"]
+        and len(r["aya_text"].split(" ")) <= 6
     )
     text = sample["aya_text"]
     out(
