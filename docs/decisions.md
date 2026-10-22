@@ -24,7 +24,7 @@ Consequences: what follows, what it rules out
 | D3 | Justification implementation | accepted: Rust port on harfrust |
 | D4 | Draw path | open (P3) |
 | D5 | First platform | accepted (website first) |
-| D6 | Ḥafṣ edition: text + layout + font | **reopened** (G-031): print follows 1421H layout |
+| D6 | Ḥafṣ edition: text + layout + font | accepted: 1441H digital layout (reconfirmed 2026-10-22) |
 | D7 | Licensing and distribution | accepted (owner-declared) |
 | D8 | Script/layout scope | accepted |
 | D9 | ID and patch model details | accepted (revisit end of P2) |
@@ -293,4 +293,20 @@ Decision:
   character can hide in tracked data or its diffs.
 - Lossless invariant (tested): per ayah, `sep_before + cps + sep_after` over all items
   reproduces KFGQPC's `aya_text` byte for byte.
+
+### D6 addendum — reconfirmed after the print comparison (2026-10-22)
+The Phase 1 review found that the owner's printed muṣḥaf and KFGQPC's scanned "Medium Medina
+Mushaf" follow the 1421H line layout (QUL V2), while the layout built in Phase 1 follows
+KFGQPC's digital 1441H data (QUL V4, `quran-qcf4`, KFGQPC per-ayah page fields, which agree
+with each other). They differ on 1,666 lines across 375 pages, mostly an ayah marker at the
+end of a line versus the start of the next (`docs/review/layout-edition-check.md`).
+Decision (owner, 2026-10-22): **keep the 1441H digital layout as built**, knowing it differs
+from the owner's printed copy.
+Consequences:
+- Layout correctness is established by agreement of the three digital 1441H sources, not by
+  comparison with the owner's print; where those sources disagree (G-011), the evidence is
+  recorded per correction.
+- Owner spot checks against a printed copy are expected to show these differences and are not
+  an acceptance criterion for this layout.
+- The rule-5 exception for DigitalKhatt Madina (a 1421H design) on 1441H lines stays (D2).
 
