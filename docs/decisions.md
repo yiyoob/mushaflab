@@ -27,10 +27,10 @@ Consequences: what follows, what it rules out
 | D6 | Ḥafṣ edition: text + layout + font | accepted: 1441H digital layout (reconfirmed 2026-10-22) |
 | D7 | Licensing and distribution | accepted (owner-declared) |
 | D8 | Script/layout scope | accepted |
-| D9 | ID and patch model details | accepted (revisited end of P2: no change proposed) |
+| D9 | ID and patch model details | accepted; P2 addendum approved at the Phase 2 gate (2026-10-22) |
 | D10 | Numeric determinism | accepted |
 | D11 | Spine file format and item IDs | accepted (Phase 1 plan) |
-| D12 | Core model: formats, patch semantics, DB access | accepted (Phase 2 plan) |
+| D12 | Core model: formats, patch semantics, DB access | accepted (Phase 2 plan); P2 addendum approved (2026-10-22) |
 
 ---
 
@@ -373,19 +373,25 @@ separator changes = item `replace`). Riwāyah profiles (T5.1) choose which patch
 stack. Revisit together with D9 at the end of Phase 2.
 
 ### D9 / D12 addendum — revisited at the end of Phase 2 (2026-10-22)
-Status: for owner review at the end of Phase 2. No change to D9 is proposed; these are what
-building it showed.
+Status: approved by the owner at the Phase 2 gate (2026-10-22), with one owner decision on
+line attachment (below). Phase 2 is approved as built. No other change to D9 is made; the
+other points record what building it showed.
 - **Implemented as decided**, with these consequences found while building (all tested in
   `core/mushaf-resolve/tests/`): patch ids must be unique across the whole active stack (the
   Phase 4 differ must emit globally unique ids, e.g. prefixed with the riwāyah); user-level
   patches are accepted only from the edit overlay, never from data files; patches built in
   code go through the same validation as parsed ones; an item left with no clusters is
   reported (`EmptyItem`), so data builds fail on it.
-- **Line attachment at a line start** (T2.6, plan rule "inserted clusters attach to the
-  previous anchor"): an item inserted *before* the first item of a line lands at the end of the
-  previous line. This follows the plan, but a riwāyah word that belongs at a line start will
-  sit on the previous line on the Ḥafṣ anchors. Native layouts per riwāyah (D1) will
-  supply their own anchors in Phase 5; the owner may prefer a different rule for that case.
+- **Line attachment at a line start** (T2.6). The plan's first rule ("inserted clusters attach
+  to the previous anchor") put an item inserted *before* a line's first item at the end of the
+  previous line. **Owner decision (Phase 2 gate, 2026-10-22):** an insert-before joins the line
+  of the word it precedes, and an insert-after joins the line of the word it follows; nested
+  inserts follow the same rule relative to their own anchor. So every inserted item belongs to
+  the line of the spine item its id starts with (`s:a:n` in `s:a:n+ins.k...`), whether or not
+  that item is deleted. Deleted anchors still contribute nothing (their line starts or ends
+  at the next surviving item). Implemented in `mushaf-resolve` (`Origin::Inserted { anchor }`)
+  and `mushaf-layout`, with tests in `core/mushaf-layout/tests/mapping.rs`; PROJECT_PLAN T2.6
+  updated. Native layouts per riwāyah (D1) still supply their own anchors in Phase 5.
 - **Insert-id collisions after switching riwāyah** (G-034): an overlay insert with the same
   anchor and `seq` as a riwāyah's insert is reported (`IdCollision`) and not applied.
 - **Whole-spine resolution** (G-035): every call rebuilds the tree for all 84k items. Fine for

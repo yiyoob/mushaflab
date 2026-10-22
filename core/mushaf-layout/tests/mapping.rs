@@ -86,13 +86,54 @@ fn identity_follows_the_layout_anchors() {
     assert!(matches!(m.lines[4].kind, LineKind::Basmalah));
 }
 
+// Owner decision at the Phase 2 gate (2026-10-22): an insert-before joins the line of the word
+// it precedes, an insert-after the line of the word it follows; nested inserts follow their
+// own anchor, so every insert goes to the line of the spine item its id starts with.
+
 #[test]
-fn inserted_items_attach_to_the_previous_anchor() {
+fn an_insert_before_a_line_start_joins_that_line() {
+    let (r, m) = map(
+        &[patch("b", "insert_before", "1:2:0", &word(1))],
+        Mode::Data,
+    );
+    let l = lines(&r, &m);
+    assert_eq!(l[1].1, s(&["1:1:1", "1:1:2", "1:1:3"]));
+    assert_eq!(
+        l[2].1,
+        s(&["1:2:0+ins.1", "1:2:0", "1:2:1", "1:2:2", "1:2:3"])
+    );
+}
+
+#[test]
+fn an_insert_after_a_line_end_stays_on_that_line() {
+    let (r, m) = map(&[patch("a", "insert_after", "1:1:3", &word(1))], Mode::Data);
+    let l = lines(&r, &m);
+    assert_eq!(l[1].1, s(&["1:1:1", "1:1:2", "1:1:3", "1:1:3+ins.1"]));
+    assert_eq!(l[2].1, s(&["1:2:0", "1:2:1", "1:2:2", "1:2:3"]));
+}
+
+#[test]
+fn an_insert_before_the_first_spine_item_joins_its_line() {
+    let (r, m) = map(
+        &[patch("c", "insert_before", "1:1:1", &word(1))],
+        Mode::Data,
+    );
+    assert_eq!(
+        lines(&r, &m)[1].1,
+        s(&["1:1:1+ins.1", "1:1:1", "1:1:2", "1:1:3"])
+    );
+}
+
+#[test]
+fn nested_inserts_follow_their_own_anchor() {
     let (r, m) = map(
         &[
-            patch("a", "insert_after", "1:1:3", &word(1)), // after a line's last anchor
-            patch("b", "insert_before", "1:2:0", &word(1)), // before a line's first anchor
-            patch("c", "insert_before", "1:1:1", &word(1)), // before the first spine item
+            patch("a", "insert_after", "1:1:3", &word(1)),
+            patch("b", "insert_before", "1:2:0", &word(1)),
+            patch("a1", "insert_after", "1:1:3+ins.1", &word(1)),
+            patch("a2", "insert_before", "1:1:3+ins.1", &word(2)),
+            patch("b1", "insert_before", "1:2:0+ins.1", &word(1)),
+            patch("b2", "insert_after", "1:2:0+ins.1", &word(2)),
         ],
         Mode::Data,
     );
@@ -100,15 +141,26 @@ fn inserted_items_attach_to_the_previous_anchor() {
     assert_eq!(
         l[1].1,
         s(&[
-            "1:1:1+ins.1",
             "1:1:1",
             "1:1:2",
             "1:1:3",
+            "1:1:3+ins.1+ins.2",
             "1:1:3+ins.1",
-            "1:2:0+ins.1"
+            "1:1:3+ins.1+ins.1"
         ])
     );
-    assert_eq!(l[2].1, s(&["1:2:0", "1:2:1", "1:2:2", "1:2:3"]));
+    assert_eq!(
+        l[2].1,
+        s(&[
+            "1:2:0+ins.1+ins.1",
+            "1:2:0+ins.1",
+            "1:2:0+ins.1+ins.2",
+            "1:2:0",
+            "1:2:1",
+            "1:2:2",
+            "1:2:3"
+        ])
+    );
 }
 
 #[test]
@@ -122,6 +174,23 @@ fn deleted_anchors_fall_through_to_surviving_items() {
         Mode::Data,
     );
     assert_eq!(lines(&r, &m)[2].1, s(&["1:2:1", "1:2:2", "1:2:3+ins.1"]));
+}
+
+#[test]
+fn inserts_next_to_deleted_line_edge_anchors_keep_their_anchor_line() {
+    // the anchors are deleted in the same layer (a replacement), the inserts stay on their line
+    let (r, m) = map(
+        &[
+            patch("d0", "delete", "1:2:0", ""),
+            patch("i0", "insert_before", "1:2:0", &word(1)),
+            patch("d1", "delete", "1:1:3", ""),
+            patch("i1", "insert_after", "1:1:3", &word(1)),
+        ],
+        Mode::Data,
+    );
+    let l = lines(&r, &m);
+    assert_eq!(l[1].1, s(&["1:1:1", "1:1:2", "1:1:3+ins.1"]));
+    assert_eq!(l[2].1, s(&["1:2:0+ins.1", "1:2:1", "1:2:2", "1:2:3"]));
 }
 
 #[test]

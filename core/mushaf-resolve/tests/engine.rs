@@ -119,27 +119,17 @@ fn inserted_items_are_ordered_by_seq_on_each_side() {
         .find(|i| i.id.to_string() == "1:1:2+ins.1+ins.1")
         .unwrap();
     assert_eq!(ins.clusters[0].id.to_string(), "1:1:2+ins.1+ins.1:1");
-    assert_eq!(
-        ins.origin,
-        Origin::Inserted {
-            after_spine: Some(1)
-        }
-    );
+    assert_eq!(ins.origin, Origin::Inserted { anchor: 1 });
     let before = r
         .items
         .iter()
         .find(|i| i.id.to_string() == "1:1:2+ins.3")
         .unwrap();
-    assert_eq!(
-        before.origin,
-        Origin::Inserted {
-            after_spine: Some(0)
-        }
-    );
+    assert_eq!(before.origin, Origin::Inserted { anchor: 1 });
 }
 
 #[test]
-fn insert_before_the_first_item_has_no_preceding_anchor() {
+fn an_insert_before_the_first_item_is_anchored_to_it() {
     let r = ok(&[patch(
         "i",
         "riwayah",
@@ -147,7 +137,7 @@ fn insert_before_the_first_item_has_no_preceding_anchor() {
         "1:1:1",
         &word(1, "U+0071"),
     )]);
-    assert_eq!(r.items[0].origin, Origin::Inserted { after_spine: None });
+    assert_eq!(r.items[0].origin, Origin::Inserted { anchor: 0 });
 }
 
 #[test]

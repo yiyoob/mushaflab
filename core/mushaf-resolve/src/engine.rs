@@ -342,32 +342,23 @@ impl<'s> Tree<'s> {
 
     fn flatten(&self, report: &mut Vec<Diagnostic>) -> Vec<RItem> {
         let mut out = Vec::new();
-        let mut last_spine = None;
         for pos in 0..self.spine.items.len() {
-            self.walk_item(pos, &mut last_spine, &mut out, report);
+            self.walk_item(pos, pos, &mut out, report);
         }
         out
     }
 
-    fn walk_item(
-        &self,
-        i: usize,
-        last_spine: &mut Option<usize>,
-        out: &mut Vec<RItem>,
-        report: &mut Vec<Diagnostic>,
-    ) {
+    /// `root` is the spine position of the item whose subtree this is: every insert chain
+    /// starts at a spine item, and that item's line is the insert's line (owner decision at
+    /// the Phase 2 gate).
+    fn walk_item(&self, i: usize, root: usize, out: &mut Vec<RItem>, report: &mut Vec<Diagnostic>) {
         let node = &self.items[i];
         for &(_, c) in &node.before {
-            self.walk_item(c, last_spine, out, report);
+            self.walk_item(c, root, out, report);
         }
         let origin = match node.spine_pos {
-            Some(pos) => {
-                *last_spine = Some(pos);
-                Origin::Spine { pos }
-            }
-            None => Origin::Inserted {
-                after_spine: *last_spine,
-            },
+            Some(pos) => Origin::Spine { pos },
+            None => Origin::Inserted { anchor: root },
         };
         if !node.deleted {
             let mut clusters = Vec::new();
@@ -391,7 +382,7 @@ impl<'s> Tree<'s> {
             });
         }
         for &(_, c) in &node.after {
-            self.walk_item(c, last_spine, out, report);
+            self.walk_item(c, root, out, report);
         }
     }
 }

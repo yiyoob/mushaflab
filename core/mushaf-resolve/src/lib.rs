@@ -32,9 +32,11 @@ pub enum Mode {
 pub enum Origin {
     /// The spine item at this position.
     Spine { pos: usize },
-    /// An inserted item; `after_spine` is the nearest spine node before it in reading order
-    /// (deleted or not), or None if it precedes the first spine item.
-    Inserted { after_spine: Option<usize> },
+    /// An inserted item; `anchor` is the spine position of the item its insert chain starts
+    /// from (the `s:a:n` its id begins with), deleted or not. An insert before or after that
+    /// item, or nested inside such an insert, belongs to that item's line (owner decision at
+    /// the Phase 2 gate, 2026-10-22).
+    Inserted { anchor: usize },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]

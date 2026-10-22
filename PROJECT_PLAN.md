@@ -291,7 +291,7 @@ Goal: the heart of "everything is changeable", tested without any rendering.
 - **T2.3 Patch engine.** All ops from §3.2, conflict detection, deterministic order. *Accept:* unit and property tests: identity (no patches gives the spine), determinism, order-independence of non-conflicting patches, conflicts raise errors.
 - **T2.4 Option resolution.** Option groups, defaults per riwāyah/ṭarīq, priority order.
 - **T2.5 User edit overlay.** Highest priority layer, serializable as a patch file.
-- **T2.6 Line mapping.** Map resolved clusters back to lines via spine anchors. Inserted clusters attach to the previous anchor; deleted anchors fall through to the next surviving cluster. *Accept:* every resolved cluster is in exactly one line; line order preserved.
+- **T2.6 Line mapping.** Map resolved clusters back to lines via spine anchors. An insert-before joins the line of the word it precedes and an insert-after the line of the word it follows; nested inserts follow the same rule relative to their own anchor (owner decision, Phase 2 gate 2026-10-22). Deleted anchors fall through to the next surviving cluster. *Accept:* every resolved cluster is in exactly one line; line order preserved.
 - **T2.7 Golden.** Resolved Ḥafṣ text per page equals the source. *Accept:* `just core-test`.
 
 ---

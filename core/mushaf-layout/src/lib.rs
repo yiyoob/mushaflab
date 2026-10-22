@@ -2,10 +2,12 @@
 //!
 //! A layout gives each text line its first and last spine item. A resolved item belongs to the
 //! line holding its spine anchor: a spine item's own position, or for an inserted item the
-//! nearest spine node before it in reading order (deleted or not), or the first text line if
-//! there is none. A deleted anchor contributes nothing, so its line starts (or ends) at the
-//! next surviving item. Because anchors never decrease in reading order, each line holds a
-//! contiguous run of resolved items, and the runs cover all of them in order.
+//! spine item its insert chain starts from, deleted or not. So an insert-before joins the line
+//! of the word it precedes and an insert-after the line of the word it follows, and nested
+//! inserts follow their own anchor (owner decision at the Phase 2 gate, 2026-10-22). A deleted
+//! anchor contributes nothing, so its line starts (or ends) at the next surviving item.
+//! Because anchors never decrease in reading order, each line holds a contiguous run of
+//! resolved items, and the runs cover all of them in order.
 
 use std::fmt;
 use std::ops::Range;
@@ -131,11 +133,8 @@ pub fn map_lines(
     // the text line (index into `starts`) of each resolved item
     let mut text_line = Vec::with_capacity(resolved.items.len());
     for it in &resolved.items {
-        let anchor = match it.origin {
-            Origin::Spine { pos } => Some(pos),
-            Origin::Inserted { after_spine } => after_spine,
-        };
-        let t = anchor.map_or(0, |p| starts.partition_point(|&(_, s)| s <= p) - 1);
+        let (Origin::Spine { pos: anchor } | Origin::Inserted { anchor }) = it.origin;
+        let t = starts.partition_point(|&(_, s)| s <= anchor) - 1;
         if text_line.last().is_some_and(|&prev| prev > t) {
             return Err(LayoutError::OutOfOrder {
                 item: it.id.to_string(),
