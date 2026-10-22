@@ -328,7 +328,7 @@ Runs after Phase 2 and before Phase 3 (see execution order). Order: `shuba` → 
 - **T4.7 Stats.** Per riwāyah: counts by op type, by surah, and by "mark-only" vs "consonant change". These show how much is uṣūl and how much is farsh/rasm.
 - **T4.8 Review sheets.** Generate HTML sheets for the owner to review per surah. Include known-tricky cases: 3:133 (Warsh drops the initial wāw of *sāriʿū*), 2:184 and 2:10 (Ḥafṣ vs Warsh word differences, with Warsh numbering shifts). These are `hypothesis` until the owner confirms them against a cited source; the sheet shows what the data says, it does not assert it.
 
-**GATE G2:** owner reviews the stats and a sample of patches for each riwāyah. Raw patches are not yet claimed to be correct qirāʾāt knowledge. They are exact mirrors of KFGQPC.
+**GATE G2:** owner reviews the stats and a sample of patches for each riwāyah. Raw patches are not yet claimed to be correct qirāʾāt knowledge. They are exact mirrors of KFGQPC. **Passed 2026-10-22 (owner); see the G2 record in `docs/decisions.md`.**
 
 ---
 

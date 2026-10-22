@@ -160,7 +160,9 @@ def hypothesis_rows() -> list[str]:
         "",
         "Each line states what the pinned data shows for a statement the plan makes without a"
         " cited source. They stay **hypothesis** until the owner confirms them against a cited"
-        " source (CLAUDE.md rule 1).",
+        " source (CLAUDE.md rule 1). Owner decision at GATE G2 (2026-10-22): kept as"
+        " hypotheses, as documented observations and not tests; revisit when a cited source"
+        " is available (G-074).",
         "",
         "| Statement (hypothesis) | What the data shows |",
         "|---|---|",
