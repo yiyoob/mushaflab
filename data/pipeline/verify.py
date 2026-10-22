@@ -15,7 +15,7 @@ from collections.abc import Callable
 from itertools import pairwise
 from pathlib import Path
 
-from pipeline import codepoints, compile_db, ingest_layout, sources, spine
+from pipeline import codepoints, compile_db, ingest_layout, ingest_riwayah, sources, spine
 
 GOLDEN = Path(__file__).resolve().parents[2] / "tests" / "golden" / "page_boundaries.json"
 
@@ -38,6 +38,9 @@ def check_tracked_files_current() -> list[str]:
         out.append("layout file differs from a rebuild")
     if codepoints.main(["", "check"]) != 0:
         out.append("codepoint table is stale")
+    report = ingest_riwayah.REPORT_PATH
+    if not report.exists() or report.read_text(encoding="utf-8") != ingest_riwayah.report():
+        out.append("docs/review/phase4/ingest.md differs from a rebuild")
     return out
 
 

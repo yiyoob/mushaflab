@@ -9,7 +9,8 @@ Rules (each needed because the pinned sources encode these differently, see S1/S
     lone hamza U+0621 (not part of the letter skeleton);
   * alef with hamza above/below, alef with madda and alef wasla -> alef U+0627;
   * waw with hamza -> waw U+0648;
-  * yeh with hamza, yeh and Farsi yeh -> alef maqsura U+0649 (dotless form).
+  * yeh with hamza, yeh, Farsi yeh and yeh barree (U+06D2, used by the KFGQPC Warsh and
+    Qalun texts, D20) -> alef maqsura U+0649 (dotless form).
 """
 
 SKELETON_MAP = str.maketrans(
@@ -22,6 +23,7 @@ SKELETON_MAP = str.maketrans(
         "\u0626": "\u0649",
         "\u064a": "\u0649",
         "\u06cc": "\u0649",
+        "\u06d2": "\u0649",
     }
 )
 FIRST_LETTER, LAST_LETTER, TATWEEL = "\u0622", "\u064a", "\u0640"

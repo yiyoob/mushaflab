@@ -27,5 +27,10 @@ def test_yeh_and_alef_maqsura_are_unified() -> None:
     assert skeleton(YEH) == skeleton(ALEF_MAQSURA) == ALEF_MAQSURA
 
 
+def test_yeh_barree_joins_the_yeh_family() -> None:
+    # D20: KFGQPC Warsh/Qalun write U+06D2; comparison only, stored text is unchanged.
+    assert skeleton(BEH + "\u06d2") == BEH + ALEF_MAQSURA
+
+
 def test_spaces_signs_and_digits_are_dropped() -> None:
     assert skeleton(BEH + " " + "\u06de" + "\u06e9" + "\u0661" + "\ufc00" + BEH) == BEH + BEH

@@ -32,6 +32,7 @@ Consequences: what follows, what it rules out
 | D11 | Spine file format and item IDs | accepted (Phase 1 plan) |
 | D12 | Core model: formats, patch semantics, DB access | accepted (Phase 2 plan); P2 addendum approved (2026-10-22) |
 | D13 | Phase 4 inputs: Bazzi source, single-source, encoding handling | accepted (2026-10-22) |
+| D20 | Phase 4 derivation pipeline: ingest, aligner, differ, emitter | accepted (Phase 4 plan, 2026-10-22) |
 
 ---
 
@@ -422,3 +423,37 @@ non-semantic field the resolver ignores); classification rules must be data-driv
 listed in the review sheets with their evidence, and anything they cannot classify is
 `unclassified`, never guessed.
 
+## D20 — Phase 4 derivation pipeline: ingest, aligner, differ, emitter
+Status: accepted (approved with the Phase 4 plan, 2026-10-22)
+Date: 2026-10-22
+Context: T4.1–T4.5 turn each KFGQPC riwāyah text into raw patches on the Ḥafṣ spine that
+reproduce it codepoint for codepoint (D13). Each step must be deterministic and must report,
+never guess.
+Decision:
+- **Ingest** (`pipeline/ingest_riwayah.py`, T4.1): one parser for all 8 texts. `ingest_kfgqpc`
+  stays the spine's parser, and a test checks that both give identical Ḥafṣ items. Ayah
+  numbers are a U+FC00 sign or, for Bazzi v7, Arabic-Indic digits (`AYAH_NUMBER_STYLE`).
+  Structural departures (`leading_separator`, `multi_separator`, `hizb_inside_ayah`,
+  `attached_ayah_number`, `digit_ayah_number`) are accepted only from the exact per-riwāyah
+  `ANOMALIES` list: found-but-unlisted and listed-but-not-found are both errors (G-070). The
+  ingested texts are rebuilt from verified sources and not tracked;
+  `docs/review/phase4/ingest.md` is tracked and checked by `data-verify`.
+- **Skeleton**: the one normalization function (`normalize.skeleton`) also maps yeh barree
+  U+06D2 to U+0649. It is used only for comparison, never on stored text. Without it, about
+  3,000 Warsh/Qālūn words would not align.
+- **Aligner** (T4.3): per surah, an LCS over tokens (word skeletons, ayah ends, hizb signs),
+  so ayah ends act as anchors. Replace blocks pair words by position (n = m) or by skeleton
+  edit distance (n ≠ m). Every pair with different skeletons and every unpaired word is listed
+  in the alignment report.
+- **Differ** (T4.4): paired words become cluster ops (`set_marks` when the base letter is
+  equal, checked by simulating the resolver; `replace` otherwise; cluster `delete`/`insert`).
+  Separator changes become an item `replace`. Unpaired words become an item `delete` plus an
+  item insert anchored on the neighbouring Ḥafṣ item (D12 replacement). Ayah-end changes are
+  ordinary item and cluster ops.
+- **Emitter** (T4.5): `data/patches/raw/<riwayah>.yaml`, one flow-style patch per line, every
+  string quoted, ASCII only. Patch ids are `<riwayah>.<key>.<op>`, unique across the stack.
+  Every patch has `status: raw-derived`, `single_source: true` and a `difference_kind` (D21).
+  Output is deterministic and rebuilt by `just data-build`.
+Consequences: the patch files are large where encodings differ (Warsh/Qālūn), since every
+codepoint difference is a patch (D13). Exactness is proved by the round-trip (T4.6), not by
+the aligner: a poor alignment can only make patches less readable, never wrong.
