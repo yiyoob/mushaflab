@@ -29,3 +29,5 @@ ignore = ["S603", "S607"]  # subprocess with fixed git arguments is expected
 
 [tool.ruff.lint.per-file-ignores]
 "pipeline/tests/*" = ["S101", "PLR2004", "ANN"]
+# Exploratory Phase 0 spikes: report-generating scripts, not pipeline code.
+"spikes/*" = ["PLR2004", "PLR0912", "PLR0915"]
