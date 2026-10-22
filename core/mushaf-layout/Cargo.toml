@@ -8,6 +8,11 @@ publish.workspace = true
 [dependencies]
 mushaf-model.workspace = true
 mushaf-resolve.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+mushaf-db.workspace = true
+proptest.workspace = true
 
 [lints]
 workspace = true

@@ -318,8 +318,11 @@ dependencies = [
 name = "mushaf-layout"
 version = "0.0.0"
 dependencies = [
+ "mushaf-db",
  "mushaf-model",
  "mushaf-resolve",
+ "proptest",
+ "serde",
 ]
 
 [[package]]

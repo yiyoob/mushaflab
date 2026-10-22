@@ -6,7 +6,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{Error, ItemRef};
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case", tag = "type")]
 pub enum LineKind {
     Text { first: ItemRef, last: ItemRef },
     SurahName { surah: u32 },
