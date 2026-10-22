@@ -29,6 +29,7 @@ Consequences: what follows, what it rules out
 | D8 | Script/layout scope | accepted |
 | D9 | ID and patch model details | accepted (revisit end of P2) |
 | D10 | Numeric determinism | accepted |
+| D11 | Spine file format and item IDs | accepted (Phase 1 plan) |
 
 ---
 
@@ -273,4 +274,23 @@ Recorded for the owner, as seen incidentally (not researched):
 Consequences: fonts and data may be tracked and bundled where the build needs them.
 Revisit before public release (Phase 10) and before any free-edit feature ships, since some
 upstream terms restrict changing the text.
+
+## D11 — Spine file format and item IDs
+Status: accepted (approved with the Phase 1 plan)
+Date: 2026-10-21
+Context: The spine must be tracked text (rule 3), lossless, reviewable in diffs, and give
+every word, sign and cluster a stable ID.
+Decision:
+- Files under `data/spine/hafs/v1/` (`script_id: uthmani`, `spine_version: 1`):
+  `items.jsonl` (one item per line, reading order) and `manifest.json` (source id and
+  sha256, codepoint-table sha256, computed counts).
+- Item kinds and IDs: `word` = `s:a:1..n`; `ayah_end` = `s:a:n+1` (as QUL numbers its
+  marker); `hizb` = `s:a:0` (the rub el hizb sign always opens its ayah in the source).
+  The sajdah sign stays inside its word as a `sign` cluster, as the source writes it.
+- Separators are stored exactly: `sep_after` per item and, for listed source anomalies only,
+  `sep_before` on an ayah's first item (2:6).
+- Codepoints are written as `U+XXXX` strings (ASCII only), so no invisible or look-alike
+  character can hide in tracked data or its diffs.
+- Lossless invariant (tested): per ayah, `sep_before + cps + sep_after` over all items
+  reproduces KFGQPC's `aya_text` byte for byte.
 

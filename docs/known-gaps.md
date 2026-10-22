@@ -29,3 +29,7 @@ by omission. Remove an entry only when its resolution is committed, and cite the
 | G-022 | Layout | Non-Ḥafṣ KFGQPC layouts are per ayah only; word-level line breaks inside ~4,450 multi-line ayahs per riwāyah must be fitted (D1 option B). | T0.6 | Phase 5 |
 | G-023 | Layout | Warsh, Qālūn, Dūrī and Sūsī have 241 lines with no ayah, Ḥafṣ/Shuʿbah/Bazzi/Qunbul 240. The extra line is unexplained. | T0.6 | T4.1 |
 | G-024 | Edition | Rule-5 exception (D2): Mashriqi riwāyāt render the 1441H text and layout with DigitalKhatt Madina, a 1421H design. The word-level diff (KFGQPC 1441H text vs DigitalKhatt 1421H text, after the derived encoding table) must be generated and reviewed by the owner. | G0 | When the KFGQPC to DigitalKhatt table is built (Phase 3, T3.1) |
+| G-025 | Source anomaly | KFGQPC v2.0 Ḥafṣ 2:286 is the only ayah with U+0020 (not U+00A0) before its ayah sign (KFGQPC's changelog mentions fixing this ayah's mark). Preserved exactly. | T1.1 | Permanent (as published) |
+| G-026 | Source anomaly | KFGQPC v2.0 Ḥafṣ 2:6 `aya_text` begins with a U+0020. Preserved exactly as `sep_before`; the parser allows this only for listed anomalies. | T1.1 | Permanent (as published) |
+| G-027 | Segmentation | 37:130: KFGQPC has 4 words, QUL's word list 3 (in addition to 15:7, 27:20, 36:22 in G-012, where KFGQPC has 1 word and QUL 2). T1.3 must map it explicitly. | T1.1 | T1.3 |
+
