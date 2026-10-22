@@ -24,7 +24,7 @@ Consequences: what follows, what it rules out
 | D3 | Justification implementation | accepted: Rust port on harfrust |
 | D4 | Draw path | open (P3) |
 | D5 | First platform | accepted (website first) |
-| D6 | Ḥafṣ edition: text + layout + font | accepted: 1441H (font part follows D2) |
+| D6 | Ḥafṣ edition: text + layout + font | **reopened** (G-031): print follows 1421H layout |
 | D7 | Licensing and distribution | accepted (owner-declared) |
 | D8 | Script/layout scope | accepted |
 | D9 | ID and patch model details | accepted (revisit end of P2) |
