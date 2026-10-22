@@ -1,6 +1,8 @@
 //! Fit all 604 Hafs pages with the tracked render profile and print the numbers behind D15.
 //!
 //!     cargo run --release --manifest-path core/Cargo.toml -p mushaf-layout --example fit_report
+//!
+//! MUSHAF_LIST=1 also lists every squeezed line and every page at the scale floor.
 
 use std::fs;
 use std::path::Path;
@@ -59,11 +61,15 @@ fn main() {
     for page in 1..=604 {
         let fp = fit_page(&shaper, &rx, &data, &resolved, &mapping, page).unwrap();
         scales.push(fp.scale * 1000 / SCALE_ONE);
-        at_floor += usize::from(
-            fp.notes
-                .iter()
-                .any(|n| matches!(n, mushaf_layout::fit::FitNote::PageScaleAtFloor { .. })),
-        );
+        let floor_page = fp
+            .notes
+            .iter()
+            .any(|n| matches!(n, mushaf_layout::fit::FitNote::PageScaleAtFloor { .. }));
+        at_floor += usize::from(floor_page);
+        let list = std::env::var_os("MUSHAF_LIST").is_some();
+        if floor_page && list {
+            println!("at floor: page {page}");
+        }
         for l in fp
             .lines
             .iter()
@@ -72,9 +78,9 @@ fn main() {
             lines += 1;
             if let Some((t, w)) = l.squeeze {
                 squeezes.push(t * 1000 / w);
-                if t * 1000 / w < 900 {
+                if list {
                     println!(
-                        "strong squeeze: page {page} line {} ({} per mille)",
+                        "squeezed: page {page} line {} ({} per mille)",
                         l.line,
                         t * 1000 / w
                     );
