@@ -71,8 +71,13 @@ render *ARGS:
     done
     cargo run --release --quiet {{manifest}} -p mushaf-render-cli -- --page "$PAGE" --riwayah "$RIWAYAH"
 
-# Golden image + line-fit + shaping-integrity tests
-golden: (_todo "T3.5")
+# Golden image + line-fit + shaping-integrity tests (release; all 604 pages)
+golden:
+    cargo test --release {{manifest}} -p mushaf-render-cli --test golden -- --ignored
+
+# Rewrite tests/golden/pages after a reviewed, intended change (then commit the diff)
+golden-update:
+    MUSHAF_UPDATE_GOLDEN=1 cargo test --release {{manifest}} -p mushaf-render-cli --test golden -- --ignored
 
 # Page resolve+shape+justify timing
 bench: (_todo "T3.6")

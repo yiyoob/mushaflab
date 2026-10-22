@@ -21,6 +21,8 @@ pub struct FontData {
     bytes: Vec<u8>,
     font: harfrust::Font,
     upem: i32,
+    /// GDEF glyph class per glyph id (0 when the font has none for it; 3 = mark).
+    classes: Vec<u16>,
 }
 
 /// One feature value on characters `start..end` of the word (end exclusive).
@@ -60,7 +62,26 @@ impl FontData {
         let font = harfrust::Font::new(bytes.clone(), 0)
             .ok_or_else(|| Error::new("font: cannot parse"))?;
         let upem = i32::from(font.units_per_em());
-        Ok(FontData { bytes, font, upem })
+        let classes = glyph_classes(&bytes, font.num_glyphs())?;
+        Ok(FontData {
+            bytes,
+            font,
+            upem,
+            classes,
+        })
+    }
+
+    /// GDEF glyph class (1 base, 2 ligature, 3 mark, 4 component, 0 none).
+    pub fn glyph_class(&self, glyph: u32) -> u16 {
+        self.classes.get(glyph as usize).copied().unwrap_or(0)
+    }
+
+    /// The font's glyph for a character, if its cmap has one.
+    pub fn nominal_glyph(&self, ch: char) -> Option<u32> {
+        self.font
+            .charmap()
+            .map_unicode(u32::from(ch))
+            .map(|g| g.to_u32())
     }
 
     pub fn units_per_em(&self) -> i32 {
@@ -127,6 +148,20 @@ impl Shaper<'_> {
             .map(|g| g.x_advance)
             .sum())
     }
+}
+
+fn glyph_classes(bytes: &[u8], n: u32) -> Result<Vec<u16>, Error> {
+    use read_fonts::TableProvider;
+    let font = read_fonts::FontRef::new(bytes).map_err(|_| Error::new("font: cannot parse"))?;
+    let Ok(gdef) = font.gdef() else {
+        return Ok(vec![0; n as usize]);
+    };
+    let Some(Ok(defs)) = gdef.glyph_class_def() else {
+        return Ok(vec![0; n as usize]);
+    };
+    Ok((0..n)
+        .map(|g| defs.get(read_fonts::types::GlyphId::new(g)))
+        .collect())
 }
 
 fn index(i: usize) -> Result<u32, Error> {

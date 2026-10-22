@@ -72,6 +72,13 @@ fn main() {
             lines += 1;
             if let Some((t, w)) = l.squeeze {
                 squeezes.push(t * 1000 / w);
+                if t * 1000 / w < 900 {
+                    println!(
+                        "strong squeeze: page {page} line {} ({} per mille)",
+                        l.line,
+                        t * 1000 / w
+                    );
+                }
             }
             if l.letter_gain > 0 {
                 stretched += 1;
