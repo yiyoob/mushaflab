@@ -26,4 +26,6 @@ by omission. Remove an entry only when its resolution is committed, and cite the
 | G-019 | Shaping | harfrust 0.14.0 `Feature::new(tag, v, s..e)` stores an inclusive end that its matcher treats as exclusive, so single-cluster feature ranges never apply. Workaround: construct `Feature { start, end }` directly. Owner may report upstream. | T0.5 | T3.1 (workaround + regression test) |
 | G-020 | Layout | DigitalKhatt's width table lists only 17 short lines for 1421H; other short/centred lines (e.g. page 604 lines 14–15) have no target width, and spaces balloon if they are justified to full width. A short-line policy is needed. | T0.5 | T3.5 / T5.2 |
 | G-021 | Layout | At DigitalKhatt's page geometry 100 of 162 sampled lines are naturally wider than the target; the oracle relies on a per-page font scale. Our overflow policy must include this. | T0.5 | T5.2 (D1) |
+| G-022 | Layout | Non-Ḥafṣ KFGQPC layouts are per ayah only; word-level line breaks inside ~4,450 multi-line ayahs per riwāyah must be fitted (D1 option B). | T0.6 | Phase 5 |
+| G-023 | Layout | Warsh, Qālūn, Dūrī and Sūsī have 241 lines with no ayah, Ḥafṣ/Shuʿbah/Bazzi/Qunbul 240. The extra line is unexplained. | T0.6 | T4.1 |
 

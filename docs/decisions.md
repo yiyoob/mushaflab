@@ -19,7 +19,7 @@ Consequences: what follows, what it rules out
 
 | ID | Title | Status |
 |---|---|---|
-| D1 | Line policy for non-Ḥafṣ riwāyāt | open (P0 spike, finalized P5) |
+| D1 | Line policy for non-Ḥafṣ riwāyāt | proposed (S4 done; finalized P5) |
 | D2 | Font per riwāyah | proposed (S2 done; coupled with D3) |
 | D3 | Justification implementation | proposed (S3 done) |
 | D4 | Draw path | open (P3) |
@@ -205,4 +205,28 @@ Recommendation: **C on D**: a Rust port of the DigitalKhatt justifier over harfr
 (pinned exactly), with the 1,559-word parity set kept as a regression test. Calligraphic
 justification then requires DigitalKhatt fonts (D2 options B/C); with KFGQPC fonts only
 spacing (and optionally flat kashida) is available.
+
+## D1 — Line policy for non-Ḥafṣ riwāyāt
+Status: proposed (evidence from S4; finalized in Phase 5)
+Date: 2026-10-21
+Context: The v1 plan defaulted to reusing Ḥafṣ line anchors for every riwāyah and absorbing
+differences by justification.
+Evidence: `docs/spikes/s4-layouts.md`; QUL has no non-Ḥafṣ layouts (T0.2).
+- KFGQPC gives every riwāyah its own complete 604-page, 15-line layout, per ayah
+  (`page`, `line_start`, `line_end`; an ayah crossing a page has `page` "a-b"). All 8 pass
+  consistency checks (no missing pages, no out-of-range lines, no ordering errors).
+- These are distinct prints: Shuʿbah's page assignments equal Ḥafṣ's (6236/6236); the
+  others differ from Ḥafṣ for about 400 ayahs each.
+- Granularity is the ayah: ~4,450 ayahs per riwāyah span several lines, and the word at
+  which those lines break is not given.
+Options:
+- A: Reuse Ḥafṣ anchors for all riwāyāt (v1 default). Pages would not match the
+  riwāyah's own print for ~400 ayahs, and overflow grows where texts differ.
+- B: Native layout per riwāyah: KFGQPC page/line per ayah as hard constraints; word-level
+  breaks inside multi-line ayahs fitted with the riwāyah's own font and flagged where
+  ambiguous; owner spot-checks against the print. Each riwāyah gets its own `layout_id`.
+- C: B where fitting is unambiguous, A as fallback, with every fallback line reported.
+Leaning: B (C as a safety net), so each riwāyah looks like its own printed muṣḥaf. This
+makes line anchors per-riwāyah data (T2.6 must map patched and inserted clusters to the
+riwāyah layout, not only to Ḥafṣ anchors).
 
