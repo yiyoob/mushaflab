@@ -286,3 +286,225 @@ fn g015_pause_signs_after_small_meem_sit_over_their_letter() {
     }
     eprintln!("G-015: {} places checked", places.len());
 }
+
+/// T3.7: a synthetic free-mode edit (a test fixture, not Quranic data or a reading). The small
+/// high seen (U+06DC) goes on the first cluster, from page 3 on, whose form with U+06DC added
+/// has an encoding row and still shapes cleanly in its word (rule 6; U+06DC on a medial nun,
+/// for one, has no anchor in DigitalKhatt Madina: G-044). On that line a copy of another word's
+/// second letter is inserted after it, a third word is widened by 0.5 em, and a manual stretch
+/// of 0.2 em goes on one letter that can reach it and one that cannot (D16: applied, reported). The line must
+/// still close, every word must pass the integrity check, and the page carries the marker.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn edit_demo_line_still_closes_and_page_is_marked() {
+    use mushaf_model::{EditOverlay, LineKind, Patch};
+    let r = Renderer::load(&repo(), "hafs").unwrap();
+    let spine = &r.data.spines[&r.profile.spine];
+    let layout = &r.data.layouts[&r.profile.layout_id];
+    let seen = '\u{06DC}';
+    let shaper0 = r.font.shaper();
+    // does this word still convert and shape cleanly with U+06DC appended to cluster ci?
+    let clean = |w: &mushaf_model::Item, ci: usize| -> bool {
+        let mut cl: Vec<Vec<char>> = w.clusters.iter().map(|c| c.cps.0.clone()).collect();
+        cl[ci].push(seen);
+        let refs: Vec<&[char]> = cl.iter().map(Vec::as_slice).collect();
+        let Ok(conv) = r.table.convert(&refs) else {
+            return false;
+        };
+        let g = shaper0.shape(&conv.chars, &[]).unwrap();
+        check_word(&r.font, &shaper0, &conv.chars, &[], &g)
+            .unwrap()
+            .is_empty()
+    };
+    let (page, line, words, wi, ci) = layout
+        .lines
+        .iter()
+        .filter(|l| l.page >= 3)
+        .find_map(|l| {
+            let LineKind::Text { first, last } = &l.kind else {
+                return None;
+            };
+            let (a, b) = (spine.position(first)?, spine.position(last)?);
+            let words: Vec<_> = spine.items[a..=b]
+                .iter()
+                .filter(|i| i.kind == mushaf_model::ItemKind::Word)
+                .collect();
+            if words.len() < 3 {
+                return None;
+            }
+            let (wi, ci) = words.iter().enumerate().find_map(|(wi, w)| {
+                (0..w.clusters.len())
+                    .find(|&ci| !w.clusters[ci].cps.0.contains(&seen) && clean(w, ci))
+                    .map(|ci| (wi, ci))
+            })?;
+            Some((l.page, l.line, words, wi, ci))
+        })
+        .unwrap();
+    let others: Vec<_> = (0..words.len())
+        .filter(|&k| k != wi && words[k].clusters.len() >= 2)
+        .take(3)
+        .collect();
+    let (ins_w, wide_w) = (words[others[0]], words[others[1]]);
+    // one letter where 0.2 em of stretch is reachable and one where it is not (both from data)
+    let upem = i64::from(r.font.units_per_em());
+    let request = 200 * upem * 64 / 1000;
+    let reach = |want: bool| {
+        words
+            .iter()
+            .enumerate()
+            .filter(|(k, _)| ![wi, others[0], others[1]].contains(k))
+            .find_map(|(_, w)| {
+                let cl: Vec<&[char]> = w.clusters.iter().map(|c| c.cps.0.as_slice()).collect();
+                let conv = r.table.convert(&cl).ok()?;
+                conv.spans.iter().find_map(|sp| {
+                    let ms = mushaf_justify::manual_stretch(
+                        &shaper0,
+                        &conv.chars,
+                        sp.chars.start,
+                        request,
+                    )
+                    .ok()?;
+                    (ms.reached == want && sp.clusters.len() == 1)
+                        .then(|| w.clusters[sp.clusters.start].id.clone())
+                })
+            })
+    };
+    let (stretch_ok, stretch_no) = (reach(true).unwrap(), reach(false).unwrap());
+    let yaml = |id: &str, op: &str, target: String, payload: String| -> Patch {
+        mushaf_model::from_yaml(&format!(
+            "id: '{id}'\nowner: {{level: 'user', id: 'demo'}}\nop: '{op}'\ntarget: '{target}'\npayload: {payload}\nsource: {{kind: 'user', ref: 'T3.7 synthetic edit demo'}}\nstatus: 'user-edit'\n"
+        ))
+        .unwrap()
+    };
+    let copied = &ins_w.clusters[1];
+    let patches = vec![
+        yaml(
+            "user.demo.seen",
+            "set_marks",
+            words[wi].clusters[ci].id.to_string(),
+            "{add: ['U+06DC']}".into(),
+        ),
+        yaml(
+            "user.demo.letter",
+            "insert_after",
+            copied.id.to_string(),
+            format!(
+                "{{seq: 1, cluster: {{kind: 'letter', cps: '{}'}}}}",
+                copied.cps
+            ),
+        ),
+        yaml(
+            "user.demo.widen",
+            "set_attr",
+            wide_w.clusters[0].id.to_string(),
+            "{width_em_delta: 500}".into(),
+        ),
+        yaml(
+            "user.demo.stretch",
+            "set_attr",
+            stretch_ok.to_string(),
+            "{stretch: 200}".into(),
+        ),
+        yaml(
+            "user.demo.stretch-unreachable",
+            "set_attr",
+            stretch_no.to_string(),
+            "{stretch: 200}".into(),
+        ),
+    ];
+    let mut overlay = EditOverlay::new(spine.id.clone());
+    for p in patches {
+        overlay.upsert(p).unwrap();
+    }
+    let edited = r.render(page, Some(&overlay)).unwrap();
+    let plain = r.render(page, None).unwrap();
+    assert!(plain.canonical && !edited.canonical);
+    let marker = |d: &DrawPage| {
+        d.items
+            .iter()
+            .filter(|i| {
+                matches!(
+                    i,
+                    mushaf_draw::DrawItem::Stroke {
+                        role: mushaf_draw::Role::EditedMarker,
+                        ..
+                    }
+                )
+            })
+            .count()
+    };
+    assert_eq!((marker(&plain), marker(&edited)), (0, 2));
+    let (a, b) = (
+        plain.lines.iter().find(|l| l.line == line).unwrap(),
+        edited.lines.iter().find(|l| l.line == line).unwrap(),
+    );
+    assert!(b.natural > a.natural, "the edits widen the line");
+    for (l, drawn, want) in line_fit(&edited) {
+        assert!(
+            (drawn - want).abs() * 1000 <= want,
+            "edited page line {l}: {drawn} vs {want}"
+        );
+    }
+    // rule 6 holds for the edited words too
+    let resolved = r.resolve(Some(&overlay)).unwrap();
+    let mapping = r.map(&resolved).unwrap();
+    let fit = r.fit(&resolved, &mapping, page).unwrap();
+    let shaper = r.font.shaper();
+    for w in fit.lines.iter().flat_map(|l| &l.words) {
+        let v = check_word(&r.font, &shaper, &w.chars, &w.features, &w.glyphs).unwrap();
+        let at = w.item.map(|i| resolved.items[i].id.to_string());
+        let cps: Vec<String> = w
+            .chars
+            .iter()
+            .map(|c| format!("{:04X}", u32::from(*c)))
+            .collect();
+        assert_eq!(v, vec![], "{at:?} {cps:?}");
+    }
+    // a reachable manual stretch is applied to its letter; an unreachable one is reported
+    let unreachable: Vec<&String> = fit
+        .notes
+        .iter()
+        .filter_map(|n| match n {
+            FitNote::StretchUnreachable { cluster, .. } => Some(cluster),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(unreachable, vec![&stretch_no.to_string()]);
+    let ok_word = fit
+        .lines
+        .iter()
+        .flat_map(|l| &l.words)
+        .find(|w| w.spans.iter().any(|sp| sp.clusters.contains(&stretch_ok)))
+        .unwrap();
+    let at = ok_word
+        .spans
+        .iter()
+        .find(|sp| sp.clusters.contains(&stretch_ok))
+        .unwrap()
+        .chars
+        .start as u32;
+    assert!(
+        ok_word
+            .features
+            .iter()
+            .any(|f| f.start == at && &f.tag == b"cv01"),
+        "manual stretch not applied"
+    );
+    eprintln!(
+        "edit demo: page {page} line {line}; natural {} -> {}, target {}",
+        a.natural, b.natural, b.target
+    );
+    let name = format!("hafs-p{page:03}-edit");
+    let overlay_path = repo().join(format!("tests/golden/pages/{name}.overlay.yaml"));
+    let text = mushaf_model::to_yaml(&overlay).unwrap();
+    if std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some() {
+        fs::write(&overlay_path, &text).unwrap();
+    } else {
+        assert_eq!(
+            fs::read_to_string(&overlay_path).unwrap(),
+            text,
+            "edit demo overlay changed"
+        );
+    }
+    check_golden(&name, &edited);
+}

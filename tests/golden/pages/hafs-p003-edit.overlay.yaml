@@ -1,0 +1,66 @@
+spine: 'hafs/v1'
+patches:
+- id: 'user.demo.seen'
+  owner:
+    level: 'user'
+    id: 'demo'
+  op: 'set_marks'
+  target: '2:6:10:2'
+  payload:
+    add:
+    - 'U+06DC'
+  source:
+    kind: 'user'
+    ref: 'T3.7 synthetic edit demo'
+  status: 'user-edit'
+- id: 'user.demo.letter'
+  owner:
+    level: 'user'
+    id: 'demo'
+  op: 'insert_after'
+  target: '2:6:11:2'
+  payload:
+    seq: 1
+    cluster:
+      kind: 'letter'
+      cps: 'U+0624 U+06E1'
+  source:
+    kind: 'user'
+    ref: 'T3.7 synthetic edit demo'
+  status: 'user-edit'
+- id: 'user.demo.widen'
+  owner:
+    level: 'user'
+    id: 'demo'
+  op: 'set_attr'
+  target: '2:7:1:1'
+  payload:
+    width_em_delta: 500
+  source:
+    kind: 'user'
+    ref: 'T3.7 synthetic edit demo'
+  status: 'user-edit'
+- id: 'user.demo.stretch'
+  owner:
+    level: 'user'
+    id: 'demo'
+  op: 'set_attr'
+  target: '2:7:3:1'
+  payload:
+    stretch: 200
+  source:
+    kind: 'user'
+    ref: 'T3.7 synthetic edit demo'
+  status: 'user-edit'
+- id: 'user.demo.stretch-unreachable'
+  owner:
+    level: 'user'
+    id: 'demo'
+  op: 'set_attr'
+  target: '2:7:2:1'
+  payload:
+    stretch: 200
+  source:
+    kind: 'user'
+    ref: 'T3.7 synthetic edit demo'
+  status: 'user-edit'

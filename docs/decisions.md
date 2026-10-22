@@ -548,6 +548,8 @@ Decision:
   `stretch` on a non-letter or on a whole item is reported (`StretchNotOnLetter`).
 - Letters carrying an override are locked: the automatic justifier never changes them, and
   the line still closes around them.
+- `width_em_delta` is a flat advance: inside a joined word it opens a visible gap (T3.7 demo
+  on page 3); `stretch` is the joined way to widen a letter.
 - **Canonical / edited:** `Resolved::canonical()` is false when the stack has any user-layer
   patch (`Resolved::user_patches`) or the resolver reported anything. A non-canonical page
   always gets the edited marker as its last draw items (a red frame and the word EDITED as
