@@ -5,7 +5,7 @@ by omission. Remove an entry only when its resolution is committed, and cite the
 
 | ID | Area | Gap | Since | Resolve by |
 |---|---|---|---|---|
-| G-001 | Approvals | CI does not yet verify that changes under `data/approvals/` are in owner-signed commits. Only CODEOWNERS is in place. The owner has no git signing key configured yet. The directory is empty. | T0.1 | Before the first approval is written (before GATE G2) |
+| G-001 | Approvals | **Resolved (2026-10-22).** CI runs `.github/scripts/check-approvals.sh`: any commit touching `data/approvals/`, `.github/allowed_signers` or the guard script must be signed by a key in `.github/allowed_signers` as of its parent commit (the owner's SSH signing key, passphrase-protected, not in ssh-agent). Bootstrap commit signed by the owner. Residual risk: an edit to the workflow file itself could remove the check; GitHub branch protection would close that. | T0.1 | Done |
 | G-002 | Licensing | `license_check` still rejects any tracked file under `fonts/`. LICENSES.md now allows redistribution (D7), so the check must read it before fonts are tracked. | T0.1 | Phase 3 (when fonts are bundled) |
 | G-003 | Sources | **Accepted by owner (2026-10-22, D13):** Bazzi uses KFGQPC v7 from the 2022 GitHub mirror; the official v2.0 zip was never archived. Re-derive Bazzi if v2.0 becomes available. | T0.2 | Permanent unless v2.0 appears |
 | G-004 | Sources | The official KFGQPC host (`qurancomplex.gov.sa`, `download.qurancomplex.gov.sa`) times out from the dev machine. The official zips come from Internet Archive captures (2025-04 to 2026-02), each matching the archive's content digest, but the live site may have newer releases. | T0.2 | GATE G0 (owner checks the live site if reachable) |

@@ -13,6 +13,19 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Owner-only paths are owner-signed (rule 4)
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then range="$BASE..$SHA"
+          elif [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then range="$SHA"
+          else range="$BEFORE..$SHA"; fi
+          .github/scripts/check-approvals.sh "$range"
       - name: Install tools
         run: brew install rustup uv just
       - name: Rust toolchain (version from rust-toolchain.toml)

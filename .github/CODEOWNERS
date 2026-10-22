@@ -1,2 +1,5 @@
-# Owner-only verification statuses (CLAUDE.md rule 4).
+# Owner-only paths (CLAUDE.md rule 4). CI also requires owner-signed commits for these
+# (.github/scripts/check-approvals.sh).
 /data/approvals/ @yiyoob
+/.github/allowed_signers @yiyoob
+/.github/scripts/check-approvals.sh @yiyoob
