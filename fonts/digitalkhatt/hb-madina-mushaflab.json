@@ -1,0 +1,25 @@
+{
+ "path": "fonts/digitalkhatt/hb-madina-mushaflab.otf",
+ "derived_from": {
+  "source": "digitalkhatt-hb-madina-font",
+  "sha256": "c99d91d61a17d0a6ecc2f9e7eb565e0977b15ec18b9f4c284c7922c129f4dcbb"
+ },
+ "decision": "D17 (G-045), owner 2026-10-22",
+ "patch": {
+  "lookup": 66,
+  "feature": "rclt",
+  "glyph": "uni0670",
+  "from": "glyph00103",
+  "to": "glyph00102"
+ },
+ "names": {
+  "1": "DigitalKhatt New Madina Mushaflab",
+  "3": "DigitalKhatt New Madina Mushaflab Regular; mushaflab D17",
+  "4": "DigitalKhatt New Madina Mushaflab Regular",
+  "5": "Version 0.1; mushaflab D17 patch 1 (rclt: uni0670 -> glyph00102)",
+  "6": "DigitalKhattNewMadinaMushaflab-Regular",
+  "16": "DigitalKhatt New Madina Mushaflab"
+ },
+ "fonttools": "4.67.0",
+ "sha256": "842f4e142c725e16d45132108df98728a760069c725a0c5ae133df85844650d2"
+}

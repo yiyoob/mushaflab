@@ -2,9 +2,13 @@
 
 CLAUDE.md rules 2 and 10:
   * raw sources (data/sources/raw/) are never tracked;
-  * a file under fonts/ may be tracked only if fonts/FONTS.json lists it with the id of the
-    pinned source it is a copy of, its bytes have that source's sha256 (MANIFEST.json), and
-    that source's group row in data/sources/LICENSES.md says redistribution is allowed.
+  * a file under fonts/ may be tracked only if fonts/FONTS.json lists it, and either
+    - it is a copy of a pinned source (`source`): its bytes have that source's sha256
+      (MANIFEST.json); or
+    - it is derived from one (`derived_from`, `record`, D17): its build record names that
+      source at its pinned sha256 and the file's own sha256;
+    and that source's group row in data/sources/LICENSES.md says redistribution is allowed.
+    A derived font's build record is tracked next to it.
 """
 
 import hashlib
@@ -56,28 +60,49 @@ def redistributable_groups(licenses: Path) -> dict[str, bool]:
 def font_violations(repo: Path, fonts: list[str]) -> list[str]:
     index = repo / FONTS_INDEX
     listed = json.loads(index.read_text(encoding="utf-8"))["fonts"] if index.exists() else []
-    by_path = {f["path"]: f["source"] for f in listed}
+    by_path = {f["path"]: f for f in listed}
     if len(by_path) != len(listed):
         return [f"{FONTS_INDEX}: a path is listed twice"]
+    records = {f["record"] for f in listed if "record" in f}
     groups = redistributable_groups(repo / "data/sources/LICENSES.md")
     sources = {s.id: s for s in load_manifest(repo / "data/sources/MANIFEST.json").sources}
     out = []
     for path in fonts:
-        sid = by_path.get(path)
-        if sid is None:
+        if path in records:
+            continue
+        entry = by_path.get(path)
+        if entry is None:
             out.append(f"{path}: not listed in {FONTS_INDEX}")
             continue
+        sid = entry.get("source") or entry.get("derived_from")
         src = sources.get(sid)
+        digest = hashlib.sha256((repo / path).read_bytes()).hexdigest()
         if src is None:
             out.append(f"{path}: unknown source {sid!r}")
         elif not groups.get(src.group, False):
             out.append(f"{path}: group {src.group!r} does not allow redistribution (LICENSES.md)")
-        elif hashlib.sha256((repo / path).read_bytes()).hexdigest() != src.sha256:
+        elif "derived_from" in entry:
+            out.extend(_derived_violations(repo, path, entry, src.sha256, digest))
+        elif digest != src.sha256:
             out.append(f"{path}: sha256 differs from pinned source {sid!r}")
     out.extend(
         f"{path}: listed in {FONTS_INDEX}, not tracked" for path in by_path if path not in fonts
     )
     return out
+
+
+def _derived_violations(repo: Path, path: str, entry: dict, pinned: str, digest: str) -> list[str]:
+    rec_path = repo / entry["record"]
+    if not rec_path.exists():
+        return [f"{path}: build record {entry['record']} missing"]
+    rec = json.loads(rec_path.read_text(encoding="utf-8"))
+    if rec["derived_from"]["sha256"] != pinned:
+        return [
+            f"{path}: built from another version of {entry['derived_from']!r} than the pinned one"
+        ]
+    if rec["sha256"] != digest:
+        return [f"{path}: sha256 differs from its build record"]
+    return []
 
 
 def find_violations(repo: Path) -> list[str]:

@@ -25,7 +25,13 @@ from spikes.s1_editions import dk_text_pages
 from spikes.s3_justify import FULL, oracle, width_ratios
 
 OUT = REPO / "tests" / "golden" / "justify" / "oracle-1421h.json"
-SETTINGS = ({"space_stretch": 1.0, "pages": None}, {"space_stretch": 0.25, "pages": (3, 4, 50)})
+# font None = the pinned DigitalKhatt font; "derived" = the D17 render font
+DERIVED_FONT = REPO / "fonts" / "digitalkhatt" / "hb-madina-mushaflab.otf"
+SETTINGS = (
+    {"space_stretch": 1.0, "pages": None, "font": None},
+    {"space_stretch": 0.25, "pages": (3, 4, 50), "font": None},
+    {"space_stretch": 1.0, "pages": None, "font": "derived"},
+)
 
 
 def run(j, font: hb.Font, space_stretch: float, pages_wanted: tuple | None) -> list[dict]:  # noqa: ANN001
@@ -60,18 +66,24 @@ def run(j, font: hb.Font, space_stretch: float, pages_wanted: tuple | None) -> l
 def main() -> int:
     j = oracle()
     src = verified_sources()
-    font = hb.Font(hb.Face(hb.Blob.from_file_path(str(src["digitalkhatt-hb-madina-font"]))))
+    fonts = {
+        None: hb.Font(hb.Face(hb.Blob.from_file_path(str(src["digitalkhatt-hb-madina-font"])))),
+        "derived": hb.Font(hb.Face(hb.Blob.from_file_path(str(DERIVED_FONT)))),
+    }
     runs = []
     for s in SETTINGS:
-        lines = run(j, font, s["space_stretch"], s["pages"])
+        lines = run(j, fonts[s["font"]], s["space_stretch"], s["pages"])
         runs.append(
             {
                 "space_stretch_per_mille": round(s["space_stretch"] * 1000),
                 "pages": list(s["pages"]) if s["pages"] else "all",
+                "font": s["font"] or "pinned",
                 "lines": lines,
             }
         )
-        print(f"space_stretch {s['space_stretch']}: {len(lines)} lines")
+        print(
+            f"space_stretch {s['space_stretch']}, font {s['font'] or 'pinned'}: {len(lines)} lines"
+        )
     head = {
         "note": "quran-madina-html justify.justify_line (oracle, @ d520c5c) on DigitalKhatt's "
         "Madina text; lines keyed by DigitalKhatt page/line; no text. Widths: target, simple, "

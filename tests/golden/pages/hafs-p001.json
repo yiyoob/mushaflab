@@ -1,10 +1,10 @@
 {
   "canonical": true,
-  "draw_sha256": "0dc4be185845f1cb0bf6a3a09105d803b087b35eb992274284ca33ce057131c2",
+  "draw_sha256": "751f516bd044bf40232d129dc5d2aea180a5a62b4d437d4cb99a7851349f0f84",
   "layout_id": "uthmani-1441h",
   "lines": [
     {
-      "baseline": 596992,
+      "baseline": 602265,
       "kind": {
         "kind": "surah_name",
         "surah": 1
@@ -20,7 +20,7 @@
       "width": 142784
     },
     {
-      "baseline": 718592,
+      "baseline": 725145,
       "kind": {
         "kind": "text"
       },
@@ -35,7 +35,7 @@
       "width": 537539
     },
     {
-      "baseline": 840192,
+      "baseline": 848025,
       "kind": {
         "kind": "text"
       },
@@ -50,7 +50,7 @@
       "width": 712789
     },
     {
-      "baseline": 961792,
+      "baseline": 970905,
       "kind": {
         "kind": "text"
       },
@@ -65,7 +65,7 @@
       "width": 934538
     },
     {
-      "baseline": 1083392,
+      "baseline": 1093785,
       "kind": {
         "kind": "text"
       },
@@ -80,14 +80,14 @@
       "width": 938164
     },
     {
-      "baseline": 1204992,
+      "baseline": 1216665,
       "kind": {
         "kind": "text"
       },
       "left": 182203,
-      "letter_gain": 0,
+      "letter_gain": 15744,
       "line": 6,
-      "natural": 852160,
+      "natural": 818368,
       "right": 1072198,
       "short_ppm": 781246,
       "squeeze": null,
@@ -95,7 +95,7 @@
       "width": 889995
     },
     {
-      "baseline": 1326592,
+      "baseline": 1339545,
       "kind": {
         "kind": "text"
       },
@@ -110,7 +110,7 @@
       "width": 699387
     },
     {
-      "baseline": 1448192,
+      "baseline": 1462425,
       "kind": {
         "kind": "text"
       },

@@ -1,70 +1,70 @@
 {
   "canonical": true,
-  "draw_sha256": "0c3791d90ef571af0008df9ba23554b2a2f2323e46d613e315cdef50459cc01f",
+  "draw_sha256": "3fe4eabbce61e09cd4850c325d3d6e76e3cf7baa8ca60934a91e3e0403458f0b",
   "layout_id": "uthmani-1441h",
   "lines": [
     {
-      "baseline": 171392,
+      "baseline": 172185,
       "kind": {
         "kind": "text"
       },
       "left": 57601,
-      "letter_gain": 161728,
+      "letter_gain": 149888,
       "line": 1,
       "natural": 933504,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
-      "target": 1150984,
-      "width": 1150984
+      "target": 1139269,
+      "width": 1139269
     },
     {
-      "baseline": 292992,
+      "baseline": 295065,
       "kind": {
         "kind": "text"
       },
       "left": 57601,
-      "letter_gain": 68096,
+      "letter_gain": 52352,
       "line": 2,
       "natural": 1011136,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
-      "target": 1150984,
-      "width": 1150984
+      "target": 1139269,
+      "width": 1139269
     },
     {
-      "baseline": 414592,
+      "baseline": 417945,
       "kind": {
         "kind": "text"
       },
       "left": 57601,
-      "letter_gain": 75648,
+      "letter_gain": 53504,
       "line": 3,
       "natural": 1010304,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
-      "target": 1150984,
-      "width": 1150984
+      "target": 1139269,
+      "width": 1139269
     },
     {
-      "baseline": 536192,
+      "baseline": 540825,
       "kind": {
         "kind": "text"
       },
       "left": 57601,
-      "letter_gain": 53568,
+      "letter_gain": 31424,
       "line": 4,
       "natural": 1037248,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
-      "target": 1150984,
-      "width": 1150984
+      "target": 1139269,
+      "width": 1139269
     },
     {
-      "baseline": 657792,
+      "baseline": 663705,
       "kind": {
         "kind": "text"
       },
@@ -75,42 +75,42 @@
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
-      "target": 1150984,
-      "width": 1150984
+      "target": 1139269,
+      "width": 1139269
     },
     {
-      "baseline": 779392,
+      "baseline": 786585,
       "kind": {
         "kind": "surah_name",
         "surah": 5
       },
-      "left": 553594,
+      "left": 552837,
       "letter_gain": 0,
       "line": 6,
       "natural": 148736,
-      "right": 700807,
+      "right": 701564,
       "short_ppm": null,
       "squeeze": null,
       "target": 148736,
       "width": 148736
     },
     {
-      "baseline": 900992,
+      "baseline": 909465,
       "kind": {
         "kind": "basmalah"
       },
-      "left": 397607,
+      "left": 395246,
       "letter_gain": 0,
       "line": 7,
       "natural": 463936,
-      "right": 856793,
+      "right": 859154,
       "short_ppm": null,
       "squeeze": null,
       "target": 463936,
       "width": 463936
     },
     {
-      "baseline": 1022592,
+      "baseline": 1032345,
       "kind": {
         "kind": "text"
       },
@@ -121,41 +121,41 @@
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
-      "target": 1150984,
-      "width": 1150984
+      "target": 1139269,
+      "width": 1139269
     },
     {
-      "baseline": 1144192,
+      "baseline": 1155225,
       "kind": {
         "kind": "text"
       },
       "left": 57601,
-      "letter_gain": 97024,
+      "letter_gain": 85120,
       "line": 9,
       "natural": 984832,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
-      "target": 1150984,
-      "width": 1150984
+      "target": 1139269,
+      "width": 1139269
     },
     {
-      "baseline": 1265792,
+      "baseline": 1278105,
       "kind": {
         "kind": "text"
       },
       "left": 57601,
-      "letter_gain": 54080,
+      "letter_gain": 42240,
       "line": 10,
       "natural": 1015680,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
-      "target": 1150984,
-      "width": 1150984
+      "target": 1139269,
+      "width": 1139269
     },
     {
-      "baseline": 1387392,
+      "baseline": 1400985,
       "kind": {
         "kind": "text"
       },
@@ -166,26 +166,26 @@
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
-      "target": 1150984,
-      "width": 1150984
+      "target": 1139269,
+      "width": 1139269
     },
     {
-      "baseline": 1508992,
+      "baseline": 1523865,
       "kind": {
         "kind": "text"
       },
       "left": 57601,
       "letter_gain": 0,
       "line": 12,
-      "natural": 1171456,
+      "natural": 1159744,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
-      "target": 1150984,
-      "width": 1150984
+      "target": 1139269,
+      "width": 1139269
     },
     {
-      "baseline": 1630592,
+      "baseline": 1646745,
       "kind": {
         "kind": "text"
       },
@@ -196,47 +196,47 @@
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
-      "target": 1150984,
-      "width": 1150984
+      "target": 1139269,
+      "width": 1139269
     },
     {
-      "baseline": 1752192,
+      "baseline": 1769625,
       "kind": {
         "kind": "text"
       },
       "left": 57601,
-      "letter_gain": 70784,
+      "letter_gain": 59008,
       "line": 14,
       "natural": 1019712,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
-      "target": 1150984,
-      "width": 1150984
+      "target": 1139269,
+      "width": 1139269
     },
     {
-      "baseline": 1873792,
+      "baseline": 1892505,
       "kind": {
         "kind": "text"
       },
       "left": 57601,
       "letter_gain": 260736,
       "line": 15,
-      "natural": 838592,
+      "natural": 826880,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
-      "target": 1150984,
-      "width": 1150984
+      "target": 1139269,
+      "width": 1139269
     }
   ],
   "notes": [
     {
       "kind": "page_scaled",
-      "scale": 64865
+      "scale": 65532
     }
   ],
   "page": 106,
   "riwayah": "hafs",
-  "scale": 64865
+  "scale": 65532
 }

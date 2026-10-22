@@ -47,33 +47,42 @@ the ten pages were compared with it.
   would match it (D15 constant, owner's choice). **Checked:** at 1,780, 7 pairs of adjacent lines
   would have touching ink, because DigitalKhatt's marks reach further than the print's; at
   1,900 none of the 8,442 pairs touch (the tightest safe pitch is 1,890, page 410 lines 14-15).
-  1,900 stays; `just golden` now fails if any line touches its neighbour.
+  `just golden` now fails if any line touches its neighbour. (Superseded: 1,920 since D17, see 1b.)
+
+## 1b. Owner decisions at G1 (2026-10-22)
+
+- Surah headers stay plain for Stage 1; the ornamental header is later polish (D16).
+- G-045 (owner found صِرَٰطَ on page 1 with a gap between rāʾ and ṭāʾ): fixed with a derived
+  render font (D17, option B). Every superscript alef is now an anchored mark; 1,742 lines on
+  518 pages change, all listed in [g045-changed-lines.md](g045-changed-lines.md).
+- Line pitch: kept at 1,900, then raised to **1,920** because the D17 font made one pair of
+  lines (page 410, 14-15) touch at 1,900 (D15). All goldens were regenerated with both changes.
 
 ## 2. Line fit and overflow (D15)
 
-All 604 pages, `just golden` and `cargo run --release -p mushaf-layout --example fit_report`:
+All 604 pages with the D17 render font, `just golden` and
+`cargo run --release -p mushaf-layout --example fit_report`:
 
 - 8,820 text lines; every one is drawn within 0.1% of its target (squeezed lines included).
-- 6,785 lines stretch letters (median gain 1,845 font units); widest space per line: median
-  2.85x, p95 3.79x, max 5.87x a normal space.
-- 209 pages are drawn with a font scale below 1; 32 are at the floor (0.90):
-  30, 77, 286, 304, 350, 367, 377, 446, 453, 455, 499, 507, 530, 549, 552, 565, 566, 567, 569, 574, 575, 576, 577, 578, 579, 583, 585, 587, 589, 591, 595, 600.
-- 65 lines are squeezed horizontally after spaces tightened to 60%:
+- 6,809 lines stretch letters (median gain 1,861 font units); widest space per line: median
+  2.89x, p95 3.79x, max 5.87x a normal space.
+- 205 pages are drawn with a font scale below 1; 31 are at the floor (0.90):
+  77, 286, 304, 350, 367, 377, 446, 453, 455, 499, 507, 530, 549, 552, 565, 566, 567, 569, 574, 575, 576, 577, 578, 579, 583, 585, 587, 589, 591, 595, 600.
+- 62 lines are squeezed horizontally after spaces tightened to 60%:
 
 | Page | Lines (squeeze) |
 |---|---|
-| 30 | 14 (0.991) |
-| 77 | 5 (0.948), 6 (0.956), 12 (0.986) |
+| 77 | 5 (0.957), 6 (0.973), 12 (0.986) |
 | 286 | 5 (0.993) |
 | 304 | 3 (0.979), 6 (0.971) |
-| 350 | 11 (0.984), 15 (0.969) |
+| 350 | 11 (0.993), 15 (0.969) |
 | 367 | 7 (0.961), 9 (0.957) |
 | 377 | 8 (0.950) |
-| 446 | 3 (0.963), 4 (0.967), 13 (0.996) |
-| 453 | 10 (0.976) |
+| 446 | 3 (0.986), 4 (0.985), 13 (0.996) |
+| 453 | 10 (0.984) |
 | 455 | 13 (0.987) |
-| 499 | 4 (0.981), 9 (0.930), 14 (0.995) |
-| 507 | 5 (0.953), 6 (0.997), 7 (0.879), 10 (0.961), 14 (0.983) |
+| 499 | 4 (0.981), 9 (0.930) |
+| 507 | 5 (0.961), 7 (0.879), 10 (0.961), 14 (0.983) |
 | 530 | 1 (0.997) |
 | 549 | 15 (0.976) |
 | 552 | 7 (0.994), 10 (0.997) |
@@ -82,12 +91,12 @@ All 604 pages, `just golden` and `cargo run --release -p mushaf-layout --example
 | 567 | 11 (0.981) |
 | 569 | 14 (0.960) |
 | 574 | 3 (0.996) |
-| 575 | 6 (0.999), 11 (0.965), 12 (0.975) |
+| 575 | 6 (0.999), 11 (0.965), 12 (0.984) |
 | 576 | 1 (0.946), 10 (0.961), 11 (0.934) |
 | 577 | 11 (0.971), 12 (0.987) |
 | 578 | 15 (0.979) |
-| 579 | 1 (0.998), 4 (0.957), 8 (0.948), 9 (0.961), 10 (0.956), 11 (0.959) |
-| 583 | 14 (0.971) |
+| 579 | 1 (0.998), 4 (0.957), 8 (0.948), 9 (0.961), 10 (0.964), 11 (0.959) |
+| 583 | 14 (0.980) |
 | 585 | 3 (0.973), 5 (0.965), 6 (0.984), 7 (0.928), 11 (0.970) |
 | 587 | 15 (0.979) |
 | 589 | 5 (0.991) |

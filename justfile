@@ -29,6 +29,7 @@ data-build:
     {{uv}} run python -m pipeline.dk_encoding build
     {{uv}} run python -m pipeline.line_widths build
     {{uv}} run python -m pipeline.surah_names build
+    {{uv}} run python -m pipeline.derived_font write
     {{uv}} run python -m pipeline.ingest_riwayah write
     {{uv}} run python -m pipeline.align write
     {{uv}} run python -m pipeline.emit_patches write

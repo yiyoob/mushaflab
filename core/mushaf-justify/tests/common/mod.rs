@@ -98,3 +98,15 @@ pub fn dk_pages(text: &str) -> Vec<Vec<String>> {
     assert_eq!(pages.len(), 604);
     pages
 }
+
+/// The D17 render font, derived from the pinned font (data/pipeline/derived_font.py); its
+/// sha256 is the one its tracked build record gives.
+pub fn derived_font() -> FontData {
+    let bytes = fs::read(repo().join("fonts/digitalkhatt/hb-madina-mushaflab.otf")).unwrap();
+    let rec: Value = serde_json::from_str(
+        &fs::read_to_string(repo().join("fonts/digitalkhatt/hb-madina-mushaflab.json")).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(sha256(&bytes), rec["sha256"].as_str().unwrap());
+    FontData::new(bytes).unwrap()
+}

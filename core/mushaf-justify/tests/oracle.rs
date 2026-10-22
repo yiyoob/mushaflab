@@ -4,6 +4,8 @@
 //! tests/golden/justify/oracle-1421h.json, written by data/spikes/s3_oracle.py; the lines are
 //! read from the pinned source (no text copied into tests).
 //!
+//! A third run uses the D17 render font (the pinned font with one rclt substitution changed).
+//!
 //! Exact: natural width and every stretch feature (character, tag, value). Spaces: within one
 //! font unit of the oracle's float widths (ours are exact 1/64 units that close the line).
 
@@ -11,9 +13,12 @@ mod common;
 
 use std::fs;
 
-use common::{dk_font, dk_pages, pinned, repo};
+use common::{derived_font, dk_font, dk_pages, pinned, repo};
 use mushaf_justify::{LineInput, ONE, Params, Regexps, SpaceKind, justify_line};
 use serde_json::Value;
+
+/// Loose lines of the third run (D17 render font), as the oracle counted them.
+const DERIVED_RUN_LINES: usize = 4121;
 
 #[test]
 fn port_matches_the_oracle_on_every_loose_line() {
@@ -25,12 +30,19 @@ fn port_matches_the_oracle_on_every_loose_line() {
         &fs::read_to_string(repo().join("tests/golden/justify/oracle-1421h.json")).unwrap(),
     )
     .unwrap();
-    let font = dk_font();
-    let shaper = font.shaper();
+    let pinned = dk_font();
+    let derived = derived_font();
+    let (pinned_shaper, derived_shaper) = (pinned.shaper(), derived.shaper());
     let rx = Regexps::new();
     let (mut lines, mut stretched, mut worst) = (0, 0, 0i64);
     let mut bad = Vec::new();
     for run in golden["runs"].as_array().unwrap() {
+        // the third run uses the D17 render font
+        let shaper = match run["font"].as_str().unwrap() {
+            "pinned" => &pinned_shaper,
+            "derived" => &derived_shaper,
+            other => panic!("unknown font {other}"),
+        };
         let params = Params {
             space_stretch: run["space_stretch_per_mille"].as_i64().unwrap(),
             ..Params::default()
@@ -42,7 +54,7 @@ fn port_matches_the_oracle_on_every_loose_line() {
                 ..LineInput::default()
             };
             let target = l["target"].as_i64().unwrap();
-            let j = justify_line(&shaper, &rx, &input, target, params).unwrap();
+            let j = justify_line(shaper, &rx, &input, target, params).unwrap();
             lines += 1;
             let ours: Vec<(u64, String, u64)> = j
                 .features
@@ -93,7 +105,7 @@ fn port_matches_the_oracle_on_every_loose_line() {
     eprintln!(
         "oracle parity: {lines} lines, {stretched} with letter stretching, worst space diff {worst}/64 unit"
     );
-    assert_eq!(lines, 4062 + 14);
+    assert_eq!(lines, 4062 + 14 + DERIVED_RUN_LINES);
     assert!(
         bad.is_empty(),
         "{} lines differ: {:?}",
