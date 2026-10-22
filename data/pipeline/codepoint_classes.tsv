@@ -1,0 +1,377 @@
+codepoint	class	category	name	gdef	used_by	note
+U+0020	space	Zs	SPACE	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+00A0	space	Zs	NO-BREAK SPACE	base:7,nocmap:1	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	REVIEW: Unicode Zs gives class space; KFGQPC font GDEF says base:7,nocmap:1. Kept as space so clustering follows Unicode.
+U+0621	base	Lo	ARABIC LETTER HAMZA	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0622	base	Lo	ARABIC LETTER ALEF WITH MADDA ABOVE	base:2	duri_abuamr,susi	
+U+0623	base	Lo	ARABIC LETTER ALEF WITH HAMZA ABOVE	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0624	base	Lo	ARABIC LETTER WAW WITH HAMZA ABOVE	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0625	base	Lo	ARABIC LETTER ALEF WITH HAMZA BELOW	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0626	base	Lo	ARABIC LETTER YEH WITH HAMZA ABOVE	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0627	base	Lo	ARABIC LETTER ALEF	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0628	base	Lo	ARABIC LETTER BEH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0629	base	Lo	ARABIC LETTER TEH MARBUTA	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+062A	base	Lo	ARABIC LETTER TEH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+062B	base	Lo	ARABIC LETTER THEH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+062C	base	Lo	ARABIC LETTER JEEM	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+062D	base	Lo	ARABIC LETTER HAH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+062E	base	Lo	ARABIC LETTER KHAH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+062F	base	Lo	ARABIC LETTER DAL	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0630	base	Lo	ARABIC LETTER THAL	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0631	base	Lo	ARABIC LETTER REH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0632	base	Lo	ARABIC LETTER ZAIN	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0633	base	Lo	ARABIC LETTER SEEN	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0634	base	Lo	ARABIC LETTER SHEEN	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0635	base	Lo	ARABIC LETTER SAD	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0636	base	Lo	ARABIC LETTER DAD	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0637	base	Lo	ARABIC LETTER TAH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0638	base	Lo	ARABIC LETTER ZAH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0639	base	Lo	ARABIC LETTER AIN	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+063A	base	Lo	ARABIC LETTER GHAIN	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0640	base	Lm	ARABIC TATWEEL	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0641	base	Lo	ARABIC LETTER FEH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0642	base	Lo	ARABIC LETTER QAF	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0643	base	Lo	ARABIC LETTER KAF	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0644	base	Lo	ARABIC LETTER LAM	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0645	base	Lo	ARABIC LETTER MEEM	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0646	base	Lo	ARABIC LETTER NOON	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0647	base	Lo	ARABIC LETTER HEH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0648	base	Lo	ARABIC LETTER WAW	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0649	base	Lo	ARABIC LETTER ALEF MAKSURA	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+064A	base	Lo	ARABIC LETTER YEH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+064B	mark	Mn	ARABIC FATHATAN	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+064C	mark	Mn	ARABIC DAMMATAN	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+064D	mark	Mn	ARABIC KASRATAN	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+064E	mark	Mn	ARABIC FATHA	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+064F	mark	Mn	ARABIC DAMMA	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0650	mark	Mn	ARABIC KASRA	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0651	mark	Mn	ARABIC SHADDA	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0652	mark	Mn	ARABIC SUKUN	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0653	mark	Mn	ARABIC MADDAH ABOVE	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0654	mark	Mn	ARABIC HAMZA ABOVE	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0655	mark	Mn	ARABIC HAMZA BELOW	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0656	mark	Mn	ARABIC SUBSCRIPT ALEF	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0657	mark	Mn	ARABIC INVERTED DAMMA	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+065C	mark	Mn	ARABIC VOWEL SIGN DOT BELOW	mark:1	shuba	
+U+065E	mark	Mn	ARABIC FATHA WITH TWO DOTS	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0660	digit	Nd	ARABIC-INDIC DIGIT ZERO	base:1	bazzi	
+U+0661	digit	Nd	ARABIC-INDIC DIGIT ONE	base:1	bazzi	
+U+0662	digit	Nd	ARABIC-INDIC DIGIT TWO	base:2	shuba,bazzi	
+U+0663	digit	Nd	ARABIC-INDIC DIGIT THREE	base:1	bazzi	
+U+0664	digit	Nd	ARABIC-INDIC DIGIT FOUR	base:1	bazzi	
+U+0665	digit	Nd	ARABIC-INDIC DIGIT FIVE	base:1	bazzi	
+U+0666	digit	Nd	ARABIC-INDIC DIGIT SIX	base:2	shuba,bazzi	
+U+0667	digit	Nd	ARABIC-INDIC DIGIT SEVEN	base:1	bazzi	
+U+0668	digit	Nd	ARABIC-INDIC DIGIT EIGHT	base:2	shuba,bazzi	
+U+0669	digit	Nd	ARABIC-INDIC DIGIT NINE	base:1	bazzi	
+U+066E	base	Lo	ARABIC LETTER DOTLESS BEH	base:2	bazzi,qunbul	
+U+0670	mark	Mn	ARABIC LETTER SUPERSCRIPT ALEF	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+0671	base	Lo	ARABIC LETTER ALEF WASLA	base:4	hafs,shuba,bazzi,qunbul	
+U+06D2	base	Lo	ARABIC LETTER YEH BARREE	base:2	warsh,qalun	
+U+06D6	mark	Mn	ARABIC SMALL HIGH LIGATURE SAD WITH LAM WITH ALEF MAKSURA	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+06D7	mark	Mn	ARABIC SMALL HIGH LIGATURE QAF WITH LAM WITH ALEF MAKSURA	mark:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	
+U+06D8	mark	Mn	ARABIC SMALL HIGH MEEM INITIAL FORM	mark:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	
+U+06DA	mark	Mn	ARABIC SMALL HIGH JEEM	mark:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	
+U+06DB	mark	Mn	ARABIC SMALL HIGH THREE DOTS	mark:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	
+U+06DC	mark	Mn	ARABIC SMALL HIGH SEEN	mark:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	
+U+06DE	sign	So	ARABIC START OF RUB EL HIZB	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+06DF	mark	Mn	ARABIC SMALL HIGH ROUNDED ZERO	base:6	warsh,qalun,bazzi,qunbul,duri_abuamr,susi	REVIEW: Unicode Mn gives class mark; KFGQPC font GDEF says base:6. Kept as mark so clustering follows Unicode.
+U+06E0	mark	Mn	ARABIC SMALL HIGH UPRIGHT RECTANGULAR ZERO	mark:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	
+U+06E1	mark	Mn	ARABIC SMALL HIGH DOTLESS HEAD OF KHAH	mark:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	
+U+06E2	mark	Mn	ARABIC SMALL HIGH MEEM ISOLATED FORM	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+06E4	mark	Mn	ARABIC SMALL HIGH MADDA	base:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	REVIEW: Unicode Mn gives class mark; KFGQPC font GDEF says base:6. Kept as mark so clustering follows Unicode.
+U+06E5	base	Lm	ARABIC SMALL WAW	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+06E6	base	Lm	ARABIC SMALL YEH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+06E7	mark	Mn	ARABIC SMALL HIGH YEH	base:2,mark:6	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	REVIEW: Unicode Mn gives class mark; KFGQPC font GDEF says base:2,mark:6. Kept as mark so clustering follows Unicode.
+U+06E8	mark	Mn	ARABIC SMALL HIGH NOON	base:2,mark:5	hafs,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	REVIEW: Unicode Mn gives class mark; KFGQPC font GDEF says base:2,mark:5. Kept as mark so clustering follows Unicode.
+U+06E9	sign	So	ARABIC PLACE OF SAJDAH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+06EA	mark	Mn	ARABIC EMPTY CENTRE LOW STOP	mark:7	hafs,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+06EC	mark	Mn	ARABIC ROUNDED HIGH STOP WITH FILLED CENTRE	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
+U+06ED	mark	Mn	ARABIC SMALL LOW MEEM	base:3,mark:3	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	REVIEW: Unicode Mn gives class mark; KFGQPC font GDEF says base:3,mark:3. Kept as mark so clustering follows Unicode.
+U+200D	joiner	Cf	ZERO WIDTH JOINER	base:2	duri_abuamr,susi	
+U+200F	control	Cf	RIGHT-TO-LEFT MARK	base:2	warsh,qalun	
+U+FC00	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC01	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC02	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC03	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC04	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC05	ayah_number	Lo	ARABIC LIGATURE BEH WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC06	ayah_number	Lo	ARABIC LIGATURE BEH WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC07	ayah_number	Lo	ARABIC LIGATURE BEH WITH KHAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC08	ayah_number	Lo	ARABIC LIGATURE BEH WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC09	ayah_number	Lo	ARABIC LIGATURE BEH WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC0A	ayah_number	Lo	ARABIC LIGATURE BEH WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC0B	ayah_number	Lo	ARABIC LIGATURE TEH WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC0C	ayah_number	Lo	ARABIC LIGATURE TEH WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC0D	ayah_number	Lo	ARABIC LIGATURE TEH WITH KHAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC0E	ayah_number	Lo	ARABIC LIGATURE TEH WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC0F	ayah_number	Lo	ARABIC LIGATURE TEH WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC10	ayah_number	Lo	ARABIC LIGATURE TEH WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC11	ayah_number	Lo	ARABIC LIGATURE THEH WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC12	ayah_number	Lo	ARABIC LIGATURE THEH WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC13	ayah_number	Lo	ARABIC LIGATURE THEH WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC14	ayah_number	Lo	ARABIC LIGATURE THEH WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC15	ayah_number	Lo	ARABIC LIGATURE JEEM WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC16	ayah_number	Lo	ARABIC LIGATURE JEEM WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC17	ayah_number	Lo	ARABIC LIGATURE HAH WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC18	ayah_number	Lo	ARABIC LIGATURE HAH WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC19	ayah_number	Lo	ARABIC LIGATURE KHAH WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC1A	ayah_number	Lo	ARABIC LIGATURE KHAH WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC1B	ayah_number	Lo	ARABIC LIGATURE KHAH WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC1C	ayah_number	Lo	ARABIC LIGATURE SEEN WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC1D	ayah_number	Lo	ARABIC LIGATURE SEEN WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC1E	ayah_number	Lo	ARABIC LIGATURE SEEN WITH KHAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC1F	ayah_number	Lo	ARABIC LIGATURE SEEN WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC20	ayah_number	Lo	ARABIC LIGATURE SAD WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC21	ayah_number	Lo	ARABIC LIGATURE SAD WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC22	ayah_number	Lo	ARABIC LIGATURE DAD WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC23	ayah_number	Lo	ARABIC LIGATURE DAD WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC24	ayah_number	Lo	ARABIC LIGATURE DAD WITH KHAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC25	ayah_number	Lo	ARABIC LIGATURE DAD WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC26	ayah_number	Lo	ARABIC LIGATURE TAH WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC27	ayah_number	Lo	ARABIC LIGATURE TAH WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC28	ayah_number	Lo	ARABIC LIGATURE ZAH WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC29	ayah_number	Lo	ARABIC LIGATURE AIN WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC2A	ayah_number	Lo	ARABIC LIGATURE AIN WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC2B	ayah_number	Lo	ARABIC LIGATURE GHAIN WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC2C	ayah_number	Lo	ARABIC LIGATURE GHAIN WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC2D	ayah_number	Lo	ARABIC LIGATURE FEH WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC2E	ayah_number	Lo	ARABIC LIGATURE FEH WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC2F	ayah_number	Lo	ARABIC LIGATURE FEH WITH KHAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC30	ayah_number	Lo	ARABIC LIGATURE FEH WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC31	ayah_number	Lo	ARABIC LIGATURE FEH WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC32	ayah_number	Lo	ARABIC LIGATURE FEH WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC33	ayah_number	Lo	ARABIC LIGATURE QAF WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC34	ayah_number	Lo	ARABIC LIGATURE QAF WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC35	ayah_number	Lo	ARABIC LIGATURE QAF WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC36	ayah_number	Lo	ARABIC LIGATURE QAF WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC37	ayah_number	Lo	ARABIC LIGATURE KAF WITH ALEF ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC38	ayah_number	Lo	ARABIC LIGATURE KAF WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC39	ayah_number	Lo	ARABIC LIGATURE KAF WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC3A	ayah_number	Lo	ARABIC LIGATURE KAF WITH KHAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC3B	ayah_number	Lo	ARABIC LIGATURE KAF WITH LAM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC3C	ayah_number	Lo	ARABIC LIGATURE KAF WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC3D	ayah_number	Lo	ARABIC LIGATURE KAF WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC3E	ayah_number	Lo	ARABIC LIGATURE KAF WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC3F	ayah_number	Lo	ARABIC LIGATURE LAM WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC40	ayah_number	Lo	ARABIC LIGATURE LAM WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC41	ayah_number	Lo	ARABIC LIGATURE LAM WITH KHAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC42	ayah_number	Lo	ARABIC LIGATURE LAM WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC43	ayah_number	Lo	ARABIC LIGATURE LAM WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC44	ayah_number	Lo	ARABIC LIGATURE LAM WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC45	ayah_number	Lo	ARABIC LIGATURE MEEM WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC46	ayah_number	Lo	ARABIC LIGATURE MEEM WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC47	ayah_number	Lo	ARABIC LIGATURE MEEM WITH KHAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC48	ayah_number	Lo	ARABIC LIGATURE MEEM WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC49	ayah_number	Lo	ARABIC LIGATURE MEEM WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC4A	ayah_number	Lo	ARABIC LIGATURE MEEM WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC4B	ayah_number	Lo	ARABIC LIGATURE NOON WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC4C	ayah_number	Lo	ARABIC LIGATURE NOON WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC4D	ayah_number	Lo	ARABIC LIGATURE NOON WITH KHAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC4E	ayah_number	Lo	ARABIC LIGATURE NOON WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC4F	ayah_number	Lo	ARABIC LIGATURE NOON WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC50	ayah_number	Lo	ARABIC LIGATURE NOON WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC51	ayah_number	Lo	ARABIC LIGATURE HEH WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC52	ayah_number	Lo	ARABIC LIGATURE HEH WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC53	ayah_number	Lo	ARABIC LIGATURE HEH WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC54	ayah_number	Lo	ARABIC LIGATURE HEH WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC55	ayah_number	Lo	ARABIC LIGATURE YEH WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC56	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC57	ayah_number	Lo	ARABIC LIGATURE YEH WITH KHAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC58	ayah_number	Lo	ARABIC LIGATURE YEH WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC59	ayah_number	Lo	ARABIC LIGATURE YEH WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC5A	ayah_number	Lo	ARABIC LIGATURE YEH WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC5B	ayah_number	Lo	ARABIC LIGATURE THAL WITH SUPERSCRIPT ALEF ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC5C	ayah_number	Lo	ARABIC LIGATURE REH WITH SUPERSCRIPT ALEF ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC5D	ayah_number	Lo	ARABIC LIGATURE ALEF MAKSURA WITH SUPERSCRIPT ALEF ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC5E	ayah_number	Lo	ARABIC LIGATURE SHADDA WITH DAMMATAN ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC5F	ayah_number	Lo	ARABIC LIGATURE SHADDA WITH KASRATAN ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC60	ayah_number	Lo	ARABIC LIGATURE SHADDA WITH FATHA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC61	ayah_number	Lo	ARABIC LIGATURE SHADDA WITH DAMMA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC62	ayah_number	Lo	ARABIC LIGATURE SHADDA WITH KASRA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC63	ayah_number	Lo	ARABIC LIGATURE SHADDA WITH SUPERSCRIPT ALEF ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC64	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH REH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC65	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH ZAIN FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC66	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH MEEM FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC67	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH NOON FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC68	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC69	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC6A	ayah_number	Lo	ARABIC LIGATURE BEH WITH REH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC6B	ayah_number	Lo	ARABIC LIGATURE BEH WITH ZAIN FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC6C	ayah_number	Lo	ARABIC LIGATURE BEH WITH MEEM FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC6D	ayah_number	Lo	ARABIC LIGATURE BEH WITH NOON FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC6E	ayah_number	Lo	ARABIC LIGATURE BEH WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC6F	ayah_number	Lo	ARABIC LIGATURE BEH WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC70	ayah_number	Lo	ARABIC LIGATURE TEH WITH REH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC71	ayah_number	Lo	ARABIC LIGATURE TEH WITH ZAIN FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC72	ayah_number	Lo	ARABIC LIGATURE TEH WITH MEEM FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC73	ayah_number	Lo	ARABIC LIGATURE TEH WITH NOON FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC74	ayah_number	Lo	ARABIC LIGATURE TEH WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC75	ayah_number	Lo	ARABIC LIGATURE TEH WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC76	ayah_number	Lo	ARABIC LIGATURE THEH WITH REH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC77	ayah_number	Lo	ARABIC LIGATURE THEH WITH ZAIN FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC78	ayah_number	Lo	ARABIC LIGATURE THEH WITH MEEM FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC79	ayah_number	Lo	ARABIC LIGATURE THEH WITH NOON FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC7A	ayah_number	Lo	ARABIC LIGATURE THEH WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC7B	ayah_number	Lo	ARABIC LIGATURE THEH WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC7C	ayah_number	Lo	ARABIC LIGATURE FEH WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC7D	ayah_number	Lo	ARABIC LIGATURE FEH WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC7E	ayah_number	Lo	ARABIC LIGATURE QAF WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC7F	ayah_number	Lo	ARABIC LIGATURE QAF WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC80	ayah_number	Lo	ARABIC LIGATURE KAF WITH ALEF FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC81	ayah_number	Lo	ARABIC LIGATURE KAF WITH LAM FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC82	ayah_number	Lo	ARABIC LIGATURE KAF WITH MEEM FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC83	ayah_number	Lo	ARABIC LIGATURE KAF WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC84	ayah_number	Lo	ARABIC LIGATURE KAF WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC85	ayah_number	Lo	ARABIC LIGATURE LAM WITH MEEM FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC86	ayah_number	Lo	ARABIC LIGATURE LAM WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC87	ayah_number	Lo	ARABIC LIGATURE LAM WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC88	ayah_number	Lo	ARABIC LIGATURE MEEM WITH ALEF FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC89	ayah_number	Lo	ARABIC LIGATURE MEEM WITH MEEM FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC8A	ayah_number	Lo	ARABIC LIGATURE NOON WITH REH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC8B	ayah_number	Lo	ARABIC LIGATURE NOON WITH ZAIN FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC8C	ayah_number	Lo	ARABIC LIGATURE NOON WITH MEEM FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC8D	ayah_number	Lo	ARABIC LIGATURE NOON WITH NOON FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC8E	ayah_number	Lo	ARABIC LIGATURE NOON WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC8F	ayah_number	Lo	ARABIC LIGATURE NOON WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC90	ayah_number	Lo	ARABIC LIGATURE ALEF MAKSURA WITH SUPERSCRIPT ALEF FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC91	ayah_number	Lo	ARABIC LIGATURE YEH WITH REH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC92	ayah_number	Lo	ARABIC LIGATURE YEH WITH ZAIN FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC93	ayah_number	Lo	ARABIC LIGATURE YEH WITH MEEM FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC94	ayah_number	Lo	ARABIC LIGATURE YEH WITH NOON FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC95	ayah_number	Lo	ARABIC LIGATURE YEH WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC96	ayah_number	Lo	ARABIC LIGATURE YEH WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC97	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC98	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC99	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH KHAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC9A	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC9B	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH HEH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC9C	ayah_number	Lo	ARABIC LIGATURE BEH WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC9D	ayah_number	Lo	ARABIC LIGATURE BEH WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC9E	ayah_number	Lo	ARABIC LIGATURE BEH WITH KHAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FC9F	ayah_number	Lo	ARABIC LIGATURE BEH WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCA0	ayah_number	Lo	ARABIC LIGATURE BEH WITH HEH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCA1	ayah_number	Lo	ARABIC LIGATURE TEH WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCA2	ayah_number	Lo	ARABIC LIGATURE TEH WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCA3	ayah_number	Lo	ARABIC LIGATURE TEH WITH KHAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCA4	ayah_number	Lo	ARABIC LIGATURE TEH WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCA5	ayah_number	Lo	ARABIC LIGATURE TEH WITH HEH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCA6	ayah_number	Lo	ARABIC LIGATURE THEH WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCA7	ayah_number	Lo	ARABIC LIGATURE JEEM WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCA8	ayah_number	Lo	ARABIC LIGATURE JEEM WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCA9	ayah_number	Lo	ARABIC LIGATURE HAH WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCAA	ayah_number	Lo	ARABIC LIGATURE HAH WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCAB	ayah_number	Lo	ARABIC LIGATURE KHAH WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCAC	ayah_number	Lo	ARABIC LIGATURE KHAH WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCAD	ayah_number	Lo	ARABIC LIGATURE SEEN WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCAE	ayah_number	Lo	ARABIC LIGATURE SEEN WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCAF	ayah_number	Lo	ARABIC LIGATURE SEEN WITH KHAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCB0	ayah_number	Lo	ARABIC LIGATURE SEEN WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCB1	ayah_number	Lo	ARABIC LIGATURE SAD WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCB2	ayah_number	Lo	ARABIC LIGATURE SAD WITH KHAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCB3	ayah_number	Lo	ARABIC LIGATURE SAD WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCB4	ayah_number	Lo	ARABIC LIGATURE DAD WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCB5	ayah_number	Lo	ARABIC LIGATURE DAD WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCB6	ayah_number	Lo	ARABIC LIGATURE DAD WITH KHAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCB7	ayah_number	Lo	ARABIC LIGATURE DAD WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCB8	ayah_number	Lo	ARABIC LIGATURE TAH WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCB9	ayah_number	Lo	ARABIC LIGATURE ZAH WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCBA	ayah_number	Lo	ARABIC LIGATURE AIN WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCBB	ayah_number	Lo	ARABIC LIGATURE AIN WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCBC	ayah_number	Lo	ARABIC LIGATURE GHAIN WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCBD	ayah_number	Lo	ARABIC LIGATURE GHAIN WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCBE	ayah_number	Lo	ARABIC LIGATURE FEH WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCBF	ayah_number	Lo	ARABIC LIGATURE FEH WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCC0	ayah_number	Lo	ARABIC LIGATURE FEH WITH KHAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCC1	ayah_number	Lo	ARABIC LIGATURE FEH WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCC2	ayah_number	Lo	ARABIC LIGATURE QAF WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCC3	ayah_number	Lo	ARABIC LIGATURE QAF WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCC4	ayah_number	Lo	ARABIC LIGATURE KAF WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCC5	ayah_number	Lo	ARABIC LIGATURE KAF WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCC6	ayah_number	Lo	ARABIC LIGATURE KAF WITH KHAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCC7	ayah_number	Lo	ARABIC LIGATURE KAF WITH LAM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCC8	ayah_number	Lo	ARABIC LIGATURE KAF WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCC9	ayah_number	Lo	ARABIC LIGATURE LAM WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCCA	ayah_number	Lo	ARABIC LIGATURE LAM WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCCB	ayah_number	Lo	ARABIC LIGATURE LAM WITH KHAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCCC	ayah_number	Lo	ARABIC LIGATURE LAM WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCCD	ayah_number	Lo	ARABIC LIGATURE LAM WITH HEH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCCE	ayah_number	Lo	ARABIC LIGATURE MEEM WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCCF	ayah_number	Lo	ARABIC LIGATURE MEEM WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCD0	ayah_number	Lo	ARABIC LIGATURE MEEM WITH KHAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCD1	ayah_number	Lo	ARABIC LIGATURE MEEM WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCD2	ayah_number	Lo	ARABIC LIGATURE NOON WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCD3	ayah_number	Lo	ARABIC LIGATURE NOON WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCD4	ayah_number	Lo	ARABIC LIGATURE NOON WITH KHAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCD5	ayah_number	Lo	ARABIC LIGATURE NOON WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCD6	ayah_number	Lo	ARABIC LIGATURE NOON WITH HEH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCD7	ayah_number	Lo	ARABIC LIGATURE HEH WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCD8	ayah_number	Lo	ARABIC LIGATURE HEH WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCD9	ayah_number	Lo	ARABIC LIGATURE HEH WITH SUPERSCRIPT ALEF INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCDA	ayah_number	Lo	ARABIC LIGATURE YEH WITH JEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCDB	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCDC	ayah_number	Lo	ARABIC LIGATURE YEH WITH KHAH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCDD	ayah_number	Lo	ARABIC LIGATURE YEH WITH MEEM INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCDE	ayah_number	Lo	ARABIC LIGATURE YEH WITH HEH INITIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCDF	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH MEEM MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCE0	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH HEH MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCE1	ayah_number	Lo	ARABIC LIGATURE BEH WITH MEEM MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCE2	ayah_number	Lo	ARABIC LIGATURE BEH WITH HEH MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCE3	ayah_number	Lo	ARABIC LIGATURE TEH WITH MEEM MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCE4	ayah_number	Lo	ARABIC LIGATURE TEH WITH HEH MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCE5	ayah_number	Lo	ARABIC LIGATURE THEH WITH MEEM MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCE6	ayah_number	Lo	ARABIC LIGATURE THEH WITH HEH MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCE7	ayah_number	Lo	ARABIC LIGATURE SEEN WITH MEEM MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCE8	ayah_number	Lo	ARABIC LIGATURE SEEN WITH HEH MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCE9	ayah_number	Lo	ARABIC LIGATURE SHEEN WITH MEEM MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCEA	ayah_number	Lo	ARABIC LIGATURE SHEEN WITH HEH MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCEB	ayah_number	Lo	ARABIC LIGATURE KAF WITH LAM MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCEC	ayah_number	Lo	ARABIC LIGATURE KAF WITH MEEM MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCED	ayah_number	Lo	ARABIC LIGATURE LAM WITH MEEM MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCEE	ayah_number	Lo	ARABIC LIGATURE NOON WITH MEEM MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCEF	ayah_number	Lo	ARABIC LIGATURE NOON WITH HEH MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCF0	ayah_number	Lo	ARABIC LIGATURE YEH WITH MEEM MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCF1	ayah_number	Lo	ARABIC LIGATURE YEH WITH HEH MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCF2	ayah_number	Lo	ARABIC LIGATURE SHADDA WITH FATHA MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCF3	ayah_number	Lo	ARABIC LIGATURE SHADDA WITH DAMMA MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCF4	ayah_number	Lo	ARABIC LIGATURE SHADDA WITH KASRA MEDIAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCF5	ayah_number	Lo	ARABIC LIGATURE TAH WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCF6	ayah_number	Lo	ARABIC LIGATURE TAH WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCF7	ayah_number	Lo	ARABIC LIGATURE AIN WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCF8	ayah_number	Lo	ARABIC LIGATURE AIN WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCF9	ayah_number	Lo	ARABIC LIGATURE GHAIN WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCFA	ayah_number	Lo	ARABIC LIGATURE GHAIN WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCFB	ayah_number	Lo	ARABIC LIGATURE SEEN WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCFC	ayah_number	Lo	ARABIC LIGATURE SEEN WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCFD	ayah_number	Lo	ARABIC LIGATURE SHEEN WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCFE	ayah_number	Lo	ARABIC LIGATURE SHEEN WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FCFF	ayah_number	Lo	ARABIC LIGATURE HAH WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD00	ayah_number	Lo	ARABIC LIGATURE HAH WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD01	ayah_number	Lo	ARABIC LIGATURE JEEM WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD02	ayah_number	Lo	ARABIC LIGATURE JEEM WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD03	ayah_number	Lo	ARABIC LIGATURE KHAH WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD04	ayah_number	Lo	ARABIC LIGATURE KHAH WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD05	ayah_number	Lo	ARABIC LIGATURE SAD WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD06	ayah_number	Lo	ARABIC LIGATURE SAD WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD07	ayah_number	Lo	ARABIC LIGATURE DAD WITH ALEF MAKSURA ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD08	ayah_number	Lo	ARABIC LIGATURE DAD WITH YEH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD09	ayah_number	Lo	ARABIC LIGATURE SHEEN WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD0A	ayah_number	Lo	ARABIC LIGATURE SHEEN WITH HAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD0B	ayah_number	Lo	ARABIC LIGATURE SHEEN WITH KHAH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD0C	ayah_number	Lo	ARABIC LIGATURE SHEEN WITH MEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD0D	ayah_number	Lo	ARABIC LIGATURE SHEEN WITH REH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD0E	ayah_number	Lo	ARABIC LIGATURE SEEN WITH REH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD0F	ayah_number	Lo	ARABIC LIGATURE SAD WITH REH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD10	ayah_number	Lo	ARABIC LIGATURE DAD WITH REH ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD11	ayah_number	Lo	ARABIC LIGATURE TAH WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD12	ayah_number	Lo	ARABIC LIGATURE TAH WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD13	ayah_number	Lo	ARABIC LIGATURE AIN WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD14	ayah_number	Lo	ARABIC LIGATURE AIN WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD15	ayah_number	Lo	ARABIC LIGATURE GHAIN WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD16	ayah_number	Lo	ARABIC LIGATURE GHAIN WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD17	ayah_number	Lo	ARABIC LIGATURE SEEN WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD18	ayah_number	Lo	ARABIC LIGATURE SEEN WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD19	ayah_number	Lo	ARABIC LIGATURE SHEEN WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD1A	ayah_number	Lo	ARABIC LIGATURE SHEEN WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD1B	ayah_number	Lo	ARABIC LIGATURE HAH WITH ALEF MAKSURA FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD1C	ayah_number	Lo	ARABIC LIGATURE HAH WITH YEH FINAL FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
+U+FD1D	ayah_number	Lo	ARABIC LIGATURE JEEM WITH ALEF MAKSURA FINAL FORM	base:1	hafs	

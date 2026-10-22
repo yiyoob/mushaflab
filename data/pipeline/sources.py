@@ -55,6 +55,10 @@ def zip_json(source_id: str, suffix: str) -> object:
     return json.load(io.TextIOWrapper(io.BytesIO(raw), encoding="utf-8-sig"))
 
 
+def json_file(source_id: str) -> object:
+    return json.loads(path(source_id).read_text(encoding="utf-8-sig"))
+
+
 @functools.cache
 def qul_hafs_words() -> dict[int, tuple[int, int, int, str]]:
     """QUL KFGQPC Hafs word list: word id -> (surah, ayah, position, text)."""

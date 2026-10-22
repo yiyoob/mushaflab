@@ -1,0 +1,23 @@
+{
+  "script_id": "uthmani",
+  "spine_version": 1,
+  "source": {
+    "id": "kfgqpc-official-hafs",
+    "member": "hafsData_v2-0.json",
+    "sha256": "a7b0e5591945712ec5e4d6142938ae4d1e9b49bdc89dff06222789bfebdfd72c"
+  },
+  "codepoint_table_sha256": "7e1111bae4a6469fc9229a24a45c305099b81e0736f7885341fddd637023da06",
+  "unicode_version": "15.0.0",
+  "counts": {
+    "items": {
+      "ayah_end": 6236,
+      "hizb": 199,
+      "word": 77430
+    },
+    "clusters": {
+      "ayah_number": 6236,
+      "letter": 328135,
+      "sign": 214
+    }
+  }
+}
