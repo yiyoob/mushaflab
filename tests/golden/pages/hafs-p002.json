@@ -1,0 +1,137 @@
+{
+  "canonical": true,
+  "draw_sha256": "12d8662b02bff36ee647160b926d62cc3404ac4650ffbc5968d18fb2bebcc260",
+  "layout_id": "uthmani-1441h",
+  "lines": [
+    {
+      "baseline": 596992,
+      "kind": {
+        "kind": "surah_name",
+        "surah": 2
+      },
+      "left": 570345,
+      "letter_gain": 0,
+      "line": 1,
+      "natural": 117376,
+      "right": 684055,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 117376,
+      "width": 117376
+    },
+    {
+      "baseline": 718592,
+      "kind": {
+        "kind": "basmalah"
+      },
+      "left": 402478,
+      "letter_gain": 0,
+      "line": 2,
+      "natural": 463936,
+      "right": 851923,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 463936,
+      "width": 463936
+    },
+    {
+      "baseline": 840192,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 261512,
+      "letter_gain": 0,
+      "line": 3,
+      "natural": 721088,
+      "right": 992888,
+      "short_ppm": 642010,
+      "squeeze": null,
+      "target": 754957,
+      "width": 754957
+    },
+    {
+      "baseline": 961792,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 167370,
+      "letter_gain": 0,
+      "line": 4,
+      "natural": 959552,
+      "right": 1087031,
+      "short_ppm": 807288,
+      "squeeze": null,
+      "target": 949313,
+      "width": 949313
+    },
+    {
+      "baseline": 1083392,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 154817,
+      "letter_gain": 0,
+      "line": 5,
+      "natural": 903232,
+      "right": 1099583,
+      "short_ppm": 829325,
+      "squeeze": null,
+      "target": 975227,
+      "width": 975227
+    },
+    {
+      "baseline": 1204992,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 174284,
+      "letter_gain": 0,
+      "line": 6,
+      "natural": 896256,
+      "right": 1080117,
+      "short_ppm": 795150,
+      "squeeze": null,
+      "target": 935039,
+      "width": 935039
+    },
+    {
+      "baseline": 1326592,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 277166,
+      "letter_gain": 14848,
+      "line": 7,
+      "natural": 658368,
+      "right": 977234,
+      "short_ppm": 614526,
+      "squeeze": null,
+      "target": 722639,
+      "width": 722639
+    },
+    {
+      "baseline": 1448192,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 414903,
+      "letter_gain": 83520,
+      "line": 8,
+      "natural": 333888,
+      "right": 839498,
+      "short_ppm": 372715,
+      "squeeze": null,
+      "target": 438285,
+      "width": 438285
+    }
+  ],
+  "notes": [
+    {
+      "kind": "page_scaled",
+      "scale": 63489
+    }
+  ],
+  "page": 2,
+  "riwayah": "hafs",
+  "scale": 63489
+}

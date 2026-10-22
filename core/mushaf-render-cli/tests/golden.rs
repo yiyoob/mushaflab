@@ -4,9 +4,10 @@
 //! every mark placed by an anchor, and a valid cluster map. The 33 lossy words (G-040, owner
 //! decision) are the only documented exception and must match the encoding table's list.
 //! T3.5: every justified line's drawn width is within 0.1% of its target; squeezed lines are
-//! listed exceptions.
+//! listed exceptions. Golden pages: exact draw-list hash plus PNG within a pixel tolerance.
 
 use std::collections::BTreeSet;
+use std::fs;
 use std::path::{Path, PathBuf};
 
 use mushaf_draw::DrawPage;
@@ -99,6 +100,85 @@ fn shaping_integrity_and_line_fit_on_every_page() {
         misfit.len(),
         &misfit[..misfit.len().min(20)]
     );
+}
+
+/// Pages for the owner's GATE G1 review and the regression goldens (T3.5). Chosen from the
+/// data: 106 is the first page with a surah header below line 1, 255 also has a short line
+/// inside the text, 278 holds 16:101 (G-015), 507 has the strongest squeeze (D15).
+const GOLDEN_PAGES: [u32; 9] = [1, 2, 3, 106, 255, 278, 302, 507, 604];
+const PNG_WIDTH: u32 = 1000;
+
+fn sha256(bytes: &[u8]) -> String {
+    use sha2::{Digest, Sha256};
+    Sha256::digest(bytes)
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect()
+}
+
+/// What a golden pins exactly: the draw list's hash and its readable summary.
+fn summary(d: &DrawPage) -> serde_json::Value {
+    serde_json::json!({
+        "page": d.page,
+        "layout_id": d.layout_id,
+        "riwayah": d.riwayah,
+        "draw_sha256": sha256(serde_json::to_string(d).unwrap().as_bytes()),
+        "scale": d.scale,
+        "canonical": d.canonical,
+        "lines": d.lines,
+        "notes": d.notes,
+    })
+}
+
+/// Pixels whose channels differ by more than `tol` (0-255), and the pixel count.
+fn png_diff(a: &[u8], b: &[u8], tol: u8) -> (usize, usize) {
+    let pa = resvg::tiny_skia::Pixmap::decode_png(a).unwrap();
+    let pb = resvg::tiny_skia::Pixmap::decode_png(b).unwrap();
+    assert_eq!(
+        (pa.width(), pa.height()),
+        (pb.width(), pb.height()),
+        "image size changed"
+    );
+    let n = pa.data().len() / 4;
+    let bad = pa
+        .data()
+        .chunks(4)
+        .zip(pb.data().chunks(4))
+        .filter(|(x, y)| x.iter().zip(*y).any(|(p, q)| p.abs_diff(*q) > tol))
+        .count();
+    (bad, n)
+}
+
+/// Compare (or, with MUSHAF_UPDATE_GOLDEN=1, write) one golden page.
+pub fn check_golden(name: &str, d: &DrawPage) {
+    let dir = repo().join("tests/golden/pages");
+    let (json_path, png_path) = (
+        dir.join(format!("{name}.json")),
+        dir.join(format!("{name}.png")),
+    );
+    let json = serde_json::to_string_pretty(&summary(d)).unwrap() + "\n";
+    let png = mushaf_render::png(&mushaf_render::svg(d), PNG_WIDTH).unwrap();
+    if std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some() {
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(&json_path, &json).unwrap();
+        fs::write(&png_path, &png).unwrap();
+        return;
+    }
+    let want = fs::read_to_string(&json_path).unwrap_or_else(|_| panic!("missing {json_path:?}"));
+    assert_eq!(json, want, "{name}: draw list or line fit changed");
+    let (bad, n) = png_diff(&png, &fs::read(&png_path).unwrap(), 32);
+    assert!(bad * 1000 <= n, "{name}: {bad} of {n} pixels differ");
+}
+
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn golden_pages() {
+    let r = Renderer::load(&repo(), "hafs").unwrap();
+    for page in GOLDEN_PAGES {
+        let d = r.render(page, None).unwrap();
+        assert!(d.canonical);
+        check_golden(&format!("hafs-p{page:03}"), &d);
+    }
 }
 
 /// G-015 (owner print check, page 278, 16:101, 2026-10-21): the pause sign that follows a
