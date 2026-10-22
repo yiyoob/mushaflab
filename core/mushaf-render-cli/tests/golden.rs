@@ -508,3 +508,38 @@ fn edit_demo_line_still_closes_and_page_is_marked() {
     }
     check_golden(&name, &edited);
 }
+
+/// D15 line pitch: no ink of adjacent lines touches on any page (glyph outlines and header
+/// frames rasterised without anti-aliasing, `mushaf_render::collide`). The detector must also
+/// find a known collision: at a pitch of 1,850 the tail of a stretched letter on page 410 line
+/// 14 touches a pause sign on line 15 (checked visually by overlaying the two lines, 2026-10-22).
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn adjacent_lines_never_collide_at_the_profile_pitch() {
+    use mushaf_render::collide::line_pairs;
+    let mut r = Renderer::load(&repo(), "hafs").unwrap();
+    let pitch = r.profile.geometry.line_pitch;
+    let resolved = r.resolve(None).unwrap();
+    let mapping = r.map(&resolved).unwrap();
+    let mut pairs = Vec::new();
+    for page in 1..=604 {
+        let d = r.draw(&r.fit(&resolved, &mapping, page).unwrap()).unwrap();
+        pairs.extend(line_pairs(&d, pitch));
+    }
+    let hits: Vec<_> = pairs.iter().filter(|p| p.collides).collect();
+    assert!(hits.is_empty(), "lines collide at pitch {pitch}: {hits:?}");
+    let tightest = pairs.iter().map(|p| p.tightest_pitch).max().unwrap();
+    eprintln!(
+        "collisions: {} line pairs clear at pitch {pitch}; tightest safe pitch {tightest}",
+        pairs.len()
+    );
+    r.profile.geometry.line_pitch = 1850;
+    let d = r.draw(&r.fit(&resolved, &mapping, 410).unwrap()).unwrap();
+    let known = line_pairs(&d, 1850);
+    assert!(
+        known
+            .iter()
+            .any(|p| p.upper == 14 && p.lower == 15 && p.collides),
+        "the detector misses a known collision"
+    );
+}

@@ -3,6 +3,8 @@
 //! SVG comes from `mushaf-draw`; PNG is rasterised here with resvg. All logic is in `core/`
 //! crates (rule 7); this crate only reads files and calls them.
 
+pub mod collide;
+
 use std::fs;
 use std::path::{Path, PathBuf};
 

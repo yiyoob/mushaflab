@@ -503,6 +503,22 @@ Evidence (all 604 pages, `cargo run --release -p mushaf-layout --example fit_rep
 | 16,500 | 401 | 131 | 419 | 0.814 | 2.28 / 3.78 / 5.54 |
 
 With 17,800, 6,785 of 8,820 text lines stretch letters (median gain 1,845 font units).
+Line pitch (added 2026-10-22, at the owner's request after the G1 print check): an ink-collision
+check (`mushaf-render-cli/src/collide.rs`, in `just golden`) rasterises each line's glyph
+outlines and header frames and tests every pair of adjacent lines on all 604 pages (8,442
+pairs). At 1,900 none touch. The tightest collision-free pitch is 1,890 (page 410, lines
+14-15: a stretched letter's tail above a pause sign); at the print's pitch of about 1,780, 7
+pairs would collide (1,800: 3; 1,850: 1). 1,900 is kept.
+
+| Line pitch | Pairs that collide |
+|---|---|
+| 1,700 | 64 |
+| 1,750 | 21 |
+| 1,780 (the print's proportion) | 7 |
+| 1,800 | 3 |
+| 1,850 | 1 |
+| **1,900 (chosen)** | **0** |
+
 Consequences: page scale depends on the resolved page, so an edit or a riwāyah change can change
 a whole page's size (deterministically). Wide spaces on loose lines are the price of few
 squeezes; the owner judges the balance on the G1 pages. The constants are data: changing them

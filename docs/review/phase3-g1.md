@@ -44,7 +44,10 @@ the ten pages were compared with it.
   name, and its basmalah in header lines is a compact calligraphic form; ours are a plain frame
   with the name and the full-size basmalah (D16). The print's line pitch is about 0.100 of its
   line width (measured on page 3); ours is 0.107 (1,900 / 17,800), so a pitch of about 1,780
-  would match it (D15 constant, owner's choice).
+  would match it (D15 constant, owner's choice). **Checked:** at 1,780, 7 pairs of adjacent lines
+  would have touching ink, because DigitalKhatt's marks reach further than the print's; at
+  1,900 none of the 8,442 pairs touch (the tightest safe pitch is 1,890, page 410 lines 14-15).
+  1,900 stays; `just golden` now fails if any line touches its neighbour.
 
 ## 2. Line fit and overflow (D15)
 
