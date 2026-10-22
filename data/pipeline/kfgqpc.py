@@ -36,9 +36,11 @@ def rows(riwayah: str) -> list[dict]:
     return sources.zip_json(OFFICIAL[riwayah], ".json")  # type: ignore[return-value]
 
 
-def font(riwayah: str) -> TTFont:
+def font_bytes(riwayah: str) -> bytes:
     if riwayah == "bazzi":
-        data = sources.path("kfgqpc-mirror-bazzi-font").read_bytes()
-    else:
-        data = sources.zip_member(OFFICIAL[riwayah], ".ttf")
-    return TTFont(io.BytesIO(data))
+        return sources.path("kfgqpc-mirror-bazzi-font").read_bytes()
+    return sources.zip_member(OFFICIAL[riwayah], ".ttf")
+
+
+def font(riwayah: str) -> TTFont:
+    return TTFont(io.BytesIO(font_bytes(riwayah)))

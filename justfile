@@ -67,6 +67,10 @@ roundtrip *RIWAYAT:
     cargo run --release -q {{manifest}} -p mushaf-roundtrip -- "{{justfile_directory()}}/data" "$out" $riwayat
     {{uv}} run python -m pipeline.roundtrip "$out" $riwayat
 
+# HTML review sheets for the owner (T4.8): build/review/phase4/<riwayah>.html, not tracked
+review-sheets *RIWAYAT:
+    {{uv}} run python -m pipeline.review_sheets {{RIWAYAT}}
+
 # SVG + PNG via reference renderer, e.g. just render PAGE=1 RIWAYAH=hafs
 render *ARGS:
     #!/usr/bin/env bash
