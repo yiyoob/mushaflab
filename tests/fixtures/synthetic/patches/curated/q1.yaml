@@ -4,7 +4,7 @@ patches:
   - id: "q1.attr"
     owner: {level: "qiraah", id: "q1"}
     op: "set_attr"
-    target: "1:1:1"
-    payload: {unset: ["annotations.note"]}
+    target: "2:1:1"
+    payload: {annotations: {base: "q1"}, stretch: 100}
     source: {kind: "test", ref: "fixture"}
     status: "raw-derived"

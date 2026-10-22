@@ -348,8 +348,12 @@ dependencies = [
 name = "mushaf-resolve"
 version = "0.0.0"
 dependencies = [
+ "mushaf-db",
  "mushaf-model",
  "mushaf-rules",
+ "proptest",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

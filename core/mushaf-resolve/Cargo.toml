@@ -8,6 +8,12 @@ publish.workspace = true
 [dependencies]
 mushaf-model.workspace = true
 mushaf-rules.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+mushaf-db.workspace = true
+proptest.workspace = true
+serde_json.workspace = true
 
 [lints]
 workspace = true

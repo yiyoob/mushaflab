@@ -66,7 +66,7 @@ patches:
     owner: {level: "riwayah", id: "r1"}
     op: "set_attr"
     target: "2:1:1"
-    payload: {width_em_delta: -120, stretch: 500, annotations: {note: "synthetic"}}
+    payload: {width_em_delta: -120, stretch: 500, annotations: {note: "synthetic"}, unset: ["annotations.base"]}
     source: {kind: "test", ref: "fixture"}
     status: "raw-derived"
   - id: "r1.opt.on"

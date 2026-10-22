@@ -235,6 +235,11 @@ impl Patch {
         }
     }
 
+    /// The checks parsing enforces, for patches built in code (their fields are public).
+    pub fn validate(&self) -> Result<(), Error> {
+        Patch::try_from(PatchWire::from(self.clone())).map(|_| ())
+    }
+
     /// The id this patch claims in its layer: the new id for an insert, else the target.
     /// At most one patch per key per layer (D9).
     pub fn key(&self) -> Ref {
