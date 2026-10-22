@@ -1,0 +1,21 @@
+{
+  "layout_id": "uthmani-1441h",
+  "corrections": [
+    {
+      "page": 254,
+      "line": 6,
+      "end": "last",
+      "expect": "13:37:9",
+      "set": "13:37:8",
+      "evidence": "owner print check 2026-10-21 (G-011): page 254 line 6 of a printed 1441H mushaf ends with the word before 13:37:9; agrees with quran-qcf4"
+    },
+    {
+      "page": 254,
+      "line": 7,
+      "end": "first",
+      "expect": "13:37:10",
+      "set": "13:37:9",
+      "evidence": "owner print check 2026-10-21 (G-011): page 254 line 7 of a printed 1441H mushaf starts with 13:37:9; agrees with quran-qcf4"
+    }
+  ]
+}
