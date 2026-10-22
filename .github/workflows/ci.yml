@@ -28,7 +28,11 @@ jobs:
           key: sources-${{ hashFiles('data/sources/MANIFEST.json') }}
       - name: Fetch and verify pinned sources
         run: just data-fetch
+      - name: Build data and require tracked files to be current
+        run: |
+          just data-build
+          git diff --exit-code
       - name: Lint and test
         env:
           MUSHAF_REQUIRE_SOURCES: "1"
-        run: just lint core-test core-targets data-test
+        run: just lint core-test core-targets data-test data-verify
