@@ -19,9 +19,9 @@ Consequences: what follows, what it rules out
 
 | ID | Title | Status |
 |---|---|---|
-| D1 | Line policy for non-Ḥafṣ riwāyāt | proposed (S4 done; finalized P5) |
-| D2 | Font per riwāyah | proposed (S2 done; coupled with D3) |
-| D3 | Justification implementation | proposed (S3 done) |
+| D1 | Line policy for non-Ḥafṣ riwāyāt | accepted: native layouts (finalized P5) |
+| D2 | Font per riwāyah | accepted: hybrid (DigitalKhatt + KFGQPC) |
+| D3 | Justification implementation | accepted: Rust port on harfrust |
 | D4 | Draw path | open (P3) |
 | D5 | First platform | accepted (website first) |
 | D6 | Ḥafṣ edition: text + layout + font | accepted: 1441H (font part follows D2) |
@@ -130,8 +130,8 @@ Options:
 Leaning: spine = KFGQPC official v2.0 (newest; differs from v18 only in the tatweel of
 كلا), which resolves G-010. Layout and font: A or B, decided at G0 from S2 and S3.
 
-Decision (owner, GATE G0, 2026-10-21): **the Ḥafṣ pages match the 1441H print** (option A
-for text and layout): KFGQPC's own page data, with word-level line breaks from QUL V4 and
+Decision (owner, GATE G0, 2026-10-21): spine = **KFGQPC official v2.0** (resolves G-010).
+**The Ḥafṣ pages match the 1441H print** (option A for text and layout): KFGQPC's own page data, with word-level line breaks from QUL V4 and
 `quran-qcf4`. Where those two disagree, the printed page decides. The owner checked the
 two disagreements against printed 1441H pages (screenshots supplied 2026-10-21):
 - page 92: line 12 ends with كُلَّ (4:91:8) and line 13 starts with مَا (4:91:9). QUL V4 is
@@ -178,6 +178,19 @@ Options:
 - C: Hybrid: DigitalKhatt for the Mashriqi-script riwāyāt, KFGQPC fonts for Warsh/Qālūn.
 Leaning: decide with D3 at G0. A is the only option complete for all 8 without new font
 work; B/C win only if S3 shows KFGQPC fonts cannot be justified acceptably.
+Decision (owner, GATE G0, 2026-10-21): **C, hybrid.**
+- Ḥafṣ, Shuʿbah, Bazzi, Qunbul, Dūrī, Sūsī (Mashriqi script): DigitalKhatt Madina (`hb/`
+  build from digitalkhatt-js), with calligraphic justification (D3). The text is converted
+  from KFGQPC encoding by a table derived from the data, never written by hand, and verified
+  by round-trip against DigitalKhatt's own text for every Ḥafṣ word. Marks that occur only
+  outside Ḥafṣ get table rows only with owner approval.
+- Warsh, Qālūn: their KFGQPC fonts (Maghribi letterforms), justified by spacing until a
+  calligraphic option exists.
+- **Rule-5 exception (recorded here as CLAUDE.md requires):** the Mashriqi stacks pair the
+  1441H text and layout (D6) with a font of the 1421H design. Evidence that this is safe for
+  the text: identical letters in all 6236 ayahs and a one-to-one mark mapping (S1, S2).
+  What differs is letterform style and line metrics. The required word-level diff is
+  produced when the conversion table is built (G-024) and reviewed by the owner.
 
 ## D3 — Justification implementation
 Status: proposed (evidence from S3)
@@ -213,7 +226,8 @@ Options:
 - D: harfrust for shaping (pure Rust), with variable-axis support available if the
   variable `madinafont` is used later.
 Recommendation: **C on D**: a Rust port of the DigitalKhatt justifier over harfrust
-(pinned exactly), with the 1,559-word parity set kept as a regression test. Calligraphic
+(pinned exactly), with the 1,559-word parity set kept as a regression test.
+Decision (owner, GATE G0, 2026-10-21): accepted. Calligraphic
 justification then requires DigitalKhatt fonts (D2 options B/C); with KFGQPC fonts only
 spacing (and optionally flat kashida) is available.
 
@@ -240,6 +254,8 @@ Options:
 Leaning: B (C as a safety net), so each riwāyah looks like its own printed muṣḥaf. This
 makes line anchors per-riwāyah data (T2.6 must map patched and inserted clusters to the
 riwāyah layout, not only to Ḥafṣ anchors).
+Decision (owner, GATE G0, 2026-10-21): B, native layouts per riwāyah, with C's reporting
+for any line that falls back. Finalized in Phase 5 once fitting results are known.
 
 ## D7 — Licensing and distribution
 Status: accepted

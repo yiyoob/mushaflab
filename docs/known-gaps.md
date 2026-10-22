@@ -14,7 +14,7 @@ by omission. Remove an entry only when its resolution is committed, and cite the
 | G-007 | Cross-check | No independent source exists for the 7 non-Ḥafṣ riwāyāt: QUL Warsh is sourced from KFGQPC and QUL has no Qālūn. All 7 are `single-source`. | T0.2 | Open; owner may supply other sources |
 | G-008 | Sources | Tanzil's file header contains the current year ("2007-2026"), so a fresh download may hash differently with identical text. The pinned copy is authoritative; a re-fetch failing verification needs a text-only diff before re-pinning. | T0.2 | When Tanzil is re-fetched |
 | G-009 | Sources | QUL export URLs embed an export timestamp and change when QUL re-exports. The manifest records the resource page each URL was resolved from (2026-10-21). | T0.2 | When a QUL source must be re-fetched |
-| G-010 | Edition | The spine version is undecided: official KFGQPC v2 text vs the 2022 mirror (Ḥafṣ v18). Switching after Phase 1 needs a new `spine_version` and ID migration. | T0.2 | GATE G0 (D6) |
+| G-010 | Edition | **Resolved at G0 (2026-10-21):** spine = KFGQPC official v2.0. | T0.2 | Done |
 | G-011 | Layout | **Resolved by owner print check (2026-10-21, D6).** QUL V4 and qcf4 disagreed on 4 lines. Page 92 lines 12–13: print agrees with QUL V4 (كُلَّ ends line 12). Page 254 lines 6–7: print agrees with qcf4 (مَا starts line 7). T1.3 must apply the page-254 correction with this provenance and treat any future disagreement as a print check. | T0.3 | Done; apply in T1.3 |
 | G-012 | Segmentation | KFGQPC writes 15:7, 27:20 and 36:22 with one word where QUL, Tanzil and DigitalKhatt have two. QUL layouts reference the split words, so T1.3 must map these explicitly. | T0.3 | T1.3 |
 | G-013 | Encoding | KFGQPC v2.0 writes ayah numbers as U+FC00+(n−1) (presentation-form codepoints its font draws as ayah signs), not digits. The ingest must decode this explicitly (one documented function), and other fonts will not render it. | T0.3 | T1.1 |
@@ -28,4 +28,4 @@ by omission. Remove an entry only when its resolution is committed, and cite the
 | G-021 | Layout | At DigitalKhatt's page geometry 100 of 162 sampled lines are naturally wider than the target; the oracle relies on a per-page font scale. Our overflow policy must include this. | T0.5 | T5.2 (D1) |
 | G-022 | Layout | Non-Ḥafṣ KFGQPC layouts are per ayah only; word-level line breaks inside ~4,450 multi-line ayahs per riwāyah must be fitted (D1 option B). | T0.6 | Phase 5 |
 | G-023 | Layout | Warsh, Qālūn, Dūrī and Sūsī have 241 lines with no ayah, Ḥafṣ/Shuʿbah/Bazzi/Qunbul 240. The extra line is unexplained. | T0.6 | T4.1 |
-
+| G-024 | Edition | Rule-5 exception (D2): Mashriqi riwāyāt render the 1441H text and layout with DigitalKhatt Madina, a 1421H design. The word-level diff (KFGQPC 1441H text vs DigitalKhatt 1421H text, after the derived encoding table) must be generated and reviewed by the owner. | G0 | When the KFGQPC to DigitalKhatt table is built (Phase 3, T3.1) |
