@@ -23,6 +23,29 @@ draw list's sha256 and every line's fit). Render any other page with
 | 604 | Last page, three surahs | short end lines |
 | 3 (edited) | T3.7 demo, `hafs-p003-edit.png` | line 2: small sīn, inserted letter, 0.5 em gap; the EDITED marker |
 
+## 1a. Check against the 1441H print preview (2026-10-22)
+
+The owner opened QUL's preview of the KFGQPC V4 layout (1441H print, drawn with the print's
+own V4 word glyphs; `qul.tarteel.ai/resources/mushaf-layout/19`) in the session's browser, and
+the ten pages were compared with it.
+
+- **Line content:** all 121 lines of the ten pages read from the preview's page markup (line
+  kind, first and last word location, number of word and ayah-number glyphs) equal our layout
+  `data/layouts/uthmani-1441h.json`. No line break differs.
+- **Centring:** the preview centres exactly the lines our renderer draws short and centred,
+  including page 2 line 5, which QUL's database flags as not centred (G-041): the preview's own
+  page markup gives it `line--center`.
+- **G-015, page 278 line 13:** the preview has the pause sign over the final letter of its word,
+  as our render does.
+- **G-043, hizb sign:** the preview also draws it as a small star, glued to the next word (page
+  507 line 12). The size matches; we leave a full word space after it, because KFGQPC stores
+  it as its own item.
+- **Look:** the print's surah headers are an ornamental frame with the word "surah" and the
+  name, and its basmalah in header lines is a compact calligraphic form; ours are a plain frame
+  with the name and the full-size basmalah (D16). The print's line pitch is about 0.100 of its
+  line width (measured on page 3); ours is 0.107 (1,900 / 17,800), so a pitch of about 1,780
+  would match it (D15 constant, owner's choice).
+
 ## 2. Line fit and overflow (D15)
 
 All 604 pages, `just golden` and `cargo run --release -p mushaf-layout --example fit_report`:
