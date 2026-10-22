@@ -34,6 +34,12 @@ data-test:
 core-test:
     cargo test {{manifest}} --workspace
 
+# Check the core builds for every platform target (web now, iOS/Android later)
+core-targets:
+    for t in wasm32-unknown-unknown aarch64-apple-ios aarch64-apple-ios-sim aarch64-linux-android x86_64-linux-android; do \
+        cargo check {{manifest}} --workspace --exclude mushaf-render-cli --target $t || exit 1; \
+    done
+
 # Patch round-trip vs KFGQPC for all riwayat in scope
 roundtrip: (_todo "T4.6")
 

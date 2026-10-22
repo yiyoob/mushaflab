@@ -22,4 +22,4 @@ jobs:
       - name: Python
         run: uv python install 3.12 && uv sync --directory data --locked
       - name: Lint and test
-        run: just lint core-test data-test
+        run: just lint core-test core-targets data-test

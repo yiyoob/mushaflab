@@ -91,4 +91,8 @@ Consequences:
   needs an Emscripten or wasm-sysroot build. S3 must measure this.
 - Rule 9 (no network at runtime) applies after the static files load; the site is
   cached for offline use and has no server-side logic.
+- iOS and Android remain planned (owner, 2026-10-21). The core stays platform-neutral:
+  `just core-targets` (in CI) checks the workspace for wasm32, aarch64-apple-ios(-sim) and
+  aarch64/x86_64-linux-android on every push, and platform code lives only in
+  `mushaf-wasm` and `mushaf-ffi`.
 

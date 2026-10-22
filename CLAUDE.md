@@ -41,6 +41,7 @@ just data-build      # run the full ETL, produce build/mushaf.db and exports
 just data-verify     # integrity tests on spine, layout, ayah maps
 just data-test       # pytest for the Python pipeline
 just core-test       # cargo test --workspace
+just core-targets    # cargo check core for wasm32, iOS and Android targets
 just roundtrip       # patch round-trip vs KFGQPC for all riwāyāt in scope
 just render PAGE=1 RIWAYAH=hafs   # SVG + PNG via reference renderer
 just golden          # golden image + line-fit tests
@@ -49,7 +50,7 @@ just lint            # rustfmt/clippy, ruff, license check
 ```
 
 ## Conventions
-- Rust for `core/` (workspace crates). Python 3.12 + `uv` for `data/`. TypeScript for `apps/web` (over the core compiled to WebAssembly, D5); Swift/SwiftUI and Kotlin/Compose for the later mobile apps. Everything in `core/` must build for `wasm32-unknown-unknown`.
+- Rust for `core/` (workspace crates). Python 3.12 + `uv` for `data/`. TypeScript for `apps/web` (over the core compiled to WebAssembly, D5); Swift/SwiftUI and Kotlin/Compose for the later mobile apps. Everything in `core/` must build for the web and mobile targets (`just core-targets`); no platform-specific code in `core/` outside `mushaf-wasm` and `mushaf-ffi`.
 - Cluster ID format: `surah:ayah:word:cluster`, 1-based, e.g. `3:133:1:1`. IDs refer to the **Ḥafṣ spine** of a given spine version (`spine_version` in `data/spine/`). IDs are stable within a spine version; a new spine version ships a migration map from old IDs to new.
 - Items that do not exist in the spine (inserted words, letters, ayah-end markers) get IDs of the form `<anchor-id>+ins.<n>` where `n` is an explicit integer sequence, e.g. `9:100:12:1+ins.1`. Never rely on string sorting of IDs for order.
 - Clusterization uses an explicit, tested codepoint table (`data/pipeline/codepoint_classes.*`), not Unicode general categories alone.
