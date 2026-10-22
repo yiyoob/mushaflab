@@ -22,15 +22,25 @@ OFFICIAL = {
 }
 
 
+BAZZI_DATA = "kfgqpc-mirror-bazzi-data"
+
+
+def source_id(riwayah: str) -> str:
+    """The pinned source id of a riwayah's text."""
+    return BAZZI_DATA if riwayah == "bazzi" else OFFICIAL[riwayah]
+
+
 def rows(riwayah: str) -> list[dict]:
     if riwayah == "bazzi":
-        return sources.json_file("kfgqpc-mirror-bazzi-data")  # type: ignore[return-value]
+        return sources.json_file(BAZZI_DATA)  # type: ignore[return-value]
     return sources.zip_json(OFFICIAL[riwayah], ".json")  # type: ignore[return-value]
 
 
-def font(riwayah: str) -> TTFont:
+def font_bytes(riwayah: str) -> bytes:
     if riwayah == "bazzi":
-        data = sources.path("kfgqpc-mirror-bazzi-font").read_bytes()
-    else:
-        data = sources.zip_member(OFFICIAL[riwayah], ".ttf")
-    return TTFont(io.BytesIO(data))
+        return sources.path("kfgqpc-mirror-bazzi-font").read_bytes()
+    return sources.zip_member(OFFICIAL[riwayah], ".ttf")
+
+
+def font(riwayah: str) -> TTFont:
+    return TTFont(io.BytesIO(font_bytes(riwayah)))

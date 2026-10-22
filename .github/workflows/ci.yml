@@ -53,3 +53,7 @@ jobs:
         env:
           MUSHAF_REQUIRE_SOURCES: "1"
         run: just golden
+      - name: Round-trip raw patches vs KFGQPC (T4.6, D22)
+        env:
+          MUSHAF_REQUIRE_SOURCES: "1"
+        run: just roundtrip

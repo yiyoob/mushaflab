@@ -15,6 +15,8 @@ duplicate and merge keys are errors, and every value must have the type the sche
 (an unquoted `1:1:1` is a base-60 integer in YAML 1.1; `yes` is a boolean).
 """
 
+import copy
+import functools
 import hashlib
 import json
 import sqlite3
@@ -68,7 +70,12 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-class _StrictLoader(yaml.SafeLoader):
+# libyaml's parser when available (the raw patch files are tens of MB, D20); the strict
+# checks below are the same either way.
+_BaseLoader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+
+
+class _StrictLoader(_BaseLoader):  # type: ignore[misc,valid-type]
     pass
 
 
@@ -113,8 +120,14 @@ def load_yaml(path: Path, ascii_only: bool = True) -> object:
     text = path.read_text(encoding="utf-8")
     if ascii_only and not text.isascii():
         raise DataError(f"{path}: must be ASCII (codepoints are written as U+XXXX)")
+    return copy.deepcopy(_parse_yaml(text, str(path)))
+
+
+@functools.lru_cache(maxsize=32)
+def _parse_yaml(text: str, where: str) -> object:
+    """Parsed once per content and process: the raw patch files are tens of MB (D20)."""
     data = yaml.load(text, Loader=_StrictLoader)  # noqa: S506 (a SafeLoader subclass)
-    _check_types(data, "", str(path))
+    _check_types(data, "", where)
     return data
 
 
