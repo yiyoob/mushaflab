@@ -20,11 +20,13 @@ data-pin:
 data-archive *DEST:
     {{uv}} run python -m pipeline.archive {{DEST}}
 
-# Run the full ETL: check codepoint table, rebuild spine + layout files, compile build/mushaf.db
+# Run the full ETL: check codepoint table, rebuild spine + layout files and the font-encoding
+# table (T3.1), compile build/mushaf.db
 data-build:
     {{uv}} run python -m pipeline.codepoints check
     {{uv}} run python -m pipeline.spine build
     {{uv}} run python -m pipeline.ingest_layout build
+    {{uv}} run python -m pipeline.dk_encoding build
     {{uv}} run python -m pipeline.compile_db
 
 # Integrity tests on spine, layout, ayah maps (needs `just data-build` first)

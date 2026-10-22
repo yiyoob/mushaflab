@@ -7,6 +7,14 @@ publish.workspace = true
 
 [dependencies]
 mushaf-model.workspace = true
+harfrust.workspace = true
+read-fonts.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+mushaf-db.workspace = true
+sha2.workspace = true
 
 [lints]
 workspace = true

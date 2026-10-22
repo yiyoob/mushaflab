@@ -32,6 +32,7 @@ Consequences: what follows, what it rules out
 | D11 | Spine file format and item IDs | accepted (Phase 1 plan) |
 | D12 | Core model: formats, patch semantics, DB access | accepted (Phase 2 plan); P2 addendum approved (2026-10-22) |
 | D13 | Phase 4 inputs: Bazzi source, single-source, encoding handling | accepted (2026-10-22) |
+| D14 | KFGQPC to DigitalKhatt Madina encoding table (Ḥafṣ) | accepted (approach with the Phase 3 plan; lossy and owner rows decided 2026-10-22) |
 
 ---
 
@@ -421,4 +422,46 @@ Consequences: the T4.4 differ and T4.5 patch format need a `difference_kind` tag
 non-semantic field the resolver ignores); classification rules must be data-driven and
 listed in the review sheets with their evidence, and anything they cannot classify is
 `unclassified`, never guessed.
+
+## D14 — KFGQPC to DigitalKhatt Madina encoding table (Ḥafṣ)
+Status: accepted (approach approved with the Phase 3 plan; the two open points decided by the
+owner during T3.1, 2026-10-22)
+Date: 2026-10-22
+Context: D2 renders the KFGQPC-encoded Ḥafṣ spine with DigitalKhatt Madina, which uses its own
+encoding (G-006, G-018). The conversion must come from data, never from hand-written rows, and
+must be checked on every word.
+Method (`data/pipeline/dk_encoding.py`, run by `just data-build`):
+- DigitalKhatt's own Madina text (`digitalkhatt-text-madina`) is split into ayahs; its lines
+  are typed by QUL's 1421H layout, which it follows (S1). Its codepoints have their own class
+  table (`data/encodings/digitalkhatt-madina-codepoint-classes.tsv`, Unicode category plus the
+  font's GDEF class as evidence). Its hizb sign, glued to the next word, is split off.
+- Words pair one to one per ayah with equal letter skeletons (`normalize.skeleton`); the three
+  G-012 words pair with two DigitalKhatt words joined.
+- Cluster rows from words with equally many clusters (one counterpart, or the identical one
+  if there are several); sequence rows from the differing window of the other words, accepted
+  only if they never break a word that cluster rows already convert. The core applies the
+  table like the pipeline: the longest sequence first, else the cluster row, else an error.
+- Every spine item is converted and compared with DigitalKhatt's word; the result is the G-024
+  sheet `docs/review/g024-dk-text-diff.html`.
+Result (from pinned sources): 1,354 rows (2 sequence rows, 1 owner row); all 83,865 spine items
+convert; 83,863 equal DigitalKhatt's text; 2 differences (2:97:5, 17:7:12); no ambiguous
+forms; 1 rejected context-dependent candidate (U+0633 U+064F in 17:7:12). The table also
+records a sha256 over every converted item, which the Rust converter must reproduce
+(`core/mushaf-shape/tests/encoding_spine.rs`).
+Findings beyond S2: S2 counted one-to-one cluster forms, but a conversion can still merge two
+KFGQPC forms into one output. 10 rows are such **lossy** rows (in each group of rows with the
+same output, the identity row, else the most used one, is the reference; the others are lossy),
+used by 33 words: 26 with U+06E4 small high madda (no glyph in DigitalKhatt Madina, absent from
+its text) and 7 with yeh + hamza below, which DigitalKhatt writes with hamza above.
+Decisions (owner, 2026-10-22):
+- **Lossy words:** render DigitalKhatt's form for now; the exact 33 are listed (`lossy_items` in
+  the table, G-040) and pinned by tests, so any new lossy word fails. To be resolved before
+  release.
+- **2:97:5:** its standalone tatweel cluster has no counterpart in DigitalKhatt's text, so no
+  row can be derived. The owner approved one identity row (U+0640 to U+0640; the font has a
+  tatweel glyph), kept in `data/encodings/hafs-v1.owner-rows.json` with the decision text.
+  The 1441H text renders as stored.
+Consequences: free-mode edits that create a cluster form with no row cannot be converted yet;
+the edit API (Phase 7) must handle that (reported, never silently passed through). Marks that
+occur only in other riwāyāt still need owner-approved rows (D2), in Phase 5.
 
