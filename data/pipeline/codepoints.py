@@ -120,8 +120,8 @@ def _note(cls: str, category: str, gdef: str) -> str:
     if kinds == {expected_gdef(cls)}:
         return ""
     return (
-        f"REVIEW: Unicode {category} gives class {cls}; KFGQPC font GDEF says {gdef}. "
-        f"Kept as {cls} so clustering follows Unicode."
+        f"Unicode {category} gives class {cls}; KFGQPC font GDEF says {gdef}. "
+        f"Class follows Unicode (owner decision 2026-10-22, G-028)."
     )
 
 

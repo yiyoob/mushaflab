@@ -1,6 +1,6 @@
 codepoint	class	category	name	gdef	used_by	note
 U+0020	space	Zs	SPACE	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
-U+00A0	space	Zs	NO-BREAK SPACE	base:7,nocmap:1	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	REVIEW: Unicode Zs gives class space; KFGQPC font GDEF says base:7,nocmap:1. Kept as space so clustering follows Unicode.
+U+00A0	space	Zs	NO-BREAK SPACE	base:7,nocmap:1	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	Unicode Zs gives class space; KFGQPC font GDEF says base:7,nocmap:1. Class follows Unicode (owner decision 2026-10-22, G-028).
 U+0621	base	Lo	ARABIC LETTER HAMZA	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
 U+0622	base	Lo	ARABIC LETTER ALEF WITH MADDA ABOVE	base:2	duri_abuamr,susi	
 U+0623	base	Lo	ARABIC LETTER ALEF WITH HAMZA ABOVE	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
@@ -74,19 +74,19 @@ U+06DA	mark	Mn	ARABIC SMALL HIGH JEEM	mark:6	hafs,shuba,bazzi,qunbul,duri_abuamr
 U+06DB	mark	Mn	ARABIC SMALL HIGH THREE DOTS	mark:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	
 U+06DC	mark	Mn	ARABIC SMALL HIGH SEEN	mark:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	
 U+06DE	sign	So	ARABIC START OF RUB EL HIZB	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
-U+06DF	mark	Mn	ARABIC SMALL HIGH ROUNDED ZERO	base:6	warsh,qalun,bazzi,qunbul,duri_abuamr,susi	REVIEW: Unicode Mn gives class mark; KFGQPC font GDEF says base:6. Kept as mark so clustering follows Unicode.
+U+06DF	mark	Mn	ARABIC SMALL HIGH ROUNDED ZERO	base:6	warsh,qalun,bazzi,qunbul,duri_abuamr,susi	Unicode Mn gives class mark; KFGQPC font GDEF says base:6. Class follows Unicode (owner decision 2026-10-22, G-028).
 U+06E0	mark	Mn	ARABIC SMALL HIGH UPRIGHT RECTANGULAR ZERO	mark:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	
 U+06E1	mark	Mn	ARABIC SMALL HIGH DOTLESS HEAD OF KHAH	mark:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	
 U+06E2	mark	Mn	ARABIC SMALL HIGH MEEM ISOLATED FORM	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
-U+06E4	mark	Mn	ARABIC SMALL HIGH MADDA	base:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	REVIEW: Unicode Mn gives class mark; KFGQPC font GDEF says base:6. Kept as mark so clustering follows Unicode.
+U+06E4	mark	Mn	ARABIC SMALL HIGH MADDA	base:6	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	Unicode Mn gives class mark; KFGQPC font GDEF says base:6. Class follows Unicode (owner decision 2026-10-22, G-028).
 U+06E5	base	Lm	ARABIC SMALL WAW	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
 U+06E6	base	Lm	ARABIC SMALL YEH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
-U+06E7	mark	Mn	ARABIC SMALL HIGH YEH	base:2,mark:6	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	REVIEW: Unicode Mn gives class mark; KFGQPC font GDEF says base:2,mark:6. Kept as mark so clustering follows Unicode.
-U+06E8	mark	Mn	ARABIC SMALL HIGH NOON	base:2,mark:5	hafs,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	REVIEW: Unicode Mn gives class mark; KFGQPC font GDEF says base:2,mark:5. Kept as mark so clustering follows Unicode.
+U+06E7	mark	Mn	ARABIC SMALL HIGH YEH	base:2,mark:6	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	Unicode Mn gives class mark; KFGQPC font GDEF says base:2,mark:6. Class follows Unicode (owner decision 2026-10-22, G-028).
+U+06E8	mark	Mn	ARABIC SMALL HIGH NOON	base:2,mark:5	hafs,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	Unicode Mn gives class mark; KFGQPC font GDEF says base:2,mark:5. Class follows Unicode (owner decision 2026-10-22, G-028).
 U+06E9	sign	So	ARABIC PLACE OF SAJDAH	base:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
 U+06EA	mark	Mn	ARABIC EMPTY CENTRE LOW STOP	mark:7	hafs,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
 U+06EC	mark	Mn	ARABIC ROUNDED HIGH STOP WITH FILLED CENTRE	mark:8	hafs,shuba,warsh,qalun,bazzi,qunbul,duri_abuamr,susi	
-U+06ED	mark	Mn	ARABIC SMALL LOW MEEM	base:3,mark:3	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	REVIEW: Unicode Mn gives class mark; KFGQPC font GDEF says base:3,mark:3. Kept as mark so clustering follows Unicode.
+U+06ED	mark	Mn	ARABIC SMALL LOW MEEM	base:3,mark:3	hafs,shuba,bazzi,qunbul,duri_abuamr,susi	Unicode Mn gives class mark; KFGQPC font GDEF says base:3,mark:3. Class follows Unicode (owner decision 2026-10-22, G-028).
 U+200D	joiner	Cf	ZERO WIDTH JOINER	base:2	duri_abuamr,susi	
 U+200F	control	Cf	RIGHT-TO-LEFT MARK	base:2	warsh,qalun	
 U+FC00	ayah_number	Lo	ARABIC LIGATURE YEH WITH HAMZA ABOVE WITH JEEM ISOLATED FORM	base:7	hafs,shuba,warsh,qalun,qunbul,duri_abuamr,susi	
