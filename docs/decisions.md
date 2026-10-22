@@ -32,6 +32,9 @@ Consequences: what follows, what it rules out
 | D11 | Spine file format and item IDs | accepted (Phase 1 plan) |
 | D12 | Core model: formats, patch semantics, DB access | accepted (Phase 2 plan); P2 addendum approved (2026-10-22) |
 | D13 | Phase 4 inputs: Bazzi source, single-source, encoding handling | accepted (2026-10-22) |
+| D20 | Phase 4 derivation pipeline: ingest, aligner, differ, emitter | accepted (Phase 4 plan, 2026-10-22) |
+| D21 | Difference-kind tags: what the data can and cannot classify | accepted: C, rows owner-signed (2026-10-22) |
+| D22 | Round-trip check for raw patches | accepted (Phase 4 plan, 2026-10-22) |
 
 ---
 
@@ -422,3 +425,127 @@ non-semantic field the resolver ignores); classification rules must be data-driv
 listed in the review sheets with their evidence, and anything they cannot classify is
 `unclassified`, never guessed.
 
+## D20 — Phase 4 derivation pipeline: ingest, aligner, differ, emitter
+Status: accepted (approved with the Phase 4 plan, 2026-10-22)
+Date: 2026-10-22
+Context: T4.1–T4.5 turn each KFGQPC riwāyah text into raw patches on the Ḥafṣ spine that
+reproduce it codepoint for codepoint (D13). Each step must be deterministic and must report,
+never guess.
+Decision:
+- **Ingest** (`pipeline/ingest_riwayah.py`, T4.1): one parser for all 8 texts. `ingest_kfgqpc`
+  stays the spine's parser, and a test checks that both give identical Ḥafṣ items. Ayah
+  numbers are a U+FC00 sign or, for Bazzi v7, Arabic-Indic digits (`AYAH_NUMBER_STYLE`).
+  Structural departures (`leading_separator`, `multi_separator`, `hizb_inside_ayah`,
+  `attached_ayah_number`, `digit_ayah_number`) are accepted only from the exact per-riwāyah
+  `ANOMALIES` list: found-but-unlisted and listed-but-not-found are both errors (G-070). The
+  ingested texts are rebuilt from verified sources and not tracked;
+  `docs/review/phase4/ingest.md` is tracked and checked by `data-verify`.
+- **Skeleton**: the one normalization function (`normalize.skeleton`) also maps yeh barree
+  U+06D2 to U+0649. It is used only for comparison, never on stored text. Without it, about
+  3,000 Warsh/Qālūn words would not align.
+- **Aligner** (T4.3): per surah, an LCS over tokens (word skeletons, ayah ends, hizb signs),
+  so ayah ends act as anchors. Replace blocks pair words by position (n = m) or by skeleton
+  edit distance (n ≠ m). Every pair with different skeletons and every unpaired word is listed
+  in the alignment report.
+- **Differ** (T4.4): paired words become cluster ops (`set_marks` when the base letter is
+  equal, checked by simulating the resolver; `replace` otherwise; cluster `delete`/`insert`).
+  Separator changes become an item `replace`. Unpaired words become an item `delete` plus an
+  item insert anchored on the neighbouring Ḥafṣ item (D12 replacement). Ayah-end changes are
+  ordinary item and cluster ops.
+- **Emitter** (T4.5): `data/patches/raw/<riwayah>.yaml`, one flow-style patch per line, every
+  string quoted, ASCII only. Patch ids are `<riwayah>.<key>.<op>`, unique across the stack.
+  Every patch has `status: raw-derived`, `single_source: true` and a `difference_kind` (D21).
+  Output is deterministic and rebuilt by `just data-build`.
+Consequences: the patch files are large where encodings differ (Warsh/Qālūn), since every
+codepoint difference is a patch (D13). Exactness is proved by the round-trip (T4.6), not by
+the aligner: a poor alignment can only make patches less readable, never wrong.
+- Measured sizes (T4.5): warsh 25.4 MB, qalun 24.3 MB, bazzi 10.6 MB, susi 8.6 MB,
+  qunbul 7.1 MB, duri_abuamr 7.1 MB, shuba 0.26 MB. To read them in reasonable time,
+  `compile_db` uses libyaml's parser with the same strict checks and parses each file once
+  per process. The Rust YAML reader's resource budget is raised for size only, and
+  third-party crates are optimized in dev/test builds (`core/Cargo.toml`).
+
+## D21 — Difference-kind tags: what the data can and cannot classify
+Status: accepted (owner, 2026-10-22, before GATE G2)
+Date: 2026-10-22
+Context: D13 asks for a `difference_kind` tag per raw patch (`encoding`, `spelling`,
+`reading`, `unclassified`). The rules must be data-driven, evidence must be shown, and
+anything uncertain stays `unclassified`. The Phase 4 plan proposed tagging `encoding` for a
+Ḥafṣ form X that the riwāyah writes as Y when the substitution is **total** (every aligned X
+becomes Y) and **exclusive** (X never occurs in the riwāyah's text).
+Evidence (Phase 4 probe over the pinned texts and the T4.3 alignment):
+- At the codepoint level, totality almost never holds, because reading differences touch the
+  same codepoints. For example, Warsh never uses U+06E1. Of its 37,122 aligned occurrences in
+  Ḥafṣ, 32,383 become U+0652, 1,996 become U+064E, and 1,473 are part of larger changes.
+  The rule tags 1–2 patches per riwāyah.
+- At the cluster-form level, total and exclusive substitutions with at least 50 occurrences
+  include Bazzi `0645 06E1 06D7 → 0645 064F` (77×) and `0649 0670 0653 → 0649 0670` (378×).
+  Whether such a change is an encoding, a spelling or a reading difference is exactly what the
+  data cannot establish; frequency and consistency are not evidence of "same mark".
+- The fonts give no independent evidence either: KFGQPC glyph names are derived from
+  codepoints (`uni06E1`, `afii57458`), not from what a mark means.
+Options:
+- A: the planned total+exclusive rule, with a minimum count. It tags changes whose nature is
+  unknown as `encoding`, which is a guess (rejected under D13).
+- B: frequency-based "dominant counterpart" rules (e.g. X absent from the riwāyah and X→Y in
+  most aligned places). Same objection, with an arbitrary threshold.
+- C (implemented): no automatic `encoding`, `spelling` or `reading`. Rules are: `ayah-number`
+  (any change to an ayah-end item) → `unclassified`; `confirmed` → the kind of an
+  owner-confirmed substitution row in `data/approvals/difference_kinds.yaml` (riwāyah,
+  `from`, `to`, kind, by, date, evidence), applied only when every codepoint difference of a
+  cluster change is a confirmed one-for-one substitution of one kind; `default` →
+  `unclassified`. The table has no rows. Stats (T4.7) list the candidate substitutions with
+  their counts, so the owner can confirm rows.
+Decision (owner, 2026-10-22): **C**, with these choices on the evidence in `stats.md`:
+- Confirmed rows live in **`data/approvals/difference_kinds.yaml`**: only owner-signed commits
+  may change it (CI, rule 4); the pipeline reads it and treats a missing file as no rows;
+  Claude never writes it.
+- **U+06E1 → U+0652 in Warsh and Qālūn: `encoding`.** Evidence: U+06E1 never occurs in either
+  text; 32,383 of 37,122 (Warsh) and 36,538 of 37,121 (Qālūn) aligned occurrences are U+0652;
+  G-006. With these rows, 31,906 Warsh and 35,962 Qālūn patches are tagged `encoding`; the
+  5,238 / 1,182 changes that also alter something else stay `unclassified`.
+- **Pause signs U+06DA, U+06D7, U+06D8 → U+06D6: left `unclassified`.** Several Ḥafṣ signs
+  map to one, so it is not a one-to-one encoding; to be decided with a cited source.
+- **U+0671 (alef waṣla): left `unclassified` for now.** Most occurrences become U+0627 plus
+  added marks, which a one-for-one row cannot express; revisit with the encoding conversion
+  (Phase 6), possibly with cluster-form rows.
+- U+06ED → U+06E2, U+06E0 and U+06E4 were not confirmed.
+Consequences: until rows are confirmed, every raw patch is `unclassified`, and the stats
+separate differences by op shape (marks / letter / word / separator / ayah number), not by
+kind. Adding a confirmed row changes only tags, never text, and is rebuilt by `data-build`.
+
+## D22 — Round-trip check for raw patches
+Status: accepted (approved with the Phase 4 plan, 2026-10-22)
+Date: 2026-10-22
+Context: T4.6 must prove that applying each riwāyah's raw patches to the Ḥafṣ spine gives
+that riwāyah's KFGQPC text exactly, using the one resolver (rule 7).
+Decision:
+- `core/mushaf-roundtrip` (host-only binary, excluded from `core-targets` like `mushaf-db`)
+  loads the data root, resolves `patches/raw/<riwayah>.yaml` on its spine with
+  `mushaf_resolve::resolve` in `Mode::Data` (any report entry fails), and writes the resolved
+  items as JSON lines (`build/roundtrip/`).
+- `pipeline/roundtrip.py` compares them with the pinned source:
+  1. the whole text, codepoint for codepoint;
+  2. each ayah, splitting after every ayah-end item, in order;
+  3. the tracked ayah map (T4.2), whose `first`/`last` must be each ayah's first and last
+     resolved item.
+  It prints the share of exact ayahs and exits 1 on any difference.
+- `just roundtrip [RIWAYAH...]` runs both. CI runs it after the other checks.
+- `pipeline/drift.py` writes `docs/review/phase4/version-drift.md`: official v2.x vs the 2022
+  mirror for every riwāyah that has both, and official Warsh vs QUL `qpc-warsh` words. Ayah
+  numbers are compared by value. Differences are grouped by codepoint change and not judged.
+Result (2026-10-22): 100% for all 7 riwāyāt, with no change to the resolver.
+
+## GATE G2 — Phase 4 review: passed (2026-10-22)
+Owner decisions at GATE G2, given in the planning session and relayed to the Phase 4 session:
+- **Phase 4 approved** (T4.1–T4.8, PR #2). The raw patches in `data/patches/raw/` are exact
+  mirrors of the pinned KFGQPC texts (`just roundtrip`: 100% for all 7 riwāyāt). They are
+  **not yet verified qirāʾāt knowledge**: every patch is `raw-derived` and `single_source`.
+- **D21** was accepted before the gate. The owner-signed rows file
+  `data/approvals/difference_kinds.yaml` (commit 775794f) confirms U+06E1 → U+0652 as
+  `encoding` for Warsh and Qālūn.
+- **Version drift (G-073):** the official v2.x releases are authoritative where they differ from
+  the 2022 mirror, as D13 assumes. The mark-level differences stay in
+  `docs/review/phase4/version-drift.md` for the muqriʾ review (Phase 6 / GATE G4).
+- **Hypotheses (G-074):** the plan's expected cases (Warsh 1:4→1:3, 3:133, 2:10, 2:184) stay
+  documented observations, not tests, until a cited source is available.

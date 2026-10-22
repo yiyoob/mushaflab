@@ -49,3 +49,7 @@ jobs:
         env:
           MUSHAF_REQUIRE_SOURCES: "1"
         run: just lint core-test core-targets data-test data-verify
+      - name: Round-trip raw patches vs KFGQPC (T4.6, D22)
+        env:
+          MUSHAF_REQUIRE_SOURCES: "1"
+        run: just roundtrip

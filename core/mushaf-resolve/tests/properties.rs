@@ -132,6 +132,7 @@ fn build(spine: &Spine, n: usize, s: Spec) -> Patch {
             choice: "c".into(),
         }),
         single_source: false,
+        difference_kind: None,
     }
 }
 

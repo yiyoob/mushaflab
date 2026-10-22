@@ -11,6 +11,7 @@ members = [
     "mushaf-draw",
     "mushaf-render-cli",
     "mushaf-ffi",
+    "mushaf-roundtrip",
 ]
 
 [workspace.package]
@@ -42,3 +43,8 @@ unsafe_code = "forbid"
 
 [workspace.lints.clippy]
 all = { level = "deny", priority = -1 }
+
+# Third-party crates are optimized in dev and test builds: the YAML parser reads ~80 MB of
+# raw patch files in the data tests (D20). Workspace crates keep debug settings.
+[profile.dev.package."*"]
+opt-level = 2
