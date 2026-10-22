@@ -20,8 +20,12 @@ data-pin:
 data-archive *DEST:
     {{uv}} run python -m pipeline.archive {{DEST}}
 
-# Run the full ETL, produce build/mushaf.db and exports
-data-build: (_todo "T1.4")
+# Run the full ETL: check codepoint table, rebuild spine + layout files, compile build/mushaf.db
+data-build:
+    {{uv}} run python -m pipeline.codepoints check
+    {{uv}} run python -m pipeline.spine build
+    {{uv}} run python -m pipeline.ingest_layout build
+    {{uv}} run python -m pipeline.compile_db
 
 # Integrity tests on spine, layout, ayah maps
 data-verify: (_todo "T1.5")
