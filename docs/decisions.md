@@ -30,6 +30,7 @@ Consequences: what follows, what it rules out
 | D9 | ID and patch model details | accepted (revisit end of P2) |
 | D10 | Numeric determinism | accepted |
 | D11 | Spine file format and item IDs | accepted (Phase 1 plan) |
+| D12 | Core model: formats, patch semantics, DB access | accepted (Phase 2 plan) |
 
 ---
 
@@ -310,3 +311,63 @@ Consequences:
   an acceptance criterion for this layout.
 - The rule-5 exception for DigitalKhatt Madina (a 1421H design) on 1441H lines stays (D2).
 
+
+## D12 — Core model: file formats, patch semantics, DB access
+Status: accepted (approved with the Phase 2 plan, 2026-10-22)
+Date: 2026-10-22
+Context: Phase 2 needs exact, deterministic semantics for every op in §3.2 and D9, file
+formats for patches, option groups and ayah maps, and a way to read `mushaf.db` from the core
+that still builds for wasm32, iOS and Android.
+Decision:
+- **DB reader is host-only.** `core/mushaf-db` (rusqlite, bundled SQLite) only runs SELECTs; all
+  row-to-model logic is in `mushaf-model`, which is portable. `mushaf-db` is excluded from
+  `just core-targets`, like `mushaf-render-cli`, because bundled SQLite needs a C toolchain per
+  target (Android NDK, a wasm sysroot). Web DB access is decided in T8.2, mobile in Phase 9 (G-032).
+- **File formats.** Patch, option-group and ayah-map files are YAML, ASCII only (option titles
+  may be Arabic), codepoints as canonical `"U+XXXX"` strings. A patch file is
+  `{spine: <spine id>, patches: [...]}`; the `spine` header pins the id space (D9). Ids and other
+  strings are quoted: PyYAML (YAML 1.1) reads an unquoted `1:1:1:1` as a base-60 integer and
+  `yes`/`off` as booleans. The Rust side reads YAML 1.2 strictly (no duplicate or merge keys,
+  only `true`/`false` as booleans, no unquoted numbers in string fields); `compile_db` rejects
+  any value whose type is not the one the schema expects, and the T2.2 parity test compares the
+  two readers on the same files. Rust writes YAML with every string quoted.
+- **Attributes are integers** (D10): `width_em_delta` in 1/1000 em, `stretch` in 1/1000 (its
+  meaning is fixed in T3.2), `annotations` string to string. Non-integer numbers are rejected.
+- **Ids** (`core/mushaf-model/src/ids.rs`): item `s:a:n`, cluster `s:a:w:c`, inserted
+  `<anchor>+ins.<seq>` (nestable), the clusters of an inserted item `<item-ins-id>:<k>`, mark
+  `<cluster>#m<n>`. Canonical decimal only, so each id has exactly one spelling. Order never
+  comes from id strings.
+- **Ops**: `delete` (item or cluster); `replace` (cluster: `{kind, cps}`; item:
+  `{sep_before?, sep_after?}`, since an item's clusters change through cluster ops);
+  `insert_before`/`insert_after` (`{seq, item}` next to an item, `{seq, cluster}` next to a
+  cluster; new id `<target>+ins.<seq>`; siblings on one side are ordered by integer `seq`);
+  `set_marks` (`remove: [cp]` removes the first occurrence, then `add` appends a bare `cp` or
+  inserts `{cp, at}` at mark index `at`); `clear_marks`; `set_attr` (set
+  `width_em_delta`/`stretch`/`annotations`, or `unset` them). "Marks" are a cluster's codepoints
+  after its first one (a joiner counts as a mark position). Mark ids parse, but marks change
+  only through `set_marks`.
+- **Layers**: a patch with `when` is in the option layer; otherwise its layer is
+  `owner.level` (`qiraah`, `riwayah`, `tariq`, `user`). Priority
+  `qiraah < riwayah < tariq < option < user`.
+- **Errors** (resolution fails): two patches with the same key in one layer (an insert's key is
+  the id it creates); in one layer, a patch on a cluster of an item that layer deletes; a patch
+  file for another spine; an unknown option group, an unknown choice, or no choice and no default.
+- **Reported, never dropped**: *orphan* (target or anchor deleted by a lower layer: a
+  modification is not applied; an insert is still placed at the deleted anchor's position and
+  marked applied); *unresolved* (the id does not exist); *id collision* (an insert creates an id
+  a lower layer already created; not applied); *ineffective* (removing an absent mark; an
+  out-of-range `at` is appended). `Mode::Data` turns any report into an error; `Mode::Free`
+  returns the result with the report (rule 11).
+- **Engine**: a tree with tombstones. Deleted nodes keep their place, and each node keeps its
+  before/after inserted children sorted by `seq`; the output is the in-order walk. Inside a
+  layer the result therefore does not depend on the order patches are listed in.
+- **Statuses in patch files**: `raw-derived`, `rule-derived`, and `user-edit` (user layer
+  only, and required there). `cross-checked` and `muqri-verified` are rejected (rule 4).
+  `single_source: true` is the optional §3.5 tag.
+- **Option defaults**: a list of `{riwayah, tariq?, choice}`. The user's selection wins, then
+  the ṭarīq's default, then the riwāyah's; with none of these, resolution fails rather
+  than guess. `allowed_for` produces lint notes only. A patch with `when.option = g` must be
+  listed in `g.affects`.
+Consequences: the Phase 4 differ emits exactly these ops (word replacement = delete + insert,
+separator changes = item `replace`). Riwāyah profiles (T5.1) choose which patch files form the
+stack. Revisit together with D9 at the end of Phase 2.

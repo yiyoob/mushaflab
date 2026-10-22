@@ -26,6 +26,15 @@ mushaf-layout = { path = "mushaf-layout" }
 mushaf-shape = { path = "mushaf-shape" }
 mushaf-justify = { path = "mushaf-justify" }
 mushaf-draw = { path = "mushaf-draw" }
+mushaf-db = { path = "mushaf-db" }
+# Third-party versions are pinned exactly (determinism, reproducible builds).
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.154"
+serde-saphyr = { version = "=2.0.0", default-features = false, features = ["deserialize", "serialize"] }
+rusqlite = { version = "=0.40.2", features = ["bundled"] }
+proptest = { version = "=1.12.0", default-features = false, features = ["std"] }
+sha2 = "=0.11.1"
+zip = { version = "=9.0.5", default-features = false, features = ["deflate"] }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
