@@ -24,7 +24,7 @@ Consequences: what follows, what it rules out
 | D3 | Justification implementation | proposed (S3 done) |
 | D4 | Draw path | open (P3) |
 | D5 | First platform | accepted (website first) |
-| D6 | Ḥafṣ edition: text + layout + font | proposed (S1 done; final after S2/S3) |
+| D6 | Ḥafṣ edition: text + layout + font | accepted: 1441H (font part follows D2) |
 | D7 | Licensing and distribution | accepted (owner-declared) |
 | D8 | Script/layout scope | accepted |
 | D9 | ID and patch model details | accepted (revisit end of P2) |
@@ -129,6 +129,17 @@ Options:
   KFGQPC's page data.
 Leaning: spine = KFGQPC official v2.0 (newest; differs from v18 only in the tatweel of
 كلا), which resolves G-010. Layout and font: A or B, decided at G0 from S2 and S3.
+
+Decision (owner, GATE G0, 2026-10-21): **the Ḥafṣ pages match the 1441H print** (option A
+for text and layout): KFGQPC's own page data, with word-level line breaks from QUL V4 and
+`quran-qcf4`. Where those two disagree, the printed page decides. The owner checked the
+two disagreements against printed 1441H pages (screenshots supplied 2026-10-21):
+- page 92: line 12 ends with كُلَّ (4:91:8) and line 13 starts with مَا (4:91:9). QUL V4 is
+  right; qcf4 is wrong.
+- page 254: line 6 ends with بَعۡدَ (13:37:8) and line 7 starts with مَا (13:37:9). qcf4 is
+  right; QUL V4 is wrong.
+The font half of the stack follows D2: KFGQPC fonts keep the stack within one edition;
+DigitalKhatt fonts (a 1421H design) on 1441H lines would be a documented rule-5 exception.
 
 ## D2 — Font per riwāyah
 Status: proposed (evidence from S2; decided together with D3 at G0)
