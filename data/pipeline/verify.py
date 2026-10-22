@@ -17,6 +17,7 @@ from pathlib import Path
 
 from pipeline import (
     align,
+    ayah_maps,
     codepoints,
     compile_db,
     drift,
@@ -58,6 +59,8 @@ def check_tracked_files_current() -> list[str]:
         path = emit_patches.path_for(r)
         if not path.exists() or path.read_text(encoding="ascii") != emit_patches.render(r):
             out.append(f"patches/raw/{path.name} differs from a rebuild")
+    if ayah_maps.main(["", "check"]) != 0:
+        out.append("ayah maps or docs/review/phase4/ayah-maps.md differ from a rebuild")
     if drift.REPORT_PATH.read_text(encoding="utf-8") != drift.report():
         out.append("docs/review/phase4/version-drift.md differs from a rebuild")
     return out

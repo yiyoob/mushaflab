@@ -38,11 +38,17 @@ def _hafs() -> tuple[list[ingest_riwayah.Item], dict[str, dict]]:
     return ingest_riwayah.load("hafs").items, {r["id"]: r for r in spine.load_records()}
 
 
-def changes_for(riwayah: str) -> list[differ.Change]:
+@functools.cache
+def derive(riwayah: str) -> tuple[list[align.Pair], list[differ.Change]]:
+    """The alignment (T4.3) and the changes (T4.4) for one riwayah."""
     table = load_table()
     hafs_items, recs = _hafs()
     pairs = align.align_text(hafs_items, ingest_riwayah.load(riwayah).items)
-    return differ.diff(pairs, recs, lambda t: clusterize(t, table))
+    return pairs, differ.diff(pairs, recs, lambda t: clusterize(t, table))
+
+
+def changes_for(riwayah: str) -> list[differ.Change]:
+    return derive(riwayah)[1]
 
 
 def patch_dict(riwayah: str, change: differ.Change, ref: str, tag: classify.Tag) -> dict:

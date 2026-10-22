@@ -7,8 +7,8 @@ For each riwayah:
      codepoint;
   2. splitting the resolved items after each ayah-end item gives the source's ayahs one by
      one, in order, each exactly equal;
-  3. if the tracked ayah map exists (T4.2), each entry's `first`..`last` items are exactly
-     that ayah's items.
+  3. the tracked ayah map (T4.2) names, for every ayah in order, its first and last
+     resolved item.
 Prints the share of exact ayahs and the first problems; exit 1 unless everything is exact.
 """
 
@@ -119,8 +119,7 @@ def main(argv: list[str]) -> int:
     print("|---|---|---|---|")
     results = []
     for r in riwayat:
-        map_path = AYAH_MAP_DIR / f"{r}.yaml"
-        amap = load_yaml(map_path) if map_path.exists() else None
+        amap = load_yaml(AYAH_MAP_DIR / f"{r}.yaml")
         res = check(r, load_resolved(folder / f"{r}.jsonl"), kfgqpc.rows(r), amap)  # type: ignore[arg-type]
         results.append(res)
         pct = 100 * res.exact / res.ayahs if res.ayahs else 0
