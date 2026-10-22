@@ -9,10 +9,16 @@ _default:
     @just --list --unsorted
 
 # Download pinned sources, verify checksums
-data-fetch: (_todo "T0.2")
+data-fetch:
+    {{uv}} run python -m pipeline.fetch fetch
 
-# Dated private backup of raw sources + manifest (outside git)
-data-archive: (_todo "T0.2")
+# Record hashes for sources not yet pinned (never changes an existing hash)
+data-pin:
+    {{uv}} run python -m pipeline.fetch pin
+
+# Dated private backup of raw sources + manifest (outside git), default ~/mushaflab-archive
+data-archive *DEST:
+    {{uv}} run python -m pipeline.archive {{DEST}}
 
 # Run the full ETL, produce build/mushaf.db and exports
 data-build: (_todo "T1.4")

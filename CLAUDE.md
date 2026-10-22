@@ -35,6 +35,7 @@ Stage 1 covers the 8 riwāyāt for which KFGQPC publishes full text, in the **15
 ## Commands (created in T0.1; keep them working)
 ```
 just data-fetch      # download pinned sources, verify checksums
+just data-pin        # record hashes for new, unpinned sources (never changes a pinned hash)
 just data-archive    # dated private backup of raw sources + manifest (outside git)
 just data-build      # run the full ETL, produce build/mushaf.db and exports
 just data-verify     # integrity tests on spine, layout, ayah maps

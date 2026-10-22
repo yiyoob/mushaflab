@@ -36,7 +36,7 @@ Stage 1 delivers the **8 riwāyāt for which full source text exists**, on a ful
 | `duri_abuamr` | al-Dūrī | Abū ʿAmr | `doori` |
 | `susi` | al-Sūsī | Abū ʿAmr | `soosi` |
 
-Secondary cross-check sources: QUL Warsh and Qālūn word-by-word scripts; for Ḥafṣ, an independent ʿUthmānī text (Tanzil and/or QUL, chosen in T0.2). The other five riwāyāt have one source only and are tagged `single-source`.
+Cross-check sources (established in T0.2): for Ḥafṣ, the Tanzil ʿUthmānī v1.1 text, an independent digitization. For the other 7 riwāyāt no independent source exists: QUL's Warsh script is itself sourced from KFGQPC, and QUL has no Qālūn text. All 7 are tagged `single-source`. Older KFGQPC versions (2022 mirror) and QUL Warsh are used only to detect version drift.
 
 ### Script and layout
 Stage 1 builds one script and one layout family: **Madinah ʿUthmānī, 15 lines per page** (`script_id: uthmani`, `layout_id` fixed by D6). Every table, file name and API still takes `script_id` and `layout_id` as explicit keys, so Stage 1b can add Indo-Pak without migrations.
@@ -241,16 +241,17 @@ Conventions: each task has an ID and an acceptance command. A `GATE` is a hard s
 Goal: scaffold, acquire and checksum all sources, and answer the risky unknowns before building.
 
 - **T0.1 Scaffold.** Repo layout, `justfile`, Rust workspace, Python `uv` project, CI running `just lint core-test`. *Accept:* `just lint core-test` passes on empty crates.
-- **T0.2 Source acquisition.**
-  - Fetch the 8 KFGQPC texts and fonts (official `qurancomplex.gov.sa/en/techquran/dev/`, or the `thetruetruth/quran-data-kfgqpc` mirror pinned to a commit).
-  - Fetch QUL layouts (Madinah V1 1405H, V2) and QUL Warsh/Qālūn word scripts.
-  - Fetch DigitalKhatt `madinafont` and `oldmadinafont` (OFL-1.1).
-  - Fetch one independent Ḥafṣ ʿUthmānī text for cross-checking (Tanzil and/or QUL).
-  - Write `MANIFEST.json` (url, commit/version, sha256) and `LICENSES.md` (terms, redistribution allowed y/n/unknown).
+- **T0.2 Source acquisition.** *(Done; see `data/sources/MANIFEST.json` for the pinned list.)*
+  - KFGQPC: the official v2 zips for 7 riwāyāt via their Internet Archive captures (the official host is unreachable from the dev machine), each checked against the archive's content digest. Bazzi v2-0 was never archived, so Bazzi uses the `thetruetruth/quran-data-kfgqpc` mirror (v7), which is also pinned for all 8 for version comparison.
+  - QUL: layouts V1 1405H, V2 1421H, V4 1441H and DigitalKhatt V2; KFGQPC Ḥafṣ and Warsh word-by-word scripts. QUL has no Qālūn script.
+  - DigitalKhatt: `oldmadinafont`, `madinafont` and DigitalKhatt's own encoded text with line breaks (`digitalkhatt-js`).
+  - `quran-qcf4@1.1.0` (npm): per-line word lists of the 1441H print.
+  - Tanzil ʿUthmānī v1.1: the independent Ḥafṣ cross-check text.
+  - Write `MANIFEST.json` (url, commit/version, sha256) and `LICENSES.md`.
   - If a source needs a login or is blocked by the sandbox, the owner downloads it manually into `data/sources/raw/` and the script verifies the checksum.
   - `just data-archive` writes a dated tarball of `raw/` plus `MANIFEST.json` to a private backup location the owner chooses (outside git). Sources can change or disappear; a checksum alone cannot restore them.
   - *Accept:* `just data-fetch` verifies all checksums.
-- **T0.3 Spike S1 — edition, layout and font pairing.** Determine which printing the KFGQPC `hafs` text follows (from its own metadata/docs, not memory). Determine which QUL layout matches `oldmadinafont` and `madinafont`. Diff the KFGQPC `hafs` words against the candidate layout's word list for the whole Qurʾān (count, segmentation, text) and report every difference. Reproduce page 1–2 line breaks. Reference: `tarekeldeeb/quran-madina-html` PR #14 (clone to `/tmp`). *Output:* ADR for D6 with the diff summary.
+- **T0.3 Spike S1 — edition, layout and font pairing.** Determine which printing the KFGQPC `hafs` text follows (from its own metadata/docs, not memory). Determine which QUL layout matches `oldmadinafont` and `madinafont`. Diff the KFGQPC `hafs` words against the candidate layout's word list for the whole Qurʾān (count, segmentation, text) and report every difference. Reproduce page 1–2 line breaks. There are three candidate editions (1405H, 1421H, 1441H), each with layouts from up to three sources (QUL, KFGQPC per-ayah `page`/`line_*` fields, `quran-qcf4` for 1441H). Compare them, and compare DigitalKhatt's own line breaks against the print, which `quran-madina-html` reports differ on 1,620 of 8,802 lines for 1441H. Also decide whether the spine is built from the official v2 text or the 2022 mirror, since switching later means a new `spine_version`. Reference: `tarekeldeeb/quran-madina-html` PR #14 (clone to `/tmp`). *Output:* ADR for D6 with the diff summary.
 - **T0.4 Spike S2 — font coverage and shaping audit.** For each of the 8 texts, list all codepoints used, and build the first draft of the codepoint class table. For each candidate font (KFGQPC riwāyah font, DigitalKhatt fonts): (1) missing codepoints; (2) **shape the full text** with HarfBuzz and report every `.notdef`, every inserted dotted circle, and every mark with no mark/mkmk attachment; (3) encoding-convention mismatches (the text uses a codepoint the font maps but for a different visual role); (4) letterform differences (e.g. whether Warsh/Qālūn text needs Maghribi forms, to confirm from the source fonts). *Output:* `docs/font-coverage.md`, ADR for D2.
 - **T0.5 Spike S3 — justification feasibility.** Justify one Ḥafṣ line with each D3 option (A, B, C, D) and compare to `quran-madina-html`'s `justify.py` as oracle. Include a case where one extra mark (small sīn) widens a word. Measure effort, fidelity and build complexity for iOS/Android. *Output:* ADR for D3.
 - **T0.6 Spike S4 — layouts for non-Ḥafṣ.** Check whether QUL or KFGQPC provides line layouts for Warsh/Qālūn or other riwāyāt. In particular, inspect the page/line fields in each KFGQPC riwāyah data file: are they present, at what granularity (ayah or word), and are they consistent (every page has 15 lines, no gaps)? *Output:* input to D1.
@@ -320,7 +321,7 @@ Runs after Phase 2 and before Phase 3 (see execution order). Order: `shuba` → 
 - **T4.3 Aligner.** Per surah, align word sequences on the consonantal skeleton (marks stripped), using ayah anchors as constraints. Output an alignment report listing every unaligned segment. Unaligned segments go to `known-gaps.md`.
 - **T4.4 Differ.** Inside aligned words, diff at cluster level into ops. Across unaligned spans, emit word insert/delete ops.
 - **T4.5 Emit** `data/patches/raw/<riwayah>.yaml` with `status: raw-derived`.
-- **T4.6 Round-trip.** `apply(raw patches, hafs spine)` must equal the KFGQPC target codepoint-for-codepoint. *Accept:* `just roundtrip` shows 100% for the riwāyah. Any mismatch is a bug in the aligner or differ, or a documented source anomaly. For Warsh and Qālūn, also cross-check against the QUL scripts (skeleton level) and report differences; all other riwāyāt are tagged `single-source`.
+- **T4.6 Round-trip.** `apply(raw patches, hafs spine)` must equal the KFGQPC target codepoint-for-codepoint. *Accept:* `just roundtrip` shows 100% for the riwāyah. Any mismatch is a bug in the aligner or differ, or a documented source anomaly. All 7 riwāyāt are tagged `single-source`: no independent digitization was found (T0.2). For each, also diff the official v2 text against the 2022 mirror version, and for Warsh against QUL's `qpc-warsh` script, and report differences; these catch version drift and transcription slips, not reading errors.
 - **T4.7 Stats.** Per riwāyah: counts by op type, by surah, and by "mark-only" vs "consonant change". These show how much is uṣūl and how much is farsh/rasm.
 - **T4.8 Review sheets.** Generate HTML sheets for the owner to review per surah. Include known-tricky cases: 3:133 (Warsh drops the initial wāw of *sāriʿū*), 2:184 and 2:10 (Ḥafṣ vs Warsh word differences, with Warsh numbering shifts). These are `hypothesis` until the owner confirms them against a cited source; the sheet shows what the data says, it does not assert it.
 
@@ -422,7 +423,7 @@ Attribution and license screen, data-provenance screen, size budget, offline tes
 |---|---|
 | Spine text, layout and font come from different printings | S1 word-level diff; D6 precondition; CLAUDE.md rule 5 |
 | Font draws wrong output without erroring (dotted circles, unattached marks, encoding mismatch) | Full-text shaping audit in S2; shaping-integrity test on every page |
-| KFGQPC text has an error we faithfully reproduce | Independent Ḥafṣ cross-check (T1.6); QUL cross-check for Warsh/Qālūn; `single-source` tag |
+| KFGQPC text has an error we faithfully reproduce | Independent Ḥafṣ cross-check against Tanzil (T1.6); version comparison official v2 vs 2022 mirror (and QUL for Warsh); `single-source` tag on all 7 non-Ḥafṣ riwāyāt |
 | Edited pages circulate as authentic | Non-removable "edited" marker (T7.3) |
 | Source disappears or changes upstream | Private dated archive of `raw/` (T0.2) |
 | Fonts lack marks or letterforms needed by some riwāyāt (S2) | Audit in P0, extend a font with visualmetafont, glyph-ID escape hatch |
@@ -431,7 +432,6 @@ Attribution and license screen, data-provenance screen, size budget, offline tes
 | Alignment errors create wrong patches | Round-trip test is exact; human review sheets |
 | Non-Ḥafṣ lines overflow Ḥafṣ-anchored line widths | Overflow policy and report (D1) |
 | LLM-generated religious content creeping in | CLAUDE.md rule 1; provenance on every patch; owner-only verification statuses |
-| License constraints on KFGQPC, QUL, DigitalKhatt tooling | P0 license review; nothing tracked until cleared |
 | Performance on older devices | Caching by state hash; device benchmark in P8 |
 
 ---
