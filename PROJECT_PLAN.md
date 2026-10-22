@@ -18,6 +18,7 @@ Stage 1 delivers the **8 riwāyāt for which full source text exists**, on a ful
 - S3 also evaluates `harfrust` and any variable-font justification from DigitalKhatt (D3).
 - S4 checks KFGQPC per-riwāyah page/line data, which may change D1 (T0.6).
 - Private backup archive of raw sources (T0.2).
+- Website first (D5): Phase 8 is a web app on the core compiled to WebAssembly; mobile apps move to Phase 9.
 
 ---
 
@@ -126,8 +127,10 @@ mushaf-project/
 │   ├── mushaf-justify/         # justification
 │   ├── mushaf-draw/            # draw commands, SVG backend
 │   ├── mushaf-render-cli/
-│   └── mushaf-ffi/             # UniFFI
+│   ├── mushaf-wasm/            # wasm-bindgen, for the website
+│   └── mushaf-ffi/             # UniFFI, for the mobile apps
 ├── apps/
+│   ├── web/
 │   ├── ios/
 │   └── android/
 └── tests/golden/               # reference images + expected json
@@ -219,7 +222,7 @@ An orthogonal tag `single-source: true` marks data that no second independent so
 | D2 | Font per riwāyah | Spike S2 decides. Possibly DigitalKhatt for Madanī-style scripts and KFGQPC fonts or an extended DigitalKhatt font where marks or letterforms are missing. | G0 |
 | D3 | Justification implementation | A: vendor DigitalKhatt's HarfBuzz fork via FFI. B: precomputed per-word font features. C: port the justifier to Rust using digitalkhatt-js (MIT) as reference. D: `harfrust` (pure-Rust HarfBuzz port) plus variable-font axes, if DigitalKhatt publishes a variable-font justification path. Verify licenses of each. | G0 |
 | D4 | Draw path | Core returns positioned glyph outlines (paths), platforms draw paths. Revisit for performance. | P3 |
-| D5 | First mobile platform | Whichever iterates faster for you. Decide at G1. | G1 |
+| D5 | First platform | **Website first** (Rust core → WebAssembly), then iOS/Android. | Decided by owner 2026-10-21 (record ADR) |
 | D6 | Ḥafṣ edition: text + layout + font | QUL Madinah V1 (1405H) with DigitalKhatt Old Madina is the known prior pairing (see `quran-madina-html`). **Precondition:** the spine text must be from the same printing. Establish which printing the KFGQPC `hafs` text follows; if it differs from the layout's printing, choose one edition and source all three from it, or record every word-level difference. Confirm in S1. | G0 |
 | D7 | Licensing and distribution | Per-source rows in `LICENSES.md`. AGPL tooling (visualmetafont) used only as a tool unless cleared. Explicitly check whether KFGQPC's terms permit (a) storing their text as patches against another text, and (b) a free-edit mode. | G0 |
 | D8 | Script/layout scope | Stage 1 = Madinah ʿUthmānī 15-line only. Indo-Pak 15/13 = Stage 1b, as a second spine (`script_id`), not patches on the ʿUthmānī spine. | Decided v2 (record ADR in T0.1) |
@@ -306,7 +309,7 @@ Goal: prove rendering and justification end to end on desktop before any mobile 
 - **T3.6 Perf harness.** Resolve + shape + justify per page, with caching keyed by `(word, state hash)`. Record desktop numbers. The 16 ms/page budget is verified on a device in Phase 8.
 - **T3.7 Edit demo.** Insert a mark (small sīn) and a letter, widen a word, and confirm the line still closes. *Accept:* golden images and line-fit tests.
 
-**GATE G1:** owner reviews 10 rendered pages against the printed muṣḥaf and decides D5 (first mobile platform).
+**GATE G1:** owner reviews 10 rendered pages against the printed muṣḥaf. (D5 is already decided: website first.)
 
 ---
 
@@ -368,22 +371,22 @@ Goal: replace raw diffs with rules so toggling works. This is where "complete ch
 
 ---
 
-### Phase 8 — Mobile app #1 (L)
+### Phase 8 — Web app (L)
 
-Platform per D5.
+Platform per D5: **a website first** (owner, 2026-10-21), because it is the fastest way to exercise and test the qirāʾāt engine. The Rust core is compiled to WebAssembly and runs in the browser, so the site uses the same resolver, layout and justification as the CLI (P3). It is static: the DB and fonts are served as files and cached for offline use, with no server-side logic and no network calls beyond loading those files (rule 9 applies to everything after load).
 
-- **T8.1 FFI.** UniFFI bindings; build scripts (xcframework or cargo-ndk).
-- **T8.2 Data.** Bundle `mushaf.db` and fonts. Load the same DB format the CLI uses.
-- **T8.3 UI.** RTL pager, canvas drawing of core draw commands, riwāyah picker, option sheet, free-edit editor, provenance/verification-status screen.
-- **T8.4 Performance.** Verify the 16 ms/page budget on a real mid-range device; tune caching.
-- **T8.5 Tests.** Screenshot tests against core goldens.
+- **T8.1 WASM bindings.** `mushaf-wasm` crate (wasm-bindgen) next to `mushaf-ffi`; build script producing a JS/WASM package. *Accept:* the same golden page resolves byte-identically in the CLI and in WASM.
+- **T8.2 Data.** Serve `mushaf.db` (or a derived static format) and fonts; same content as the CLI uses. Cache for offline use.
+- **T8.3 UI.** RTL pager, drawing of core draw commands (SVG or Canvas), riwāyah picker, option sheet, free-edit editor, provenance/verification-status screen, and an engine-inspector view (patch stack, applied rules, per-cluster provenance) for testing qirāʾāt.
+- **T8.4 Performance.** Verify the 16 ms/page budget in a mid-range phone browser; tune caching.
+- **T8.5 Tests.** Browser screenshot tests (Playwright) against core goldens.
 
-**GATE G5:** owner uses the app daily for a week, then logs issues.
+**GATE G5:** owner uses the site daily for a week, then logs issues.
 
 ---
 
-### Phase 9 — Mobile app #2 (M)
-Same as Phase 8 for the other platform, reusing the core. Expected to be much smaller because all logic is shared.
+### Phase 9 — Mobile apps (L)
+iOS and Android (UniFFI via `mushaf-ffi`), reusing the core. Expected to be much smaller than before the web app, because all logic and its tests are shared.
 
 ---
 

@@ -23,7 +23,7 @@ Consequences: what follows, what it rules out
 | D2 | Font per riwāyah | open (G0) |
 | D3 | Justification implementation | open (G0) |
 | D4 | Draw path | open (P3) |
-| D5 | First mobile platform | open (G1) |
+| D5 | First platform | accepted (website first) |
 | D6 | Ḥafṣ edition: text + layout + font | open (G0) |
 | D7 | Licensing and distribution | open (G0) |
 | D8 | Script/layout scope | accepted |
@@ -72,3 +72,23 @@ platform draw edge, after the core's output is final.
 Consequences: the shaping backend chosen in D3 must expose integer positions (HarfBuzz
 and its ports do). Golden outputs are compared exactly, not with tolerance, at the
 draw-command level.
+
+## D5 — First platform
+Status: accepted
+Date: 2026-10-21
+Context: The engine (resolver, rules, layout, justification) must be tested thoroughly
+before any app polish. The original plan picked between iOS and Android at G1.
+Options:
+- A: iOS first (SwiftUI over UniFFI).
+- B: Android first (Compose over UniFFI).
+- C: Website first, with the Rust core compiled to WebAssembly.
+Decision: C (owner, 2026-10-21). It is the fastest loop for testing the qirāʾāt engine:
+no device builds, easy inspection, and screenshots via a desktop browser.
+Consequences:
+- Phase 8 becomes the web app (`apps/web`, `core/mushaf-wasm`); mobile apps move to Phase 9.
+- Everything in `core/` must compile to `wasm32-unknown-unknown`. This is a constraint on
+  D3 (justification): pure-Rust shaping compiles directly, while a C/C++ HarfBuzz fork
+  needs an Emscripten or wasm-sysroot build. S3 must measure this.
+- Rule 9 (no network at runtime) applies after the static files load; the site is
+  cached for offline use and has no server-side logic.
+

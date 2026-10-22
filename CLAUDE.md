@@ -3,7 +3,7 @@
 Read this first. Then read `PROJECT_PLAN.md`, but only the phase currently in progress.
 
 ## What this project is
-A native iOS/Android muṣḥaf with fixed-line pages, runtime-changeable qirāʾāt, and calligraphic justification.
+A muṣḥaf (website first, then native iOS/Android) with fixed-line pages, runtime-changeable qirāʾāt, and calligraphic justification.
 Everything is changeable at the cluster level: any letter or mark can be added, removed, replaced or resized.
 Stage 1 covers the 8 riwāyāt for which KFGQPC publishes full text, in the **15-line Madinah ʿUthmānī script only**. Indo-Pak (15- and 13-line) and Stage 2 (the other 12 riwāyāt) are out of scope until told otherwise. Do not build Indo-Pak features, but do not hardcode "one script, one layout" either: `script_id` and `layout_id` are explicit everywhere (see PROJECT_PLAN §0).
 
@@ -49,7 +49,7 @@ just lint            # rustfmt/clippy, ruff, license check
 ```
 
 ## Conventions
-- Rust for `core/` (workspace crates). Python 3.12 + `uv` for `data/`. Swift/SwiftUI and Kotlin/Compose for apps.
+- Rust for `core/` (workspace crates). Python 3.12 + `uv` for `data/`. TypeScript for `apps/web` (over the core compiled to WebAssembly, D5); Swift/SwiftUI and Kotlin/Compose for the later mobile apps. Everything in `core/` must build for `wasm32-unknown-unknown`.
 - Cluster ID format: `surah:ayah:word:cluster`, 1-based, e.g. `3:133:1:1`. IDs refer to the **Ḥafṣ spine** of a given spine version (`spine_version` in `data/spine/`). IDs are stable within a spine version; a new spine version ships a migration map from old IDs to new.
 - Items that do not exist in the spine (inserted words, letters, ayah-end markers) get IDs of the form `<anchor-id>+ins.<n>` where `n` is an explicit integer sequence, e.g. `9:100:12:1+ins.1`. Never rely on string sorting of IDs for order.
 - Clusterization uses an explicit, tested codepoint table (`data/pipeline/codepoint_classes.*`), not Unicode general categories alone.
