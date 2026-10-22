@@ -129,6 +129,10 @@ def _is_digits(token: str) -> bool:
     return bool(token) and all(DIGIT_ZERO <= ord(c) <= DIGIT_NINE for c in token)
 
 
+def is_ayah_number(token: str) -> bool:
+    return _is_sign(token) or _is_digits(token)
+
+
 def decode_ayah_number(token: str) -> int:
     """A U+FC00+n-1 sign (G-013) or a run of Arabic-Indic digits, as the number n."""
     if _is_sign(token):

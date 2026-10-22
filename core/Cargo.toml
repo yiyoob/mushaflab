@@ -11,6 +11,7 @@ members = [
     "mushaf-draw",
     "mushaf-render-cli",
     "mushaf-ffi",
+    "mushaf-roundtrip",
 ]
 
 [workspace.package]

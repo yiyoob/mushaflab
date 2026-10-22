@@ -34,6 +34,7 @@ Consequences: what follows, what it rules out
 | D13 | Phase 4 inputs: Bazzi source, single-source, encoding handling | accepted (2026-10-22) |
 | D20 | Phase 4 derivation pipeline: ingest, aligner, differ, emitter | accepted (Phase 4 plan, 2026-10-22) |
 | D21 | Difference-kind tags: what the data can and cannot classify | proposed (owner at G2) |
+| D22 | Round-trip check for raw patches | accepted (Phase 4 plan, 2026-10-22) |
 
 ---
 
@@ -499,3 +500,25 @@ Decision: C for now; owner to confirm or choose at GATE G2.
 Consequences: until rows are confirmed, every raw patch is `unclassified`, and the stats
 separate differences by op shape (marks / letter / word / separator / ayah number), not by
 kind. Adding a confirmed row changes only tags, never text, and is rebuilt by `data-build`.
+
+## D22 — Round-trip check for raw patches
+Status: accepted (approved with the Phase 4 plan, 2026-10-22)
+Date: 2026-10-22
+Context: T4.6 must prove that applying each riwāyah's raw patches to the Ḥafṣ spine gives
+that riwāyah's KFGQPC text exactly, using the one resolver (rule 7).
+Decision:
+- `core/mushaf-roundtrip` (host-only binary, excluded from `core-targets` like `mushaf-db`)
+  loads the data root, resolves `patches/raw/<riwayah>.yaml` on its spine with
+  `mushaf_resolve::resolve` in `Mode::Data` (any report entry fails), and writes the resolved
+  items as JSON lines (`build/roundtrip/`).
+- `pipeline/roundtrip.py` compares them with the pinned source:
+  1. the whole text, codepoint for codepoint;
+  2. each ayah, splitting after every ayah-end item, in order;
+  3. the tracked ayah map (T4.2), whose `first`/`last` must be each ayah's first and last
+     resolved item.
+  It prints the share of exact ayahs and exits 1 on any difference.
+- `just roundtrip [RIWAYAH...]` runs both. CI runs it after the other checks.
+- `pipeline/drift.py` writes `docs/review/phase4/version-drift.md`: official v2.x vs the 2022
+  mirror for every riwāyah that has both, and official Warsh vs QUL `qpc-warsh` words. Ayah
+  numbers are compared by value. Differences are grouped by codepoint change and not judged.
+Result (2026-10-22): 100% for all 7 riwāyāt, with no change to the resolver.

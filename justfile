@@ -28,6 +28,7 @@ data-build:
     {{uv}} run python -m pipeline.ingest_riwayah write
     {{uv}} run python -m pipeline.align write
     {{uv}} run python -m pipeline.emit_patches write
+    {{uv}} run python -m pipeline.drift write
     {{uv}} run python -m pipeline.compile_db
 
 # Integrity tests on spine, layout, ayah maps (needs `just data-build` first)
@@ -47,14 +48,22 @@ core-test: core-fixtures
     cargo test {{manifest}} --workspace
 
 # Check the core builds for every platform target (web now, iOS/Android later).
-# mushaf-db (bundled SQLite) and the CLI are host-only (D12, G-032).
+# mushaf-db (bundled SQLite), the CLI and the round-trip tool are host-only (D12, D22, G-032).
 core-targets:
     for t in wasm32-unknown-unknown aarch64-apple-ios aarch64-apple-ios-sim aarch64-linux-android x86_64-linux-android; do \
-        cargo check {{manifest}} --workspace --exclude mushaf-render-cli --exclude mushaf-db --target $t || exit 1; \
+        cargo check {{manifest}} --workspace --exclude mushaf-render-cli --exclude mushaf-db --exclude mushaf-roundtrip --target $t || exit 1; \
     done
 
-# Patch round-trip vs KFGQPC for all riwayat in scope
-roundtrip: (_todo "T4.6")
+# Patch round-trip vs KFGQPC for all riwayat in scope (D22): Rust resolver in data mode,
+# then a codepoint-for-codepoint comparison with the pinned texts
+roundtrip *RIWAYAT:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    riwayat="{{RIWAYAT}}"
+    riwayat="${riwayat:-shuba qalun warsh bazzi qunbul susi duri_abuamr}"
+    out="{{justfile_directory()}}/build/roundtrip"
+    cargo run --release -q {{manifest}} -p mushaf-roundtrip -- "{{justfile_directory()}}/data" "$out" $riwayat
+    {{uv}} run python -m pipeline.roundtrip "$out" $riwayat
 
 # SVG + PNG via reference renderer, e.g. just render PAGE=1 RIWAYAH=hafs
 render *ARGS:

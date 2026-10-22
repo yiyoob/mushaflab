@@ -1,0 +1,16 @@
+[package]
+name = "mushaf-roundtrip"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+description = "Host-only round-trip tool (T4.6, D22): resolves raw patch files; excluded from core-targets"
+
+[dependencies]
+mushaf-model.workspace = true
+mushaf-resolve.workspace = true
+mushaf-db.workspace = true
+serde.workspace = true
+
+[lints]
+workspace = true
