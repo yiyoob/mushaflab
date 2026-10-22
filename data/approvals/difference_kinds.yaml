@@ -1,0 +1,5 @@
+# D21: owner-confirmed difference kinds for raw patches (review tags only; never applied to
+# text). Owner-signed commits only (rule 4); read by data/pipeline/classify.py.
+confirmed:
+  - {riwayah: "warsh", from: "U+06E1", to: "U+0652", kind: "encoding", by: "Yusuf", date: "2026-10-22", evidence: "docs/review/phase4/stats.md (D21 evidence): U+06E1 never occurs in the warsh text; 32383 of 37122 aligned occurrences are U+0652; G-006"}
+  - {riwayah: "qalun", from: "U+06E1", to: "U+0652", kind: "encoding", by: "Yusuf", date: "2026-10-22", evidence: "docs/review/phase4/stats.md (D21 evidence): U+06E1 never occurs in the qalun text; 36538 of 37121 aligned occurrences are U+0652; G-006"}
