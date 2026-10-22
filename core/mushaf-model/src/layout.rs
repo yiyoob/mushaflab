@@ -65,6 +65,33 @@ impl TryFrom<LineWire> for Line {
     }
 }
 
+impl Line {
+    /// A line from the columns of the `lines` table in `mushaf.db`.
+    #[allow(clippy::too_many_arguments)]
+    pub fn from_columns(
+        page: u32,
+        line: u32,
+        kind: &str,
+        surah: Option<u32>,
+        first: Option<&str>,
+        last: Option<&str>,
+        centered: bool,
+        correction: Option<String>,
+    ) -> Result<Line, Error> {
+        let item = |s: Option<&str>| s.map(str::parse::<ItemRef>).transpose();
+        Line::try_from(LineWire {
+            page,
+            line,
+            kind: kind.into(),
+            surah,
+            first: item(first)?,
+            last: item(last)?,
+            centered,
+            correction,
+        })
+    }
+}
+
 impl From<Line> for LineWire {
     fn from(l: Line) -> Self {
         let (kind, surah, first, last) = match l.kind {

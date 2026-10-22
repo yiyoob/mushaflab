@@ -2,6 +2,7 @@
 resolver = "3"
 members = [
     "mushaf-model",
+    "mushaf-db",
     "mushaf-resolve",
     "mushaf-rules",
     "mushaf-layout",

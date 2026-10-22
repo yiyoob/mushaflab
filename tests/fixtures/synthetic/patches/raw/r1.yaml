@@ -1,0 +1,79 @@
+# Synthetic riwayah patches over the synthetic spine test/v1: one of every op.
+spine: "test/v1"
+patches:
+  - id: "r1.del.cluster"
+    owner: {level: "riwayah", id: "r1"}
+    op: "delete"
+    target: "1:1:2:1"
+    source: {kind: "test", ref: "fixture"}
+    status: "raw-derived"
+    single_source: true
+  - id: "r1.del.item"
+    owner: {level: "riwayah", id: "r1"}
+    op: "delete"
+    target: "1:2:0"
+    source: {kind: "test", ref: "fixture"}
+    status: "raw-derived"
+  - id: "r1.replace.cluster"
+    owner: {level: "riwayah", id: "r1"}
+    op: "replace"
+    target: "1:1:1:1"
+    payload: {kind: "letter", cps: "U+0078 U+0301"}
+    source: {kind: "test", ref: "fixture"}
+    status: "raw-derived"
+    rule_id: null
+  - id: "r1.replace.item"
+    owner: {level: "riwayah", id: "r1"}
+    op: "replace"
+    target: "1:1:2"
+    payload: {sep_after: "U+0020"}
+    source: {kind: "test", ref: "fixture"}
+    status: "raw-derived"
+  - id: "r1.ins.item"
+    owner: {level: "riwayah", id: "r1"}
+    op: "insert_after"
+    target: "1:1:2"
+    payload:
+      seq: 1
+      item:
+        kind: "ayah_end"
+        sep_after: "U+0020"
+        clusters: [{kind: "ayah_number", cps: "U+0039"}]
+    source: {kind: "test", ref: "fixture"}
+    status: "raw-derived"
+  - id: "r1.ins.cluster"
+    owner: {level: "riwayah", id: "r1"}
+    op: "insert_before"
+    target: "1:2:1:2"
+    payload: {seq: 1, cluster: {kind: "letter", cps: "U+0079"}}
+    source: {kind: "test", ref: "fixture"}
+    status: "raw-derived"
+  - id: "r1.marks"
+    owner: {level: "riwayah", id: "r1"}
+    op: "set_marks"
+    target: "1:2:1:1"
+    payload: {remove: ["U+0301"], add: ["U+0303", {cp: "U+0304", at: 0}]}
+    source: {kind: "test", ref: "fixture"}
+    status: "rule-derived"
+    rule_id: "test.rule"
+  - id: "r1.clear"
+    owner: {level: "riwayah", id: "r1"}
+    op: "clear_marks"
+    target: "1:1:1:2"
+    source: {kind: "test", ref: "fixture"}
+    status: "raw-derived"
+  - id: "r1.attr"
+    owner: {level: "riwayah", id: "r1"}
+    op: "set_attr"
+    target: "2:1:1"
+    payload: {width_em_delta: -120, stretch: 500, annotations: {note: "synthetic"}}
+    source: {kind: "test", ref: "fixture"}
+    status: "raw-derived"
+  - id: "r1.opt.on"
+    owner: {level: "riwayah", id: "r1"}
+    op: "set_marks"
+    target: "2:1:2:1"
+    payload: {add: ["U+0307"]}
+    source: {kind: "test", ref: "fixture"}
+    status: "rule-derived"
+    when: {option: "test.toggle", choice: "on"}

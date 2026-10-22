@@ -1,0 +1,12 @@
+# Synthetic option groups.
+- id: "test.toggle"
+  title_ar: "test toggle"
+  choices: ["off", "on"]
+  defaults:
+    - {riwayah: "r1", choice: "off"}
+    - {riwayah: "r1", tariq: "t2", choice: "on"}
+  affects: ["r1.opt.on"]
+  allowed_for: ["r1"]
+- id: "test.other"
+  title_ar: "test other"
+  choices: ["a", "b", "c"]

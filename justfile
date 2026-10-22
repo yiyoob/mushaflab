@@ -35,14 +35,19 @@ data-verify:
 data-test:
     {{uv}} run pytest
 
+# Compile the synthetic fixture root into build/fixtures/synthetic.db (for the T2.2 parity test)
+core-fixtures:
+    {{uv}} run python -m pipeline.compile_db --root "{{justfile_directory()}}/tests/fixtures/synthetic" "{{justfile_directory()}}/build/fixtures/synthetic.db"
+
 # cargo test --workspace
-core-test:
+core-test: core-fixtures
     cargo test {{manifest}} --workspace
 
-# Check the core builds for every platform target (web now, iOS/Android later)
+# Check the core builds for every platform target (web now, iOS/Android later).
+# mushaf-db (bundled SQLite) and the CLI are host-only (D12, G-032).
 core-targets:
     for t in wasm32-unknown-unknown aarch64-apple-ios aarch64-apple-ios-sim aarch64-linux-android x86_64-linux-android; do \
-        cargo check {{manifest}} --workspace --exclude mushaf-render-cli --target $t || exit 1; \
+        cargo check {{manifest}} --workspace --exclude mushaf-render-cli --exclude mushaf-db --target $t || exit 1; \
     done
 
 # Patch round-trip vs KFGQPC for all riwayat in scope

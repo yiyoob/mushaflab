@@ -1,0 +1,15 @@
+[package]
+name = "mushaf-db"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+description = "Host-only reader for the data root and mushaf.db (D12); excluded from core-targets"
+
+[dependencies]
+mushaf-model.workspace = true
+rusqlite.workspace = true
+sha2.workspace = true
+
+[lints]
+workspace = true

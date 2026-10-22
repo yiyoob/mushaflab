@@ -1,6 +1,7 @@
 //! Spine, clusters, IDs and patch types (PROJECT_PLAN §3; ADR D9, D11, D12).
 //!
 //! Pure data and parsing: no file system, no clock, no network. Builds for every core target.
+//! Reading files and `mushaf.db` from disk is `mushaf-db`'s job (host only, D12).
 
 use std::fmt;
 
@@ -9,6 +10,7 @@ use serde::de::DeserializeOwned;
 
 mod ayah_map;
 mod cps;
+mod dataset;
 mod ids;
 mod layout;
 mod options;
@@ -18,6 +20,10 @@ mod spine;
 
 pub use ayah_map::{AyahMap, AyahMapEntry};
 pub use cps::{Cp, Cps};
+pub use dataset::{
+    BodyRow, ClusterRow, DATA_DIRS, DataFiles, DataSet, DbRows, Input, ItemRow, LayoutRow, LineRow,
+    SpineRow, classify,
+};
 pub use ids::{ClusterRef, ItemRef, MarkRef, Ref};
 pub use layout::{Layout, Line, LineKind};
 pub use options::{OptionDefault, OptionGroup};

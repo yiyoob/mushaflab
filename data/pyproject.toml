@@ -3,7 +3,9 @@ name = "mushaf-data"
 version = "0.0.0"
 description = "Offline data pipeline for the multi-qiraat mushaf"
 requires-python = "==3.12.*"
-dependencies = []
+dependencies = [
+    "pyyaml>=6.0.3",
+]
 
 [dependency-groups]
 dev = [

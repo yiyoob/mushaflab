@@ -1,0 +1,23 @@
+{
+  "script_id": "synthetic",
+  "spine_version": 1,
+  "source": {
+    "id": "synthetic",
+    "member": "synthetic",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "codepoint_table_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "unicode_version": "15.0.0",
+  "counts": {
+    "items": {
+      "ayah_end": 3,
+      "hizb": 1,
+      "word": 6
+    },
+    "clusters": {
+      "ayah_number": 3,
+      "letter": 11,
+      "sign": 1
+    }
+  }
+}
