@@ -69,8 +69,7 @@ render *ARGS:
             *) echo "render: unknown argument '$arg' (expected PAGE=<n> RIWAYAH=<id>)" >&2; exit 2 ;;
         esac
     done
-    echo "render PAGE=$PAGE RIWAYAH=$RIWAYAH: not implemented yet (T3.4)" >&2
-    exit 1
+    cargo run --release --quiet {{manifest}} -p mushaf-render-cli -- --page "$PAGE" --riwayah "$RIWAYAH"
 
 # Golden image + line-fit + shaping-integrity tests
 golden: (_todo "T3.5")
