@@ -29,8 +29,8 @@ pub use layout::{Layout, Line, LineKind};
 pub use options::{OptionDefault, OptionGroup};
 pub use overlay::EditOverlay;
 pub use patch::{
-    AttrChange, AttrName, Layer, MarkAdd, MarkAt, NewCluster, NewItem, NewNode, Op, Owner,
-    OwnerLevel, Patch, PatchFile, Side, Source, Status, When,
+    AttrChange, AttrName, DifferenceKind, Layer, MarkAdd, MarkAt, NewCluster, NewItem, NewNode, Op,
+    Owner, OwnerLevel, Patch, PatchFile, Side, Source, Status, When,
 };
 pub use spine::{Attrs, Cluster, ClusterKind, Item, ItemKind, Spine};
 
@@ -53,13 +53,19 @@ impl fmt::Display for Error {
 impl std::error::Error for Error {}
 
 /// Strict YAML: duplicate keys, merge keys, unknown tags, YAML 1.1 booleans (`yes`/`on`) and
-/// unquoted numbers or booleans in string fields are all errors.
+/// unquoted numbers or booleans in string fields are all errors. The parser's resource budget
+/// is raised for size only: raw patch files reach about 25 MB and 2M nodes (D20).
 pub fn from_yaml<T: DeserializeOwned>(text: &str) -> Result<T, Error> {
     let options = serde_saphyr::options! {
         strict_booleans: true,
         no_schema: true,
         reject_unsupported_tags: true,
         merge_keys: serde_saphyr::MergeKeyPolicy::Error,
+        budget: serde_saphyr::budget! {
+            max_nodes: 16_000_000,
+            max_events: 64_000_000,
+            max_total_scalar_bytes: 256 << 20,
+        },
     };
     serde_saphyr::from_str_with_options(text, options).map_err(|e| Error::new(e.to_string()))
 }

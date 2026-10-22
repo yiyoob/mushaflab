@@ -89,6 +89,17 @@ pub struct Source {
     pub reference: String,
 }
 
+/// The kind of difference a raw patch carries (D13, D21): for review and stats only, never
+/// applied, and ignored by the resolver. Only the owner confirms a tag.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DifferenceKind {
+    Encoding,
+    Spelling,
+    Reading,
+    Unclassified,
+}
+
 /// Makes a patch part of the option layer, active when `option` resolves to `choice`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -220,6 +231,8 @@ pub struct Patch {
     pub when: Option<When>,
     /// No second independent source supports this patch (§3.5).
     pub single_source: bool,
+    /// Review-only classification (D13); the resolver ignores it.
+    pub difference_kind: Option<DifferenceKind>,
 }
 
 impl Patch {
@@ -335,6 +348,8 @@ struct PatchWire {
     when: Option<When>,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     single_source: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    difference_kind: Option<DifferenceKind>,
 }
 
 fn op_from_wire(kind: OpKind, target: &Ref, p: PayloadWire) -> Result<Op, String> {
@@ -477,6 +492,7 @@ impl TryFrom<PatchWire> for Patch {
             rule_id: w.rule_id,
             when: w.when,
             single_source: w.single_source,
+            difference_kind: w.difference_kind,
         })
     }
 }
@@ -536,6 +552,7 @@ impl From<Patch> for PatchWire {
             rule_id: p.rule_id,
             when: p.when,
             single_source: p.single_source,
+            difference_kind: p.difference_kind,
         }
     }
 }
@@ -731,6 +748,26 @@ mod tests {
         ] {
             assert!(one(&body).is_err(), "accepted:\n{body}");
         }
+    }
+
+    #[test]
+    fn difference_kind_round_trips_and_rejects_unknown_kinds() {
+        let p = base("delete", "1:1:1", "") + "    difference_kind: \"unclassified\"\n";
+        let got = one(&p).unwrap();
+        assert_eq!(got.difference_kind, Some(DifferenceKind::Unclassified));
+        let file = PatchFile {
+            spine: "t/v1".into(),
+            patches: vec![got],
+        };
+        assert_eq!(
+            from_yaml::<PatchFile>(&to_yaml(&file).unwrap()).unwrap(),
+            file
+        );
+        assert_eq!(
+            one(&base("delete", "1:1:1", "")).unwrap().difference_kind,
+            None
+        );
+        assert!(one(&p.replace("unclassified", "guess")).is_err());
     }
 
     #[test]

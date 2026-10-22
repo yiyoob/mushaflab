@@ -15,7 +15,16 @@ from collections.abc import Callable
 from itertools import pairwise
 from pathlib import Path
 
-from pipeline import align, codepoints, compile_db, ingest_layout, ingest_riwayah, sources, spine
+from pipeline import (
+    align,
+    codepoints,
+    compile_db,
+    emit_patches,
+    ingest_layout,
+    ingest_riwayah,
+    sources,
+    spine,
+)
 
 GOLDEN = Path(__file__).resolve().parents[2] / "tests" / "golden" / "page_boundaries.json"
 
@@ -44,6 +53,10 @@ def check_tracked_files_current() -> list[str]:
     for path, text in align.build_reports().items():
         if not path.exists() or path.read_text(encoding="utf-8") != text:
             out.append(f"{path.name} differs from a rebuild")
+    for r in emit_patches.ORDER:
+        path = emit_patches.path_for(r)
+        if not path.exists() or path.read_text(encoding="ascii") != emit_patches.render(r):
+            out.append(f"patches/raw/{path.name} differs from a rebuild")
     return out
 
 

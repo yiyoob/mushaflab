@@ -27,6 +27,7 @@ data-build:
     {{uv}} run python -m pipeline.ingest_layout build
     {{uv}} run python -m pipeline.ingest_riwayah write
     {{uv}} run python -m pipeline.align write
+    {{uv}} run python -m pipeline.emit_patches write
     {{uv}} run python -m pipeline.compile_db
 
 # Integrity tests on spine, layout, ayah maps (needs `just data-build` first)

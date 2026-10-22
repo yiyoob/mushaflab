@@ -22,9 +22,17 @@ OFFICIAL = {
 }
 
 
+BAZZI_DATA = "kfgqpc-mirror-bazzi-data"
+
+
+def source_id(riwayah: str) -> str:
+    """The pinned source id of a riwayah's text."""
+    return BAZZI_DATA if riwayah == "bazzi" else OFFICIAL[riwayah]
+
+
 def rows(riwayah: str) -> list[dict]:
     if riwayah == "bazzi":
-        return sources.json_file("kfgqpc-mirror-bazzi-data")  # type: ignore[return-value]
+        return sources.json_file(BAZZI_DATA)  # type: ignore[return-value]
     return sources.zip_json(OFFICIAL[riwayah], ".json")  # type: ignore[return-value]
 
 

@@ -33,6 +33,7 @@ Consequences: what follows, what it rules out
 | D12 | Core model: formats, patch semantics, DB access | accepted (Phase 2 plan); P2 addendum approved (2026-10-22) |
 | D13 | Phase 4 inputs: Bazzi source, single-source, encoding handling | accepted (2026-10-22) |
 | D20 | Phase 4 derivation pipeline: ingest, aligner, differ, emitter | accepted (Phase 4 plan, 2026-10-22) |
+| D21 | Difference-kind tags: what the data can and cannot classify | proposed (owner at G2) |
 
 ---
 
@@ -457,3 +458,44 @@ Decision:
 Consequences: the patch files are large where encodings differ (Warsh/Qālūn), since every
 codepoint difference is a patch (D13). Exactness is proved by the round-trip (T4.6), not by
 the aligner: a poor alignment can only make patches less readable, never wrong.
+- Measured sizes (T4.5): warsh 25.4 MB, qalun 24.3 MB, bazzi 10.6 MB, susi 8.6 MB,
+  qunbul 7.1 MB, duri_abuamr 7.1 MB, shuba 0.26 MB. To read them in reasonable time,
+  `compile_db` uses libyaml's parser with the same strict checks and parses each file once
+  per process. The Rust YAML reader's resource budget is raised for size only, and
+  third-party crates are optimized in dev/test builds (`core/Cargo.toml`).
+
+## D21 — Difference-kind tags: what the data can and cannot classify
+Status: proposed (owner decision at GATE G2); implemented conservatively in T4.5
+Date: 2026-10-22
+Context: D13 asks for a `difference_kind` tag per raw patch (`encoding`, `spelling`,
+`reading`, `unclassified`). The rules must be data-driven, evidence must be shown, and
+anything uncertain stays `unclassified`. The Phase 4 plan proposed tagging `encoding` for a
+Ḥafṣ form X that the riwāyah writes as Y when the substitution is **total** (every aligned X
+becomes Y) and **exclusive** (X never occurs in the riwāyah's text).
+Evidence (Phase 4 probe over the pinned texts and the T4.3 alignment):
+- At the codepoint level, totality almost never holds, because reading differences touch the
+  same codepoints. For example, Warsh never uses U+06E1. Of its 37,122 aligned occurrences in
+  Ḥafṣ, 32,383 become U+0652, 1,996 become U+064E, and 1,473 are part of larger changes.
+  The rule tags 1–2 patches per riwāyah.
+- At the cluster-form level, total and exclusive substitutions with at least 50 occurrences
+  include Bazzi `0645 06E1 06D7 → 0645 064F` (77×) and `0649 0670 0653 → 0649 0670` (378×).
+  Whether such a change is an encoding, a spelling or a reading difference is exactly what the
+  data cannot establish; frequency and consistency are not evidence of "same mark".
+- The fonts give no independent evidence either: KFGQPC glyph names are derived from
+  codepoints (`uni06E1`, `afii57458`), not from what a mark means.
+Options:
+- A: the planned total+exclusive rule, with a minimum count. It tags changes whose nature is
+  unknown as `encoding`, which is a guess (rejected under D13).
+- B: frequency-based "dominant counterpart" rules (e.g. X absent from the riwāyah and X→Y in
+  most aligned places). Same objection, with an arbitrary threshold.
+- C (implemented): no automatic `encoding`, `spelling` or `reading`. Rules are: `ayah-number`
+  (any change to an ayah-end item) → `unclassified`; `confirmed` → the kind of an
+  owner-confirmed substitution row in `data/pipeline/difference_kinds.yaml` (riwāyah,
+  `from`, `to`, kind, by, date, evidence), applied only when every codepoint difference of a
+  cluster change is a confirmed one-for-one substitution of one kind; `default` →
+  `unclassified`. The table has no rows. Stats (T4.7) list the candidate substitutions with
+  their counts, so the owner can confirm rows.
+Decision: C for now; owner to confirm or choose at GATE G2.
+Consequences: until rows are confirmed, every raw patch is `unclassified`, and the stats
+separate differences by op shape (marks / letter / word / separator / ayah number), not by
+kind. Adding a confirmed row changes only tags, never text, and is rebuilt by `data-build`.
