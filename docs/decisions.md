@@ -955,6 +955,15 @@ Result:
 | duri_abuamr | 1775 | 7043 | 1 |
 | susi | 1775 | 7043 | 1 |
 
+Spot check (planning session, relayed 2026-10-23; G-106 has the method and details): Shuʿbah
+pages 7, 300 and 501 (45 lines) match the QuranFlash `Shubah` scan at every word break, apart from
+the ayah-marker convention already accepted for Ḥafṣ (D6 addendum): evidence for the transferred
+breaks in a riwāyah on the Ḥafṣ grid. No scan exists for Bazzi, Qunbul and al-Sūsī, and the
+`Douri`, `Qaloon` and `Warsh1` books are other printings. The `Warsh2` scan is another printing
+too (different ayah lines and numbering on page 7); on its page 8, where its ayah lines agree with
+KFGQPC, 2 of 9 transferred breaks differ: a warning for Warsh and Qālūn, not proof. Warsh and
+Qālūn need KFGQPC's own printing to be checked (G-104, G-105).
+
 Proposed for D1 (owner at GATE G3): **final = this rule**, with the spot check of P7 deciding
 whether the transferred breaks stand. Spot check: establish each QuranFlash book's edition on 5
 pages (which ayah starts each line, against the KFGQPC data), then compare all fitted lines of

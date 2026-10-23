@@ -62,6 +62,13 @@ def render() -> str:
         "width; every other open break takes the 1441H Hafs break (G-104, a hypothesis until "
         "the spot check, G-106).\n",
         "3. **Overflow (D31)**: `overflow-<r>.md`, every scaled page and squeezed line.\n",
+        "**Print spot check (G-106, 2026-10-23).** Shu\u02bfbah pages 7, 300 and 501 match the "
+        "QuranFlash `Shubah` scan at every word break (apart from the ayah-marker convention "
+        "accepted for Hafs, D6 addendum). Warsh and Qalun could not be verified: the only "
+        "Warsh scan with KFGQPC's page frame (`Warsh2`) is another printing, and on its page 8 "
+        "2 of 9 transferred breaks differ (a warning, not proof; G-104). No scans exist for "
+        "Bazzi, Qunbul or al-Susi; the `Douri` book is another printing. Fitted lines (G-105) "
+        "have no verdict. The reference still needed is KFGQPC's own Warsh/Qalun printing.\n",
         "4. **Decisions waiting**: D29, D30 (short lines: 60% threshold on evidence), D32, D33 "
         "(display style as a render key, default style only); the "
         "open encoding groups (G-102, sheet `build/review/phase5/encoding.html` from "
