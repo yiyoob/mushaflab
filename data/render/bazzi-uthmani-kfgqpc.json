@@ -1,6 +1,7 @@
 {
   "profile": "bazzi-uthmani-kfgqpc",
   "riwayah": "bazzi",
+  "style": "hijazi",
   "script_id": "uthmani",
   "layout_id": "uthmani-bazzi-kfgqpc",
   "spine": "hafs/v1",
@@ -10,9 +11,7 @@
   "line_widths": "data/render/uthmani-bazzi-kfgqpc.line-widths.json",
   "surah_names": "data/render/surah-names.json",
   "note": "Native layout (T5.2, D29) drawn with DigitalKhatt Madina (D2): the Hafs design constants of D15 unchanged (same font, same page). Rows for cluster forms outside Hafs: owner-approved groups (D28). overline_marks as for Hafs (D18).",
-  "overline_marks": [
-    "U+06E4"
-  ],
+  "overline_marks": ["U+06E4"],
   "geometry": {
     "line_width": 17800,
     "line_pitch": 1900,

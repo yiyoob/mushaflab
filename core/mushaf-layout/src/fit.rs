@@ -33,6 +33,8 @@ use crate::Mapping;
 pub struct Profile {
     pub profile: String,
     pub riwayah: String,
+    /// Display style (D36): `hijazi` or `maghribi`.
+    pub style: String,
     pub script_id: String,
     pub layout_id: String,
     pub spine: String,

@@ -1043,4 +1043,10 @@ Consequences: style conversion is a render-time transformation from owner-confir
 never a change to the spine or patches; a combination a font cannot render correctly is
 reported as unavailable rather than drawn wrongly (rule 6); line breaks remain each
 riwāyah's own (D1).
+Phase 5 (2026-10-23, after merging this decision into the Phase 5 branch): render profiles carry
+a `style` (`hijazi`, `maghribi`) and are looked up by (riwāyah, style)
+(`mushaf_render::profile_path`, `default_style`, `Renderer::load_style`, `just render`'s CLI
+`--style`). Each riwāyah's default style is the one rendered (Warsh and Qālūn `maghribi` with their
+KFGQPC fonts and spacing-only justification; the others `hijazi` with DigitalKhatt Madina);
+any other combination is refused with a reason naming this decision.
 

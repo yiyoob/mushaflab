@@ -39,3 +39,33 @@ fn warsh_renders_on_its_native_layout() {
     assert!(d.canonical);
     assert_eq!(&png(&svg(&d), 300).unwrap()[1..4], b"PNG");
 }
+
+/// D36: render profiles are keyed by (riwāyah, style). Phase 5 renders each riwāyah's default
+/// style only (Maghribi for Warsh and Qālūn, Ḥijāzī for the rest); any other style is refused
+/// with a reason until Phase 6 builds it.
+#[test]
+fn render_profiles_are_keyed_by_riwayah_and_style() {
+    use mushaf_render::{default_style, profile_path};
+    for (r, style) in [
+        ("hafs", "hijazi"),
+        ("shuba", "hijazi"),
+        ("warsh", "maghribi"),
+        ("qalun", "maghribi"),
+        ("bazzi", "hijazi"),
+        ("qunbul", "hijazi"),
+        ("duri_abuamr", "hijazi"),
+        ("susi", "hijazi"),
+    ] {
+        assert_eq!(default_style(r).unwrap(), style);
+        let p = mushaf_layout::fit::Profile::from_json(
+            &std::fs::read_to_string(repo().join(profile_path(r, style).unwrap())).unwrap(),
+        )
+        .unwrap();
+        assert_eq!((p.riwayah.as_str(), p.style.as_str()), (r, style));
+    }
+    let err = Renderer::load_style(&repo(), "hafs", "maghribi")
+        .err()
+        .unwrap();
+    assert!(err.to_string().contains("D36"), "{err}");
+    assert!(Renderer::load_style(&repo(), "warsh", "hijazi").is_err());
+}

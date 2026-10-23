@@ -18,16 +18,28 @@ use mushaf_model::{DataSet, EditOverlay, Error};
 use mushaf_resolve::{Mode, Resolved, Selection, resolve_profile};
 use mushaf_shape::{EncodingTable, Exceptions, FontData, Violation, check_word};
 
-/// Render profiles by riwayah (Ḥafṣ on the 1441H layout; the others on their native KFGQPC
-/// layouts, T5.2).
-pub fn profile_path(riwayah: &str) -> Result<String, Error> {
+/// A riwāyah's default display style (D36): Maghribi for Warsh and Qālūn, Ḥijāzī for the rest.
+pub fn default_style(riwayah: &str) -> Result<&'static str, Error> {
     match riwayah {
-        "hafs" => Ok("data/render/hafs-uthmani-1441h.json".into()),
-        "shuba" | "warsh" | "qalun" | "bazzi" | "qunbul" | "duri_abuamr" | "susi" => {
-            Ok(format!("data/render/{riwayah}-uthmani-kfgqpc.json"))
-        }
+        "warsh" | "qalun" => Ok("maghribi"),
+        "hafs" | "shuba" | "bazzi" | "qunbul" | "duri_abuamr" | "susi" => Ok("hijazi"),
         other => Err(Error::new(format!("unknown riwayah {other:?}"))),
     }
+}
+
+/// Render profiles by (riwāyah, style) (D36): Ḥafṣ on the 1441H layout, the others on their
+/// native KFGQPC layouts (T5.2). Only each riwāyah's default style exists in Phase 5.
+pub fn profile_path(riwayah: &str, style: &str) -> Result<String, Error> {
+    if style != default_style(riwayah)? {
+        return Err(Error::new(format!(
+            "style {style:?} of riwayah {riwayah:?} is not available yet (D36: other styles are \
+             built in Phase 6, T6.7-T6.10)"
+        )));
+    }
+    Ok(match riwayah {
+        "hafs" => "data/render/hafs-uthmani-1441h.json".into(),
+        _ => format!("data/render/{riwayah}-uthmani-kfgqpc.json"),
+    })
 }
 
 /// Owner-approved per-glyph rule-6 exceptions (D27, G-100).
@@ -64,8 +76,19 @@ fn read(repo: &Path, rel: &str) -> Result<String, Error> {
 }
 
 impl Renderer {
+    /// The riwāyah in its default style (D36).
     pub fn load(repo: &Path, riwayah: &str) -> Result<Self, Error> {
-        let profile = Profile::from_json(&read(repo, &profile_path(riwayah)?)?)?;
+        Self::load_style(repo, riwayah, default_style(riwayah)?)
+    }
+
+    pub fn load_style(repo: &Path, riwayah: &str, style: &str) -> Result<Self, Error> {
+        let profile = Profile::from_json(&read(repo, &profile_path(riwayah, style)?)?)?;
+        if profile.riwayah != riwayah || profile.style != style {
+            return Err(Error::new(format!(
+                "render profile {} is for {} in style {}",
+                profile.profile, profile.riwayah, profile.style
+            )));
+        }
         let data = mushaf_db::load_dir(&repo.join("data"))?;
         let table = profile.encoding_table(|p| read(repo, p))?;
         let spine = data

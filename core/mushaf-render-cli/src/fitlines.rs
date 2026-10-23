@@ -20,7 +20,7 @@ use mushaf_layout::native::{
     short_lines,
 };
 use mushaf_model::{Error, FitTag, Layout};
-use mushaf_render::profile_path;
+use mushaf_render::{default_style, profile_path};
 use mushaf_resolve::{Mode, Selection, resolve_profile};
 use mushaf_shape::FontData;
 
@@ -218,7 +218,10 @@ fn widths_json(layout_id: &str, short: &ShortLines) -> String {
 }
 
 fn run_one(repo: &Path, ds: &mushaf_model::DataSet, riwayah: &str) -> Result<String, Error> {
-    let profile = Profile::from_json(&read(repo, &profile_path(riwayah)?)?)?;
+    let profile = Profile::from_json(&read(
+        repo,
+        &profile_path(riwayah, default_style(riwayah)?)?,
+    )?)?;
     let table = profile.encoding_table(|p| read(repo, p))?;
     let font = FontData::new(
         fs::read(repo.join(&profile.font))

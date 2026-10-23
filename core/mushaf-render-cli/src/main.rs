@@ -1,4 +1,4 @@
-//! `mushaf-render --page N --riwayah ID [--overlay FILE] [--out DIR] [--width PX]`
+//! `mushaf-render --page N --riwayah ID [--style STYLE] [--overlay FILE] [--out DIR] [--width PX]`
 //!
 //! Writes `<out>/<riwayah>/p<NNN>.svg`, `.png` and `.json` (the draw commands, D4). The default
 //! output directory is `build/render` (untracked).
@@ -14,11 +14,13 @@ fn run() -> Result<(), String> {
     let mut args = std::env::args().skip(1);
     let (mut page, mut riwayah, mut overlay, mut out, mut width) =
         (None, "hafs".to_string(), None, None, 1200u32);
+    let mut style: Option<String> = None;
     while let Some(a) = args.next() {
         let mut val = || args.next().ok_or_else(|| format!("{a} needs a value"));
         match a.as_str() {
             "--page" => page = Some(val()?.parse::<u32>().map_err(|e| e.to_string())?),
             "--riwayah" => riwayah = val()?,
+            "--style" => style = Some(val()?),
             "--overlay" => overlay = Some(PathBuf::from(val()?)),
             "--out" => out = Some(PathBuf::from(val()?)),
             "--width" => {
@@ -34,7 +36,11 @@ fn run() -> Result<(), String> {
         return Err(format!("page {page} is not in 1..604"));
     }
     let repo = std::env::current_dir().map_err(|e| e.to_string())?;
-    let renderer = Renderer::load(&repo, &riwayah).map_err(|e| e.to_string())?;
+    let renderer = match &style {
+        Some(s) => Renderer::load_style(&repo, &riwayah, s),
+        None => Renderer::load(&repo, &riwayah),
+    }
+    .map_err(|e| e.to_string())?;
     let overlay = match overlay {
         Some(p) => {
             let text = fs::read_to_string(&p).map_err(|e| format!("{}: {e}", p.display()))?;
