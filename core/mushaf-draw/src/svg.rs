@@ -121,11 +121,16 @@ pub fn to_svg(page: &DrawPage) -> String {
             .expect("string");
         }
     }
+    for item in &page.items {
+        if let DrawItem::Fill { path, .. } = item {
+            writeln!(s, "<path d=\"{}\"/>", path_d(path)).expect("string");
+        }
+    }
     s.push_str("</g>\n");
     for item in &page.items {
         if let DrawItem::Stroke { role, width, path } = item {
             let color = match role {
-                Role::Frame => "#000000",
+                Role::Frame | Role::SajdahOverline => "#000000",
                 Role::EditedMarker => "#cc0000",
             };
             writeln!(

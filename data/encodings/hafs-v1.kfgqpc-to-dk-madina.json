@@ -12,11 +12,41 @@
   "spine_items_sha256": "1fe71d336f2c17acf92567f9ea0aa0aaa78e830a9f8688e98cc282fdfa2d28a4",
   "kfgqpc_codepoint_table_sha256": "1f37ca102cb8966b3042ebaa636fe6ba02ce72d2435285f423fb75764701758a",
   "dk_codepoint_table_sha256": "f0372adf619737ab1741c45c74da681354322ffd40144b62c2a5cebce2a4a2cf",
-  "owner_rows_sha256": "3726ab1a2470efa859f768556eab6e3318ca74664e9b94b64d0c61b4ddb50dc9"
+  "owner_rows_sha256": "21fd25032aa277c66fb94ef7addddf1d1596b33fad57cb5d4c48a758857477e0",
+  "owner_words_sha256": "c1178fc839b2cc96732659ee99dbd5958fc3e0451a8f248cd350fe516cd757d9"
  },
+ "word_rows": [
+  {
+   "item": "17:7:12",
+   "src": [
+    "U+0644 U+0650",
+    "U+064A U+064E",
+    "U+0633 U+064F",
+    "U+0640 U+0654 U+064F",
+    "U+0648",
+    "U+0627 U+0652"
+   ],
+   "dst": "U+0644 U+0650 U+064A U+064E U+0633 U+064F U+034F U+08F3 U+0653 U+0640 U+0654 U+034F U+064F U+0648 U+0627 U+06DF",
+   "decision": "Owner at GATE G1 (G-046): the 1441H print (quran-qcf4 word glyph) and DigitalKhatt's text have a small waw and madda above the seen that KFGQPC v2.0 lacks; render DigitalKhatt's form."
+  },
+  {
+   "item": "2:97:5",
+   "src": [
+    "U+0644 U+0651 U+0650",
+    "U+0640",
+    "U+062C U+0650",
+    "U+0628 U+06E1",
+    "U+0631 U+0650",
+    "U+064A",
+    "U+0644 U+064E"
+   ],
+   "dst": "U+0644 U+0651 U+0650 U+062C U+0650 U+0628 U+0652 U+0631 U+0650 U+064A U+0644 U+064E",
+   "decision": "Owner at GATE G1 (G-047): no tatweel between lam and jeem, as in the 1441H print and DigitalKhatt's text; render DigitalKhatt's form (replaces the identity row for U+0640 approved in T3.1)."
+  }
+ ],
  "converted_spine": {
   "items": 83865,
-  "sha256": "87f34f4de78b7872414363be068338d1972e4a3316afee82f378ad437fe1636e"
+  "sha256": "6346b0a8c140d9e993c7df1f3fc4441a6ae2edafe1f80bbd2896e14e65139402"
  },
  "lossy_items": [
   "7:206:11",

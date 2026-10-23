@@ -48,6 +48,7 @@ DATA_DIR = Path(__file__).resolve().parents[1]
 ENCODINGS_DIR = DATA_DIR / "encodings"
 TABLE_PATH = ENCODINGS_DIR / "hafs-v1.kfgqpc-to-dk-madina.json"
 OWNER_ROWS_PATH = ENCODINGS_DIR / "hafs-v1.owner-rows.json"
+OWNER_WORDS_PATH = ENCODINGS_DIR / "hafs-v1.owner-words.json"
 DK_CLASSES_PATH = ENCODINGS_DIR / "digitalkhatt-madina-codepoint-classes.tsv"
 REVIEW_PATH = DATA_DIR.parent / "docs" / "review" / "g024-dk-text-diff.html"
 DK_TEXT = "digitalkhatt-text-madina"
@@ -275,6 +276,8 @@ class Table:
     ambiguous: dict = field(default_factory=dict)
     rejected: dict = field(default_factory=dict)
     unmapped: dict = field(default_factory=dict)
+    # item id -> (KFGQPC clusters, DigitalKhatt word, decision): owner word rows (D18)
+    word_rows: dict = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self.cluster_rows = {r.src[0]: r.dst for r in self.rows if r.kind in ("cluster", "owner")}
@@ -290,6 +293,10 @@ class Table:
             "from": "kfgqpc",
             "to": "digitalkhatt-madina",
             "provenance": provenance,
+            "word_rows": [
+                {"item": item, "src": [cps(c) for c in src], "dst": cps(dst), "decision": why}
+                for item, (src, dst, why) in sorted(self.word_rows.items())
+            ],
             "rows": [
                 {
                     "src": [cps(c) for c in r.src],
@@ -304,6 +311,14 @@ class Table:
 
     @staticmethod
     def from_json(data: dict) -> "Table":
+        words = {
+            w["item"]: (
+                tuple(spine.from_cps(c) for c in w["src"]),
+                spine.from_cps(w["dst"]),
+                w["decision"],
+            )
+            for w in data.get("word_rows", [])
+        }
         return Table(
             [
                 Row(
@@ -314,7 +329,8 @@ class Table:
                     r["lossy"],
                 )
                 for r in data["rows"]
-            ]
+            ],
+            word_rows=words,
         )
 
 
@@ -340,6 +356,15 @@ def convert(k: tuple[str, ...], table: Table) -> Converted:
         out += dst
         i += n
     return Converted(out, spans)
+
+
+def convert_item(item: str, k: tuple[str, ...], table: Table) -> Converted:
+    """Convert a spine item: an owner word row (D18) when it lists this item with exactly these
+    clusters, else cluster by cluster."""
+    row = table.word_rows.get(item)
+    if row is not None and row[0] == k:
+        return Converted(row[1], [(0, len(k), 0, len(row[1]))])
+    return convert(k, table)
 
 
 def _try(k: tuple[str, ...], table: Table) -> str | None:
@@ -478,7 +503,21 @@ def provenance() -> dict:
         "kfgqpc_codepoint_table_sha256": _sha256(KFGQPC_CLASSES_PATH),
         "dk_codepoint_table_sha256": _sha256(DK_CLASSES_PATH),
         "owner_rows_sha256": _sha256(OWNER_ROWS_PATH),
+        "owner_words_sha256": _sha256(OWNER_WORDS_PATH),
     }
+
+
+def owner_word_rows(pairs: list[WordPair], path: Path = OWNER_WORDS_PATH) -> dict:
+    """Owner word rows (D18): each listed item takes DigitalKhatt's aligned word, from the data."""
+    data = json.loads(path.read_text(encoding="ascii"))
+    by_item = {p.word: p for p in pairs}
+    out = {}
+    for w in data["words"]:
+        p = by_item.get(w["item"])
+        if p is None:
+            raise EncodingError(f"owner word {w['item']}: not an aligned spine item")
+        out[w["item"]] = (p.k, "".join(p.d), w["decision"])
+    return out
 
 
 def load_owner_rows() -> tuple[Row, ...]:
@@ -496,15 +535,25 @@ def build() -> tuple[Table, dict]:
     recs = spine.load_records()
     pairs, segmentation = align(recs, ayahs, dk_table)
     table = derive(pairs, load_owner_rows())
+    table.word_rows = owner_word_rows(pairs)
+    for item, (k, _, _) in table.word_rows.items():
+        try:
+            convert(k, table)
+        except EncodingError as e:
+            raise EncodingError(
+                f"owner word {item}: {e}; an edit of this word could not render (rule 11)"
+            ) from e
+    table.differences = [d for d in table.differences if d.word not in table.word_rows]
     font_cmap = TTFont(sources.path(DK_FONT)).getBestCmap()
-    no_glyph = sorted({c for r in table.rows for c in r.dst if ord(c) not in font_cmap})
+    dsts = [r.dst for r in table.rows] + [w[1] for w in table.word_rows.values()]
+    no_glyph = sorted({c for d in dsts for c in d if ord(c) not in font_cmap})
     if no_glyph:
         raise EncodingError(f"rows produce codepoints the font cannot draw: {no_glyph}")
     unmapped: Counter = Counter()
     converted = 0
     for r in recs:
         try:
-            convert(spine_clusters(r), table)
+            convert_item(r["id"], spine_clusters(r), table)
             converted += 1
         except EncodingError:
             unmapped.update(c for c in spine_clusters(r) if c not in table.cluster_rows)
@@ -568,7 +617,8 @@ def converted_digest(recs: list[dict], table: Table) -> dict:
     (mushaf-shape) must reproduce it exactly."""
     h = hashlib.sha256()
     for r in recs:
-        h.update(f"{r['id']}\t{cps(convert(spine_clusters(r), table).text)}\n".encode("ascii"))
+        text = convert_item(r["id"], spine_clusters(r), table).text
+        h.update(f"{r['id']}\t{cps(text)}\n".encode("ascii"))
     return {"items": len(recs), "sha256": h.hexdigest()}
 
 
@@ -578,7 +628,7 @@ def lossy_items(recs: list[dict], table: Table) -> list[str]:
     out = []
     for r in recs:
         k = spine_clusters(r)
-        if any(k[a:b] in lossy for a, b, _, _ in convert(k, table).spans):
+        if any(k[a:b] in lossy for a, b, _, _ in convert_item(r["id"], k, table).spans):
             out.append(r["id"])
     return out
 
@@ -691,6 +741,17 @@ def review_html(table: Table, report: dict) -> str:
         w(
             f"<tr><td>{d.word}</td><td>{_ar(''.join(d.k))}<br>{_cl(d.k)}</td>"
             f"<td>{conv}</td><td>{_ar(''.join(d.d), 'dk')}<br>{_cl(d.d)}</td></tr>\n"
+        )
+    w("</table>\n")
+
+    w("<h2>3a. Owner word rows (D18)</h2>\n")
+    w("<p>Spine words rendered in DigitalKhatt's own form by owner decision.</p>\n<table>\n")
+    w("<tr><th>Item</th><th>KFGQPC</th><th>Rendered (DigitalKhatt)</th><th>Decision</th></tr>\n")
+    for item, (src, dst, why) in sorted(table.word_rows.items()):
+        w(
+            f"<tr><td>{item}</td><td>{_ar(''.join(src))}<br>{_cl(src)}</td>"
+            f"<td>{_ar(dst, 'dk')}<br><code>{cps(dst)}</code></td>"
+            f"<td>{html.escape(why)}</td></tr>\n"
         )
     w("</table>\n")
 

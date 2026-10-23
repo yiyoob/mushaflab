@@ -721,3 +721,46 @@ taken.
 Decision (owner): go back to the previous rendering (pinned font, line pitch 1,900). G-045 stays
 open; any new fix must be judged on full-size rendered lines against the print before it lands.
 
+## D18 — Owner print corrections at G1: sajdah overline and owner word rows
+Status: accepted (owner decisions at GATE G1, 2026-10-22)
+Date: 2026-10-22
+Context: the G1 check against the 1441H print (docs/review/phase3-g1.md §3a) found three places
+where our pages differ from the print: the 26 KFGQPC words with U+06E4 (G-040), 17:7:12
+(G-046) and 2:97:5 (G-047). Owner: "I want the sajdah overline", "I want the small waw and
+madda" (17:7:12), "I don't want the tatweel" (2:97:5).
+Evidence:
+- KFGQPC's own font draws U+06E4 as a bar over the word, and the print (quran-qcf4 word glyphs,
+  `qcf4-npm-1.1.0`) has a bar over exactly these 26 words. Measured on the print's glyphs: bar
+  101–124 of 2,500 units thick (0.040–0.050 em); one height per line; its gap above the line's
+  tallest overlined word 120–193 units (0.05–0.08 em); one continuous bar over adjacent
+  overlined words (13:15:1–2, 17:107:16–18, 53:62:1–2). DigitalKhatt Madina has no such mark;
+  the encoding table drops U+06E4 (lossy rows, D14).
+- 17:7:12 and 2:97:5: the print and DigitalKhatt's text agree with each other and differ from
+  KFGQPC v2.0 (§3a).
+Options for the overline: (a) draw nothing (as before); (b) a derived font with an overline mark
+(rejected: D17 showed derived-font changes are risky, and the bar spans words); (c) the core draws
+the bar as a filled rectangle. Options for the two words: (a) edit the spine (rejected: rule 1,
+and Phase 4's round-trip is against KFGQPC); (b) a per-cluster encoding row (rejected: the
+change is word-level and would leak into other words); (c) an owner word row.
+Decision:
+- **Sajdah overline (c).** The render profile lists the source codepoints that mark a word
+  (`overline_marks`: U+06E4) and the bar's `overline_thickness` (44) and `overline_clearance`
+  (70, font units of a 1000-unit em). A word whose resolved clusters contain a mark gets
+  `FitWord::overline`; `mushaf-draw` emits one `DrawItem::Fill { role: SajdahOverline }` per run
+  of adjacent overlined words on a line, spanning their ink (outline on-curve and control
+  points), at one height per line: clearance above the line's tallest overlined word. Integer
+  arithmetic only. Because the marks are read from the resolved clusters, a free edit that adds
+  or removes U+06E4 adds or removes the bar. The collision check counts the bar as ink (pitch
+  1,900: no collisions).
+- **Owner word rows (c).** `data/encodings/hafs-v1.owner-words.json` lists spine items the owner
+  decided to render in DigitalKhatt's own form; `dk_encoding.py` takes that form from the
+  aligned DigitalKhatt word (never typed) into the table's `word_rows` (item, KFGQPC clusters,
+  DK word). `EncodingTable::convert_item` uses a word row only when the item id and its
+  clusters both match exactly, else converts cluster by cluster, so an edited word still renders
+  (rule 11); the build fails if a word row's clusters could not convert on their own. The
+  spine is unchanged (KFGQPC); the G-024 sheet lists the word rows (§3a).
+  The U+0640 identity row (T3.1) is kept for that fallback.
+Consequences: text differences in the G-024 sheet drop to 0; the converted-spine digest changes;
+golden pages are unchanged (none of them has these words). Hit-testing on a word-row word maps
+every glyph to the word's first cluster (one span).
+

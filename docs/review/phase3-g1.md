@@ -56,7 +56,11 @@ the ten pages were compared with it.
 - G-045 (owner found صِرَٰطَ on page 1 with a gap between rāʾ and ṭāʾ) is **open**. A derived font
   that put the font's anchored superscript mark in place of the spacing alef was tried and
   rejected by the owner after review: it put the alef on top of the ط (D17). The pages here are
-  the previous rendering again.
+  the previous rendering again. Later the owner deferred it: "leave it how it is, we can fix it
+  later".
+- Sajdah overline: draw it (G-040, D18). 17:7:12: render the small wāw and madda (G-046, D18).
+  2:97:5: no tatweel (G-047, D18). Checked at full size against the print
+  (`build/fix/d18-overline.png`, `build/fix/d18-words.png`, not tracked).
 
 ## 2. Line fit and overflow (D15)
 
@@ -126,12 +130,12 @@ rendering. Sheets were looked at large, after the D17 lesson.
   42:51:11): the hamza is drawn below, as in the print.
 - **The 26 lossy U+06E4 words are the sajdah overline (G-040).** KFGQPC's own font draws U+06E4
   as a line over the word, and the print overlines exactly these words (e.g. وَلِلَّهِ and يَسۡجُدُ
-  13:15, يَخِرُّونَ, لِلۡأَذۡقَانِ, سُجَّدٗا 17:107). DigitalKhatt has no such mark, so our pages draw
-  no overline on them.
+  13:15, يَخِرُّونَ, لِلۡأَذۡقَانِ, سُجَّدٗا 17:107). DigitalKhatt has no such mark; at G1 the owner
+  chose to draw it, and the core now does (D18).
 - **17:7:12 لِيَسُـُٔوا۟ (G-046):** the print has a small wāw and madda above the sīn, as DigitalKhatt's
-  text does; KFGQPC v2.0 (our spine) does not, so our page does not either.
+  text does; KFGQPC v2.0 (our spine) does not. The page now renders DigitalKhatt's form (owner word row, D18).
 - **2:97:5 لِّجِبۡرِيلَ (G-047):** the print joins lām and jīm directly, as DigitalKhatt's text does;
-  KFGQPC v2.0 has a standalone tatweel there, which we draw (owner-approved identity row, D14).
+  KFGQPC v2.0 has a standalone tatweel there. The page now renders without it (owner word row, D18).
 
 ## 4. Shaping integrity (rule 6, T3.5a)
 

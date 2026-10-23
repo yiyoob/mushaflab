@@ -3,7 +3,8 @@
 //! D4: the core returns positioned glyph outlines. A `DrawPage` holds each used glyph's outline
 //! once (26.6 font units, y up) and a list of draw items in page coordinates (26.6 page units,
 //! y down): glyphs placed with an origin and a 16.16 scale, and strokes (surah-header frames,
-//! the "edited" marker). Platforms only fill and stroke paths. Every glyph carries the id of
+//! the "edited" marker) and fills (the sajdah overline, D18). Platforms only fill and stroke
+//! paths. Every glyph carries the id of
 //! the spine (or inserted) cluster it draws, for hit-testing and per-glyph edits.
 //!
 //! Rule 11: a non-canonical page (`FitPage::canonical == false`) always gets the edited
@@ -37,6 +38,8 @@ pub enum Role {
     Frame,
     /// Rule 11: the page is not canonical.
     EditedMarker,
+    /// D18: the bar over a sajdah word.
+    SajdahOverline,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -52,6 +55,12 @@ pub enum DrawItem {
         line: u32,
         #[serde(skip_serializing_if = "Option::is_none")]
         cluster: Option<ClusterRef>,
+    },
+    /// Fill a path given in page units (26.6, y down).
+    Fill {
+        role: Role,
+        line: u32,
+        path: Vec<PathOp>,
     },
     /// Stroke a path given in page units (26.6, y down).
     Stroke {
@@ -155,14 +164,47 @@ fn edited_label(center_x: i64, top: i64, height: i64) -> Vec<PathOp> {
     out
 }
 
+/// Ink extent of a glyph outline placed at (`x`, `y`) (26.6 font units, y up), from its
+/// on-curve and control points: (left, right, top).
+fn ink(path: &[PathOp], x: i64, y: i64) -> Option<(i64, i64, i64)> {
+    let mut out: Option<(i64, i64, i64)> = None;
+    let mut add = |px: i32, py: i32| {
+        let (px, py) = (x + i64::from(px), y + i64::from(py));
+        out = Some(match out {
+            None => (px, px, py),
+            Some((l, r, t)) => (l.min(px), r.max(px), t.max(py)),
+        });
+    };
+    for op in path {
+        match *op {
+            PathOp::Move { x, y } | PathOp::Line { x, y } => add(x, y),
+            PathOp::Cubic {
+                x1,
+                y1,
+                x2,
+                y2,
+                x,
+                y,
+            } => {
+                add(x1, y1);
+                add(x2, y2);
+                add(x, y);
+            }
+            PathOp::Close => {}
+        }
+    }
+    out
+}
+
 fn place_line(
     l: &FitLine,
     scale: i64,
     top: i64,
     g: &Geometry,
+    outlines: &Outlines,
     items: &mut Vec<DrawItem>,
     used: &mut BTreeSet<u32>,
-) -> LineSummary {
+) -> Result<LineSummary, Error> {
     let pitch = g.line_pitch * ONE;
     let baseline = top + pitch * BASELINE / 1000;
     // squeeze: positions scale by target/width on top of the page scale
@@ -178,8 +220,12 @@ fn place_line(
     };
     let left = right - drawn;
     let mut cursor = 0; // font units (26.6) from the line's right edge, reading order
+    // ink (left, right, top) of each run of adjacent overlined words, font units
+    let mut bars: Vec<(i64, i64, i64)> = Vec::new();
+    let mut last_overlined = None;
     for (wi, w) in l.words.iter().enumerate() {
         let word_left = l.width - cursor - w.width; // from the line's left edge
+        let mut word_ink: Option<(i64, i64, i64)> = None;
         let mut pen = 0;
         let mut gaps = w.gaps.clone();
         gaps.sort_by_key(|g| std::cmp::Reverse(g.0)); // visual order: later characters first
@@ -206,9 +252,44 @@ fn place_line(
                 cluster,
             });
             used.insert(gl.glyph);
+            if w.overline
+                && let Some((gl_l, gl_r, gl_t)) = ink(outlines.get(gl.glyph)?, x_fu, y_fu)
+            {
+                word_ink = Some(match word_ink {
+                    None => (gl_l, gl_r, gl_t),
+                    Some((a, b, c)) => (a.min(gl_l), b.max(gl_r), c.max(gl_t)),
+                });
+            }
             pen += i64::from(gl.x_advance) * ONE;
         }
+        if let Some((a, b, c)) = word_ink {
+            // one bar over adjacent overlined words, as the 1441H print draws it
+            match bars.last_mut() {
+                Some(bar) if last_overlined.is_some_and(|i| i + 1 == wi) => {
+                    *bar = (bar.0.min(a), bar.1.max(b), bar.2.max(c));
+                }
+                _ => bars.push((a, b, c)),
+            }
+            last_overlined = Some(wi);
+        }
         cursor += w.width + l.spaces.get(wi).copied().unwrap_or(0);
+    }
+    // one height per line, above its tallest overlined word (as the 1441H print draws it)
+    if let Some(ink_top) = bars.iter().map(|b| b.2).max() {
+        let y0 = ink_top + g.overline_clearance * ONE;
+        let y1 = y0 + g.overline_thickness * ONE;
+        for (bl, br, _) in &bars {
+            items.push(DrawItem::Fill {
+                role: Role::SajdahOverline,
+                line: l.line,
+                path: rect(
+                    left + muldiv(*bl, sx, SCALE_ONE),
+                    baseline - muldiv(y1, scale, SCALE_ONE),
+                    left + muldiv(*br, sx, SCALE_ONE),
+                    baseline - muldiv(y0, scale, SCALE_ONE),
+                ),
+            });
+        }
     }
     if matches!(l.kind, FitKind::SurahName { .. }) {
         items.push(DrawItem::Stroke {
@@ -222,7 +303,7 @@ fn place_line(
             ),
         });
     }
-    LineSummary {
+    Ok(LineSummary {
         line: l.line,
         kind: l.kind.clone(),
         short_ppm: l.short_ppm,
@@ -234,7 +315,7 @@ fn place_line(
         left,
         right,
         baseline,
-    }
+    })
 }
 
 /// Draw commands for a fitted page. Deterministic and pure.
@@ -255,7 +336,9 @@ pub fn draw_page(
     for (i, l) in fit.lines.iter().enumerate() {
         let top =
             g.margin_top * ONE + v_offset + i64::try_from(i).expect("few") * g.line_pitch * ONE;
-        lines.push(place_line(l, fit.scale, top, g, &mut items, &mut used));
+        lines.push(place_line(
+            l, fit.scale, top, g, outlines, &mut items, &mut used,
+        )?);
     }
     if !fit.canonical {
         let inset = 150 * ONE;

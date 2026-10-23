@@ -17,8 +17,8 @@ code { font-size: .8rem; }
 <tr><td>Spine items (words, ayah numbers, hizb signs)</td><td>83865</td></tr>
 <tr><td>Items the table converts</td><td>83865</td></tr>
 <tr><td>Items aligned with DigitalKhatt's text</td><td>83865</td></tr>
-<tr><td>Identical to DigitalKhatt after conversion</td><td>83863</td></tr>
-<tr><td>Text differences (section 3)</td><td>2</td></tr>
+<tr><td>Identical to DigitalKhatt after conversion</td><td>83865</td></tr>
+<tr><td>Text differences (section 3)</td><td>0</td></tr>
 <tr><td>Segmentation differences, G-012 (section 4)</td><td>3</td></tr>
 <tr><td>Table rows: cluster</td><td>1351</td></tr>
 <tr><td>Table rows: sequence</td><td>2</td></tr>
@@ -671,8 +671,13 @@ code { font-size: .8rem; }
 <p>Words whose converted KFGQPC form is not DigitalKhatt's word.</p>
 <table>
 <tr><th>Item</th><th>KFGQPC</th><th>Converted</th><th>DigitalKhatt</th></tr>
-<tr><td>2:97:5</td><td><span class="ar">لِّـجِبۡرِيلَ</span><br><code>U+0644 U+0651 U+0650</code><br><code>U+0640</code><br><code>U+062C U+0650</code><br><code>U+0628 U+06E1</code><br><code>U+0631 U+0650</code><br><code>U+064A</code><br><code>U+0644 U+064E</code></td><td><span class="dk">لِّـجِبْرِيلَ</span></td><td><span class="dk">لِّجِبْرِيلَ</span><br><code>U+0644 U+0651 U+0650</code><br><code>U+062C U+0650</code><br><code>U+0628 U+0652</code><br><code>U+0631 U+0650</code><br><code>U+064A</code><br><code>U+0644 U+064E</code></td></tr>
-<tr><td>17:7:12</td><td><span class="ar">لِيَسُـُٔواْ</span><br><code>U+0644 U+0650</code><br><code>U+064A U+064E</code><br><code>U+0633 U+064F</code><br><code>U+0640 U+0654 U+064F</code><br><code>U+0648</code><br><code>U+0627 U+0652</code></td><td><span class="dk">لِيَسُـٔ͏ُوا۟</span></td><td><span class="dk">لِيَسُ͏ࣳٓـٔ͏ُوا۟</span><br><code>U+0644 U+0650</code><br><code>U+064A U+064E</code><br><code>U+0633 U+064F U+034F U+08F3 U+0653</code><br><code>U+0640 U+0654 U+034F U+064F</code><br><code>U+0648</code><br><code>U+0627 U+06DF</code></td></tr>
+</table>
+<h2>3a. Owner word rows (D18)</h2>
+<p>Spine words rendered in DigitalKhatt's own form by owner decision.</p>
+<table>
+<tr><th>Item</th><th>KFGQPC</th><th>Rendered (DigitalKhatt)</th><th>Decision</th></tr>
+<tr><td>17:7:12</td><td><span class="ar">لِيَسُـُٔواْ</span><br><code>U+0644 U+0650</code><br><code>U+064A U+064E</code><br><code>U+0633 U+064F</code><br><code>U+0640 U+0654 U+064F</code><br><code>U+0648</code><br><code>U+0627 U+0652</code></td><td><span class="dk">لِيَسُ͏ࣳٓـٔ͏ُوا۟</span><br><code>U+0644 U+0650 U+064A U+064E U+0633 U+064F U+034F U+08F3 U+0653 U+0640 U+0654 U+034F U+064F U+0648 U+0627 U+06DF</code></td><td>Owner at GATE G1 (G-046): the 1441H print (quran-qcf4 word glyph) and DigitalKhatt&#x27;s text have a small waw and madda above the seen that KFGQPC v2.0 lacks; render DigitalKhatt&#x27;s form.</td></tr>
+<tr><td>2:97:5</td><td><span class="ar">لِّـجِبۡرِيلَ</span><br><code>U+0644 U+0651 U+0650</code><br><code>U+0640</code><br><code>U+062C U+0650</code><br><code>U+0628 U+06E1</code><br><code>U+0631 U+0650</code><br><code>U+064A</code><br><code>U+0644 U+064E</code></td><td><span class="dk">لِّجِبْرِيلَ</span><br><code>U+0644 U+0651 U+0650 U+062C U+0650 U+0628 U+0652 U+0631 U+0650 U+064A U+0644 U+064E</code></td><td>Owner at GATE G1 (G-047): no tatweel between lam and jeem, as in the 1441H print and DigitalKhatt&#x27;s text; render DigitalKhatt&#x27;s form (replaces the identity row for U+0640 approved in T3.1).</td></tr>
 </table>
 <h2>4. Segmentation (G-012)</h2>
 <table>

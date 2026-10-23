@@ -105,6 +105,22 @@ def test_owner_rows_fill_forms_the_data_cannot_give() -> None:
         enc.derive([pair("1", "a", "a")], (enc.Row(("a",), "a", 0, "owner"),))
 
 
+def test_owner_word_rows_take_the_aligned_word_for_that_item_only(tmp_path) -> None:
+    pairs = [pair("1:1:1", "a t", "a t"), pair("1:1:2", "a t", "a T")]
+    path = tmp_path / "words.json"
+    path.write_text(json.dumps({"words": [{"item": "1:1:2", "decision": "test"}]}))
+    t = enc.derive(pairs)
+    t.word_rows = enc.owner_word_rows(pairs, path)
+    assert t.word_rows == {"1:1:2": (("a", "t"), "aT", "test")}
+    assert enc.convert_item("1:1:2", ("a", "t"), t).text == "aT"
+    assert enc.convert_item("1:1:3", ("a", "t"), t).text == "at", "other items: cluster rows"
+    again = enc.Table.from_json(json.loads(json.dumps(t.to_json(provenance={}))))
+    assert again.word_rows == t.word_rows
+    path.write_text(json.dumps({"words": [{"item": "9:9:9", "decision": "test"}]}))
+    with pytest.raises(enc.EncodingError, match="not an aligned"):
+        enc.owner_word_rows(pairs, path)
+
+
 def test_table_round_trips_through_json() -> None:
     t = enc.derive([pair("1", "a q b", "a Q1 Q2 b"), pair("2", "a b", "a b")])
     again = enc.Table.from_json(json.loads(json.dumps(t.to_json(provenance={}))))

@@ -41,6 +41,9 @@ pub struct Profile {
     pub line_widths: String,
     pub surah_names: String,
     pub note: String,
+    /// Source codepoints that mark a word for the sajdah overline (D18), drawn by the core
+    /// because the font has no such mark.
+    pub overline_marks: Vec<Cps>,
     pub geometry: Geometry,
     pub justify: JustifySettings,
 }
@@ -56,6 +59,10 @@ pub struct Geometry {
     pub margin_bottom: i64,
     /// Smallest page scale, per mille.
     pub page_scale_floor: i64,
+    /// The sajdah overline (D18): its thickness, and its gap above the line's tallest
+    /// overlined word.
+    pub overline_thickness: i64,
+    pub overline_clearance: i64,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
@@ -190,6 +197,8 @@ pub struct FitWord {
     pub gaps: Vec<(usize, i64)>,
     /// Advance of the word with its features and gaps (26.6).
     pub width: i64,
+    /// Draw the sajdah overline over this word (D18).
+    pub overline: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -291,6 +300,7 @@ fn plain_word(chars: Vec<char>) -> FitWord {
         glyphs: Vec::new(),
         gaps: Vec::new(),
         width: 0,
+        overline: false,
     }
 }
 
@@ -315,11 +325,17 @@ fn text_plan(
         let cl: Vec<&[char]> = it.clusters.iter().map(|c| c.cps.0.as_slice()).collect();
         let conv = data
             .table
-            .convert(&cl)
+            .convert_item(&it.id.to_string(), &cl)
             .map_err(|e| Error::new(format!("{}: no encoding row for cluster {}", it.id, e.cps)))?;
         let wi = words.len();
         let mut word = plain_word(conv.chars);
         word.item = Some(idx);
+        word.overline = cl.iter().any(|c| {
+            data.profile
+                .overline_marks
+                .iter()
+                .any(|m| c.windows(m.0.len()).any(|w| w == m.0.as_slice()))
+        });
         let mut word_extra = 0;
         for s in &conv.spans {
             word.spans.push(WordSpan {

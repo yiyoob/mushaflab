@@ -8,14 +8,17 @@
   "encoding": "data/encodings/hafs-v1.kfgqpc-to-dk-madina.json",
   "line_widths": "data/render/uthmani-1441h.line-widths.json",
   "surah_names": "data/render/surah-names.json",
-  "note": "Design constants (D15), not text data. Font units of the font (1000 per em). line_width: a full text line (about the p90 of DigitalKhatt Madina's natural widths on 1441H lines). page_scale_floor: smallest per-page font scale, per mille. line_pitch and margins: for the owner to judge at GATE G1.",
+  "note": "Design constants (D15), not text data. Font units of the font (1000 per em). line_width: a full text line (about the p90 of DigitalKhatt Madina's natural widths on 1441H lines). page_scale_floor: smallest per-page font scale, per mille. line_pitch and margins: for the owner to judge at GATE G1. overline_marks, overline_thickness, overline_clearance (D18): KFGQPC's U+06E4 is the sajdah overline (KFGQPC's font draws it as a bar over the word; the 1441H print overlines exactly these 26 words); thickness and gap measured on the print's word glyphs (quran-qcf4, qcf4-npm-1.1.0): bar 101-124 of 2500 units thick, 120-955 above the word's ink, one height per line.",
+  "overline_marks": ["U+06E4"],
   "geometry": {
     "line_width": 17800,
     "line_pitch": 1900,
     "margin_x": 900,
     "margin_top": 1500,
     "margin_bottom": 900,
-    "page_scale_floor": 900
+    "page_scale_floor": 900,
+    "overline_thickness": 44,
+    "overline_clearance": 70
   },
   "justify": {
     "space_stretch": 1000,

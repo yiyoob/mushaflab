@@ -87,7 +87,7 @@ render *ARGS:
             *) echo "render: unknown argument '$arg' (expected PAGE=<n> RIWAYAH=<id>)" >&2; exit 2 ;;
         esac
     done
-    cargo run --release --quiet {{manifest}} -p mushaf-render-cli -- --page "$PAGE" --riwayah "$RIWAYAH"
+    cargo run --release --quiet {{manifest}} -p mushaf-render-cli --bin mushaf-render -- --page "$PAGE" --riwayah "$RIWAYAH"
 
 # Golden image + line-fit + shaping-integrity tests (release; all 604 pages)
 golden:

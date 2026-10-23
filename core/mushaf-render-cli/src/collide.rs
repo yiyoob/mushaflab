@@ -159,6 +159,12 @@ fn line_inks(d: &DrawPage) -> Vec<(u32, Ink)> {
             {
                 glyph_path(&mut pb, &d.glyphs[glyph], (*x, *y, *sx, *sy));
             }
+            if let DrawItem::Fill { line, path, .. } = item
+                && *line == l.line
+            {
+                // page units, y down: the identity transform of `glyph_path`
+                glyph_path(&mut pb, path, (0, 0, 65536, -65536));
+            }
         }
         // a frame belongs to the line whose baseline is nearest its middle
         let mut strokes = Vec::new();

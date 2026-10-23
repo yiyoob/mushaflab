@@ -22,7 +22,19 @@ struct Wire {
     provenance: serde_json::Value,
     converted_spine: Digest,
     lossy_items: Vec<String>,
+    word_rows: Vec<WireWord>,
     rows: Vec<WireRow>,
+}
+
+/// An owner word row (D18): a spine item rendered as DigitalKhatt's own word.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct WireWord {
+    item: String,
+    src: Vec<Cps>,
+    dst: Cps,
+    #[allow(dead_code)]
+    decision: String,
 }
 
 #[derive(Deserialize)]
@@ -58,6 +70,8 @@ pub struct EncodingTable {
     pub converted_spine: Digest,
     /// Spine items whose conversion uses a lossy row (G-040), as the pipeline lists them.
     pub lossy_items: Vec<String>,
+    /// Owner word rows by item id: (KFGQPC clusters, font-encoded word) (D18).
+    word_rows: BTreeMap<String, (Vec<Vec<char>>, Vec<char>)>,
     clusters: BTreeMap<Vec<char>, Target>,
     sequences: BTreeMap<Vec<Vec<char>>, Target>,
     max_seq: usize,
@@ -114,10 +128,34 @@ impl EncodingTable {
             to: wire.to,
             converted_spine: wire.converted_spine,
             lossy_items: wire.lossy_items,
+            word_rows: wire
+                .word_rows
+                .into_iter()
+                .map(|w| (w.item, (w.src.into_iter().map(|c| c.0).collect(), w.dst.0)))
+                .collect(),
             clusters,
             sequences,
             max_seq,
         })
+    }
+
+    /// Convert a spine item: its owner word row (D18) when the table lists this item with
+    /// exactly these clusters, else cluster by cluster.
+    pub fn convert_item(&self, item: &str, clusters: &[&[char]]) -> Result<Converted, Unmapped> {
+        if let Some((src, dst)) = self.word_rows.get(item)
+            && src.len() == clusters.len()
+            && src.iter().zip(clusters).all(|(a, b)| a.as_slice() == *b)
+        {
+            return Ok(Converted {
+                chars: dst.clone(),
+                spans: vec![Span {
+                    clusters: 0..clusters.len(),
+                    chars: 0..dst.len(),
+                    lossy: false,
+                }],
+            });
+        }
+        self.convert(clusters)
     }
 
     /// Convert one item's clusters (KFGQPC codepoints) to the font's encoding.
@@ -162,6 +200,7 @@ mod tests {
     // Synthetic Latin "clusters": test fixtures, not Quranic text.
     const TABLE: &str = r#"{"schema": 1, "spine": "t/v1", "from": "kfgqpc", "to": "f",
       "provenance": {}, "converted_spine": {"items": 0, "sha256": ""}, "lossy_items": [],
+      "word_rows": [{"item": "1:1:1", "src": ["U+0061", "U+007A"], "dst": "U+0057", "decision": "test"}],
       "rows": [
         {"src": ["U+0061"], "dst": "U+0061", "count": 1, "kind": "cluster", "lossy": false},
         {"src": ["U+0062"], "dst": "U+0042", "count": 1, "kind": "cluster", "lossy": true},
@@ -205,6 +244,22 @@ mod tests {
                 },
             ]
         );
+    }
+
+    #[test]
+    fn an_owner_word_row_applies_to_its_item_and_clusters_only() {
+        let t = EncodingTable::from_json(TABLE).unwrap();
+        let a: Vec<char> = vec!['a'];
+        let z: Vec<char> = vec!['z'];
+        let cl = [a.as_slice(), z.as_slice()];
+        let c = t.convert_item("1:1:1", &cl).unwrap();
+        assert_eq!(c.chars, vec!['W']);
+        assert_eq!(c.spans.len(), 1);
+        assert!(
+            t.convert_item("1:1:2", &cl).is_err(),
+            "another item converts cluster by cluster"
+        );
+        assert!(t.convert_item("1:1:1", &cl[..1]).is_ok());
     }
 
     #[test]

@@ -17,7 +17,7 @@ fn every_spine_item_converts_like_the_pipeline() {
     for item in &spine.items {
         let clusters: Vec<&[char]> = item.clusters.iter().map(|c| c.cps.0.as_slice()).collect();
         let conv = table
-            .convert(&clusters)
+            .convert_item(&item.id.to_string(), &clusters)
             .unwrap_or_else(|e| panic!("{}: no row for cluster {}", item.id, e.cps));
         digest.push_str(&format!(
             "{}\t{}\n",
