@@ -25,7 +25,17 @@ fn pages_render_to_svg_that_parses_and_to_png() {
 }
 
 #[test]
-fn riwayat_without_a_profile_are_refused_with_a_reason() {
-    let err = Renderer::load(&repo(), "warsh").err().unwrap();
-    assert!(err.to_string().contains("Phase 5"));
+fn an_unknown_riwayah_is_refused_with_a_reason() {
+    let err = Renderer::load(&repo(), "nope").err().unwrap();
+    assert!(err.to_string().contains("unknown riwayah"));
+}
+
+/// T5.2: a riwāyah on its native layout, in its own KFGQPC font (D27, D29).
+#[test]
+fn warsh_renders_on_its_native_layout() {
+    let r = Renderer::load(&repo(), "warsh").unwrap();
+    let d = r.render(1, None).unwrap();
+    assert_eq!(d.layout_id, "uthmani-warsh-kfgqpc");
+    assert!(d.canonical);
+    assert_eq!(&png(&svg(&d), 300).unwrap()[1..4], b"PNG");
 }

@@ -19,7 +19,7 @@ use mushaf_justify::{
     Features, LineInput, ONE, Params, Regexps, SCALE_ONE, justify_line, manual_stretch,
     natural_width, space_width, tight_width, word_ranges,
 };
-use mushaf_model::{ClusterRef, Cps, Error, ItemRef, LineKind, Spine};
+use mushaf_model::{ClusterRef, Cps, Error, ItemRef, LineKind};
 use mushaf_resolve::Resolved;
 use mushaf_shape::{EncodingTable, FeatureRange, ShapedGlyph, Shaper};
 use serde::{Deserialize, Serialize};
@@ -37,7 +37,13 @@ pub struct Profile {
     pub layout_id: String,
     pub spine: String,
     pub font: String,
-    pub encoding: String,
+    /// The KFGQPC -> font encoding table; absent for a font that reads KFGQPC's encoding as
+    /// stored (the identity table, T5.3).
+    #[serde(default)]
+    pub encoding: Option<String>,
+    /// Owner-approved rows for cluster forms outside Ḥafṣ (D28), loaded next to `encoding`.
+    #[serde(default)]
+    pub encoding_extra: Option<String>,
     pub line_widths: String,
     pub surah_names: String,
     pub note: String,
@@ -156,16 +162,46 @@ impl SurahNames {
     }
 }
 
-/// The basmalah line's words: spine items 1:1:1 to 1:1:4, converted (D16).
-pub fn basmalah_words(spine: &Spine, table: &EncodingTable) -> Result<Vec<Vec<char>>, Error> {
-    (1..=4)
-        .map(|n| {
-            let id = ItemRef::spine(1, 1, n);
-            let item = spine
+impl Profile {
+    /// The profile's encoding table: the identity table without `encoding`, else the table
+    /// plus any `encoding_extra` rows. `read` returns a repository file's text.
+    pub fn encoding_table(
+        &self,
+        read: impl Fn(&str) -> Result<String, Error>,
+    ) -> Result<EncodingTable, Error> {
+        let Some(path) = &self.encoding else {
+            if self.encoding_extra.is_some() {
+                return Err(Error::new("encoding_extra without an encoding table"));
+            }
+            return Ok(EncodingTable::identity(&self.spine));
+        };
+        let mut table = EncodingTable::from_json(&read(path)?)?;
+        if let Some(extra) = &self.encoding_extra {
+            table.extend_from_json(&read(extra)?)?;
+        }
+        Ok(table)
+    }
+}
+
+/// Where the basmalah of header lines is taken from: the words of the basmalah inside 27:30
+/// (owner decision at the T5.3 checkpoint, D30). In Ḥafṣ they equal 1:1:1 to 1:1:4 codepoint for
+/// codepoint; riwāyāt that do not number the basmalah of al-Fātiḥah keep 27:30 in their own
+/// spelling.
+pub const BASMALAH_ITEMS: [(u32, u32, u32); 4] =
+    [(27, 30, 5), (27, 30, 6), (27, 30, 7), (27, 30, 8)];
+
+/// The basmalah line's words: the riwāyah's own `BASMALAH_ITEMS` in its resolved text (data
+/// mode, without edits), converted (D16, D30).
+pub fn basmalah_words(resolved: &Resolved, table: &EncodingTable) -> Result<Vec<Vec<char>>, Error> {
+    BASMALAH_ITEMS
+        .iter()
+        .map(|&(s, a, n)| {
+            let id = ItemRef::spine(s, a, n);
+            let item = resolved
                 .items
                 .iter()
                 .find(|i| i.id == id)
-                .ok_or_else(|| Error::new(format!("spine has no {id}")))?;
+                .ok_or_else(|| Error::new(format!("resolved text has no {id}")))?;
             let cl: Vec<&[char]> = item.clusters.iter().map(|c| c.cps.0.as_slice()).collect();
             table
                 .convert(&cl)

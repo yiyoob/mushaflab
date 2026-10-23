@@ -13,7 +13,7 @@ use mushaf_layout::fit::{
 };
 use mushaf_layout::map_lines;
 use mushaf_resolve::{Mode, resolve_patches};
-use mushaf_shape::{EncodingTable, FontData};
+use mushaf_shape::FontData;
 
 fn pct(v: &mut [i64], q: usize) -> i64 {
     v.sort();
@@ -38,12 +38,13 @@ fn main() {
     let ds = mushaf_db::load_dir(&repo.join("data")).unwrap();
     let spine = &ds.spines[&profile.spine];
     let layout = &ds.layouts[&profile.layout_id];
-    let table = EncodingTable::from_json(&read(&profile.encoding)).unwrap();
+    let table = profile.encoding_table(|p| Ok(read(p))).unwrap();
     let widths = LineWidths::from_json(&read(&profile.line_widths)).unwrap();
     let names = SurahNames::from_json(&read(&profile.surah_names)).unwrap();
     let font = FontData::new(fs::read(repo.join(&profile.font)).unwrap()).unwrap();
     let shaper = font.shaper();
-    let basmalah = basmalah_words(spine, &table).unwrap();
+    let resolved = resolve_patches(spine, &[], Mode::Data).unwrap();
+    let basmalah = basmalah_words(&resolved, &table).unwrap();
     let data = FitData {
         profile: &profile,
         table: &table,
@@ -52,7 +53,6 @@ fn main() {
         basmalah: &basmalah,
         upem: i64::from(font.units_per_em()),
     };
-    let resolved = resolve_patches(spine, &[], Mode::Data).unwrap();
     let mapping = map_lines(layout, spine, &resolved).unwrap();
     let rx = Regexps::new();
     let space = mushaf_justify::space_width(&shaper).unwrap();

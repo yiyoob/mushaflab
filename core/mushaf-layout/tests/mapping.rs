@@ -308,3 +308,74 @@ fn hafs_identity_maps_every_line_to_its_anchors() {
     }
     assert_eq!(m.lines.last().unwrap().items.end, r.items.len());
 }
+
+/// T5.2: a native layout names items of a riwāyah's resolved text (`base`), inserted ones
+/// included. An item of a resolution on top of it (an edit overlay) joins the line of its own id
+/// in `base`, else of the nearest id its insert chain starts from.
+#[test]
+fn native_layouts_map_on_the_riwayah_stream() {
+    use mushaf_layout::map_lines_on;
+    let ds = synthetic();
+    let spine = &ds.spines["test/v1"];
+    let base_ps = vec![
+        patch("r.ins", "insert_after", "1:1:2", &word(1)),
+        patch("r.del", "delete", "1:2:0", ""),
+    ];
+    let base = resolve_patches(spine, &base_ps.iter().collect::<Vec<_>>(), Mode::Data).unwrap();
+    let layout: Layout = serde_json::from_str(
+        r#"{"layout_id": "test-native", "script_id": "synthetic", "spine": "test/v1",
+            "riwayah": "r", "pages": 1, "lines_per_page": 3, "sources": {},
+            "lines": [
+              {"page": 1, "line": 1, "type": "text", "first": "1:1:1", "last": "1:1:2+ins.1", "centered": false, "fit": "forced"},
+              {"page": 1, "line": 2, "type": "text", "first": "1:1:3", "last": "1:2:3", "centered": false, "fit": "hafs"},
+              {"page": 1, "line": 3, "type": "text", "first": "2:1:1", "last": "2:1:3", "centered": false, "fit": "fitted"}]}"#,
+    )
+    .unwrap();
+    layout.validate().unwrap();
+    let mut all = base_ps.clone();
+    all.push(patch("u.nested", "insert_after", "1:1:2+ins.1", &word(1)));
+    all.push(patch("u.before", "insert_before", "1:1:3", &word(1)));
+    let r = resolve_patches(spine, &all.iter().collect::<Vec<_>>(), Mode::Data).unwrap();
+    let m = map_lines_on(&layout, &base, &r).unwrap();
+    assert_eq!(
+        lines(&r, &m),
+        [
+            (
+                "1:1".to_string(),
+                vec!["1:1:1", "1:1:2", "1:1:2+ins.1", "1:1:2+ins.1+ins.1"]
+                    .into_iter()
+                    .map(String::from)
+                    .collect::<Vec<_>>()
+            ),
+            (
+                "1:2".to_string(),
+                vec!["1:1:3+ins.1", "1:1:3", "1:2:1", "1:2:2", "1:2:3"]
+                    .into_iter()
+                    .map(String::from)
+                    .collect()
+            ),
+            (
+                "1:3".to_string(),
+                vec!["2:1:1", "2:1:2", "2:1:3"]
+                    .into_iter()
+                    .map(String::from)
+                    .collect()
+            ),
+        ]
+    );
+    // the layout must tile the base stream exactly
+    let mut short = layout.clone();
+    short.lines.pop();
+    assert!(matches!(
+        map_lines_on(&short, &base, &base),
+        Err(LayoutError::NotCovered)
+    ));
+    let mut gap = layout.clone();
+    if let LineKind::Text { first, .. } = &mut gap.lines[1].kind {
+        *first = "1:2:1".parse().unwrap();
+    }
+    assert!(matches!(
+        map_lines_on(&gap, &base, &base),
+        Err(LayoutError::NotContiguous { .. })
+    ));
+}

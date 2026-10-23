@@ -26,7 +26,7 @@ pub use dataset::{
     SpineRow, classify,
 };
 pub use ids::{ClusterRef, ItemRef, MarkRef, Ref};
-pub use layout::{Layout, Line, LineKind};
+pub use layout::{FitTag, Layout, Line, LineKind};
 pub use options::{OptionDefault, OptionGroup};
 pub use overlay::EditOverlay;
 pub use patch::{

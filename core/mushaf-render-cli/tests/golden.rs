@@ -670,3 +670,217 @@ fn dk_riwayat_words_pass_rule_6() {
         "only unconvertible forms and unattached marks may be pending"
     );
 }
+
+/// The seven riwāyāt on their native layouts (T5.2).
+const NATIVE: [&str; 7] = [
+    "shuba",
+    "warsh",
+    "qalun",
+    "bazzi",
+    "qunbul",
+    "duri_abuamr",
+    "susi",
+];
+/// DigitalKhatt Madina's spacing upright alef that `rclt` puts after a non-joining letter
+/// (G-045): `glyph00103`.
+const G045_GLYPH: u32 = 103;
+
+/// Pinned rule-6 findings for one riwāyah: (item, is "no row") from both pending lists.
+fn pinned(riwayah: &str) -> Vec<(String, bool)> {
+    let mut out = Vec::new();
+    for f in [KFGQPC_PENDING, DK_PENDING] {
+        let list: Vec<String> =
+            serde_json::from_str(&fs::read_to_string(repo().join(f)).unwrap()).unwrap();
+        for e in list {
+            let (r, rest) = e.split_once(' ').unwrap();
+            if r == riwayah {
+                let (item, what) = rest.split_once(": ").unwrap();
+                out.push((item.to_string(), what.starts_with("no row for")));
+            }
+        }
+    }
+    out
+}
+
+fn pct(v: &[i64], p: usize) -> i64 {
+    v[(v.len() - 1) * p / 100]
+}
+
+/// T5.2 (D29, D31), every page of every riwāyah on its native layout: a page whose words cannot
+/// all be converted yet is blocked, exactly the pages holding a G-102 form; every other page
+/// passes rule 6 except the pinned words (G-101, G-103), its text lines close within 0.1%, and
+/// no ink of adjacent lines touches at the profile's pitch. The overflow report per riwāyah
+/// (`docs/review/phase5/overflow-<r>.md`) must equal what the pages give.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn native_layouts_pass_rule_6_close_and_never_collide() {
+    use mushaf_render::collide::line_pairs;
+    use mushaf_render::fit_checked;
+    for riwayah in NATIVE {
+        let r = Renderer::load(&repo(), riwayah).unwrap();
+        let resolved = r.resolve(None).unwrap();
+        let mapping = r.map(&resolved).unwrap();
+        let shaper = r.font.shaper();
+        let space = mushaf_justify::space_width(&shaper).unwrap();
+        let mut page_of = std::collections::BTreeMap::new();
+        for l in &mapping.lines {
+            for it in &resolved.items[l.items.clone()] {
+                page_of.insert(it.id.to_string(), l.page);
+            }
+        }
+        let pins = pinned(riwayah);
+        let want_blocked: BTreeSet<u32> = pins
+            .iter()
+            .filter(|(_, no_row)| *no_row)
+            .map(|(i, _)| page_of[i])
+            .collect();
+        let want_flagged: BTreeSet<String> = pins
+            .iter()
+            .filter(|(i, no_row)| !no_row && !want_blocked.contains(&page_of[i]))
+            .map(|(i, _)| i.clone())
+            .collect();
+        let (mut blocked, mut flagged) = (BTreeSet::new(), BTreeSet::new());
+        let (mut misfit, mut hits) = (Vec::new(), Vec::new());
+        let (mut scaled, mut floor, mut squeezed) = (Vec::new(), Vec::new(), Vec::new());
+        let (mut widest, mut g045, mut lines) = (Vec::new(), 0usize, 0usize);
+        let mut flag_pages = std::collections::BTreeMap::<u32, Vec<String>>::new();
+        for page in 1..=604 {
+            let cp = fit_checked(&r, &shaper, &resolved, &mapping, page).unwrap();
+            let Some(fit) = cp.fit else {
+                blocked.insert(page);
+                continue;
+            };
+            for (item, v) in &cp.violations {
+                assert!(
+                    matches!(v, mushaf_shape::Violation::UnattachedMark { .. }),
+                    "{riwayah} {item}: {v:?}"
+                );
+                flagged.insert(item.clone());
+                flag_pages.entry(page).or_default().push(item.clone());
+            }
+            for n in &fit.notes {
+                match n {
+                    FitNote::PageScaled { scale } => scaled.push((page, *scale)),
+                    FitNote::PageScaleAtFloor { .. } => floor.push(page),
+                    FitNote::Squeezed { line, x_scale } => squeezed.push((page, *line, *x_scale)),
+                    _ => {}
+                }
+            }
+            for l in &fit.lines {
+                if l.kind == FitKind::Text && l.width > 0 {
+                    lines += 1;
+                    if let Some(w) = l.spaces.iter().max() {
+                        widest.push(w * 1000 / space);
+                    }
+                }
+                for w in &l.words {
+                    g045 += w.glyphs.iter().filter(|g| g.glyph == G045_GLYPH).count();
+                }
+            }
+            let d = r.draw(&fit).unwrap();
+            for (line, drawn, want) in line_fit(&d) {
+                if (drawn - want).abs() * 1000 > want {
+                    misfit.push(format!("{page}:{line} drawn {drawn} vs {want}"));
+                }
+            }
+            hits.extend(
+                line_pairs(&d, r.profile.geometry.line_pitch)
+                    .into_iter()
+                    .filter(|p| p.collides)
+                    .map(|p| (page, p.upper, p.lower)),
+            );
+        }
+        assert_eq!(blocked, want_blocked, "{riwayah}: blocked pages (G-102)");
+        assert_eq!(
+            flagged, want_flagged,
+            "{riwayah}: rule-6 findings (G-101, G-103)"
+        );
+        assert!(
+            misfit.is_empty(),
+            "{riwayah}: lines outside 0.1%: {misfit:?}"
+        );
+        assert!(hits.is_empty(), "{riwayah}: colliding lines: {hits:?}");
+        widest.sort_unstable();
+        let mut md = format!(
+            "# Overflow report: {riwayah} (T5.2, D31)\n\nGenerated by `just golden` \
+             (`MUSHAF_UPDATE_GOLDEN=1` rewrites it) from every page of `{}` drawn with `{}`. \
+             Overflow policy (D15, extended per riwayah): one font scale per page (floor {}), \
+             then simple spaces tighten to {}%, then a horizontal squeeze; each step is \
+             listed. Justification: {}.\n\n",
+            r.profile.layout_id,
+            r.profile.font,
+            fmt_milli(r.profile.geometry.page_scale_floor),
+            r.profile.justify.min_space / 10,
+            if r.profile.justify.letters {
+                "letter stretching (DigitalKhatt features), then spaces"
+            } else {
+                "spaces only (D27)"
+            }
+        );
+        md += &format!(
+            "| | |\n|---|---|\n| Text lines drawn | {lines} |\n| Pages blocked (G-102) | {} |\n\
+             | Pages scaled below 1 | {} |\n| Pages at the scale floor | {} |\n| Squeezed lines | {} |\n\
+             | Widest space per line, median / p95 / max (x normal) | {} / {} / {} |\n\
+             | Spacing upright alef after a non-joining letter (G-045) | {} |\n\n",
+            blocked.len(),
+            scaled.len(),
+            floor.len(),
+            squeezed.len(),
+            fmt_milli(pct(&widest, 50)),
+            fmt_milli(pct(&widest, 95)),
+            fmt_milli(pct(&widest, 100)),
+            if r.profile.justify.letters {
+                g045.to_string()
+            } else {
+                "n/a (KFGQPC font)".into()
+            }
+        );
+        md += "## Blocked pages (G-102: a word has no DigitalKhatt row yet)\n\n";
+        md += &list_or_none(blocked.iter().map(u32::to_string));
+        md += "\n## Pages with pinned rule-6 findings (G-101, G-103)\n\n";
+        md += &list_or_none(
+            flag_pages
+                .iter()
+                .map(|(p, items)| format!("{p} ({})", items.join(", "))),
+        );
+        md += "\n## Pages at the scale floor\n\n";
+        md += &list_or_none(floor.iter().map(u32::to_string));
+        md += "\n## Squeezed lines\n\n";
+        md += &list_or_none(
+            squeezed
+                .iter()
+                .map(|(p, l, x)| format!("{p}:{l} ({})", fmt_ratio(*x))),
+        );
+        let path = repo().join(format!("docs/review/phase5/overflow-{riwayah}.md"));
+        if std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some() {
+            fs::write(&path, &md).unwrap();
+        } else {
+            let want = fs::read_to_string(&path).unwrap_or_default();
+            assert_eq!(md, want, "{riwayah}: overflow report differs from {path:?}");
+        }
+        eprintln!(
+            "{riwayah}: {lines} lines, {} blocked pages, {} squeezed, G-045 {g045}",
+            blocked.len(),
+            squeezed.len()
+        );
+    }
+}
+
+/// 16.16 as a decimal with three places.
+fn fmt_ratio(v: i64) -> String {
+    let m = v * 1000 / mushaf_justify::SCALE_ONE;
+    format!("{}.{:03}", m / 1000, m % 1000)
+}
+
+fn fmt_milli(v: i64) -> String {
+    format!("{}.{:02}", v / 1000, (v % 1000) / 10)
+}
+
+fn list_or_none(items: impl Iterator<Item = String>) -> String {
+    let v: Vec<String> = items.collect();
+    if v.is_empty() {
+        "None.\n".into()
+    } else {
+        v.join(", ") + "\n"
+    }
+}

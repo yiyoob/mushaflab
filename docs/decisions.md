@@ -19,7 +19,7 @@ Consequences: what follows, what it rules out
 
 | ID | Title | Status |
 |---|---|---|
-| D1 | Line policy for non-Ḥafṣ riwāyāt | accepted: native layouts (finalized P5) |
+| D1 | Line policy for non-Ḥafṣ riwāyāt | accepted: native layouts; final form proposed at GATE G3 (D29) |
 | D2 | Font per riwāyah | accepted: hybrid (DigitalKhatt + KFGQPC) |
 | D3 | Justification implementation | accepted: Rust port on harfrust |
 | D4 | Draw path | accepted with the Phase 3 plan: positioned glyph outlines |
@@ -42,6 +42,10 @@ Consequences: what follows, what it rules out
 | D26 | Riwāyah profiles and surah transitions | accepted with the Phase 5 plan (2026-10-22) |
 | D27 | Warsh and Qālūn on their KFGQPC fonts: TrueType outlines, spacing-only justification | accepted with the Phase 5 plan (P4); per-glyph exceptions decided (2026-10-22) |
 | D28 | DigitalKhatt rows for cluster forms outside Ḥafṣ | accepted (approach with the plan, P3); groups decided at the T5.3 checkpoint (2026-10-22) |
+| D29 | Native layouts: Ḥafṣ breaks inside each riwāyah's KFGQPC ayah lines (D1 final form) | proposed for GATE G3 (approach approved with the plan, P1/P2) |
+| D30 | Short lines and header basmalah on native layouts | proposed for GATE G3 (P5, threshold changed on evidence; basmalah decided by the owner) |
+| D31 | Overflow per riwāyah | accepted with the plan (P6); numbers for GATE G3 |
+| D32 | Rule-5 edition notes per riwāyah | proposed for GATE G3 |
 
 ---
 
@@ -269,6 +273,8 @@ makes line anchors per-riwāyah data (T2.6 must map patched and inserted cluster
 riwāyah layout, not only to Ḥafṣ anchors).
 Decision (owner, GATE G0, 2026-10-21): B, native layouts per riwāyah, with C's reporting
 for any line that falls back. Finalized in Phase 5 once fitting results are known.
+Phase 5: the final form is proposed in D29 for GATE G3 (Ḥafṣ breaks inside each riwāyah's KFGQPC
+ayah lines, width-fitted lines listed; no fallback was needed).
 
 ## D7 — Licensing and distribution
 Status: accepted
@@ -894,5 +900,125 @@ Consequences:
 - Shaping the whole texts found 16 words where an approved or Ḥafṣ row leaves a mark unattached in
   a context Ḥafṣ never has (alef + U+06EC after lām or hāʾ; the small nūn U+06E8 on a tatweel in
   12:110:11). The sheet the owner saw had checked six examples per form; it now checks every
-  occurrence. These words are pinned and blocked as well (G-103), for the owner at G3.
+  occurrence. These words are pinned (any change fails) and their pages are flagged in the
+  overflow reports and contact sheets (G-103), for the owner at G3.
+
+## D29 — Native layouts: Ḥafṣ breaks inside each riwāyah's KFGQPC ayah lines (T5.2; D1 final form)
+Status: proposed for GATE G3 (approach approved with the Phase 5 plan as P1 and P2, 2026-10-22;
+the plan's questions were not answered separately, so the recommended options were taken)
+Date: 2026-10-22
+Context: D1 chose native layouts per riwāyah: KFGQPC's page and lines per ayah as hard
+constraints, word-level breaks inside multi-line ayahs fitted, every fitted or fallback line
+reported. The planning spikes measured what the data supports:
+- Width alone is weak. On Ḥafṣ, where the true breaks are known, fitting the 7,037 breaks the
+  ayah lines leave open by natural width finds about 54% of them, with the KFGQPC Ḥafṣ font or
+  DigitalKhatt and for every cost shape tried (the print stretches letters, so natural widths do
+  not show where it broke).
+- The riwāyah layouts share the 1441H Ḥafṣ line grid: every ayah of Shuʿbah (6,236), Bazzi and
+  Qunbul (6,216 plus four page-crossing ayahs) starts and ends on the same page and line as the
+  aligned Ḥafṣ items; al-Dūrī and al-Sūsī differ only at two ayahs; Warsh and Qālūn differ at
+  about 243 ayahs on about 250 pages.
+Decision:
+- `pipeline/ayah_lines.py` copies each riwāyah's KFGQPC page and lines per ayah to
+  `data/layout_inputs/<r>.ayah-lines.yaml` (tracked, checked by `data-verify`).
+- `mushaf_layout::native::fit_native` (pure, integer): one dynamic programme over all text lines
+  of the riwāyah's resolved text. An item may sit only on its ayah's lines; an ayah's first item
+  opens its first line and its last item closes its last line. Among the solutions it takes the
+  fewest lines not starting at the 1441H Ḥafṣ break of the same page and line, then the smallest
+  sum of squared differences between natural and target width (the target is the median natural
+  width of lines whose two breaks the data fix), then the earliest start. Widths come from the
+  riwāyah's own render font and encoding; an item without an encoding row yet (G-102) counts as
+  unmeasured (it affects no fitted line).
+- Every text line carries a `fit` tag in the layout file: `forced` (the ayah lines fix the
+  break), `hafs` (the transferred Ḥafṣ break, a **hypothesis** for that print until spot-checked),
+  `fitted` (width). No page needed a fallback: the programme always finds a solution, and fails
+  loudly if it ever does not.
+- Layouts `data/layouts/uthmani-<r>-kfgqpc.json` name items of the riwāyah's resolved text,
+  inserted ones included (`Layout::riwayah`); `map_lines_on` maps any resolution of that riwāyah
+  onto them (an overlay insert joins the line its insert chain starts from). Generated by
+  `mushaf-fitlines` in `just data-build` (rule 7: the logic is in `core/`). Reports:
+  `docs/review/phase5/layout-<r>.md` (every fitted line with its alternatives and margin).
+- Self-test: from KFGQPC's own Ḥafṣ ayah lines the programme rebuilds the 1441H layout exactly
+  (`core/mushaf-layout/tests/native.rs`), and every native layout keeps each ayah on its KFGQPC
+  lines.
+Result:
+
+| Riwāyah | forced | hafs | fitted |
+|---|---|---|---|
+| shuba | 1783 | 7037 | 0 |
+| warsh | 1749 | 6849 | 221 |
+| qalun | 1749 | 6850 | 220 |
+| bazzi | 1778 | 7042 | 0 |
+| qunbul | 1778 | 7042 | 0 |
+| duri_abuamr | 1775 | 7043 | 1 |
+| susi | 1775 | 7043 | 1 |
+
+Proposed for D1 (owner at GATE G3): **final = this rule**, with the spot check of P7 deciding
+whether the transferred breaks stand. Spot check: establish each QuranFlash book's edition on 5
+pages (which ayah starts each line, against the KFGQPC data), then compare all fitted lines of
+al-Dūrī and al-Sūsī, 30 fitted lines each of Warsh and Qālūn spread over the muṣḥaf, 20 random
+`hafs` lines per riwāyah, every page-crossing ayah, and page 1 (G-106).
+
+## D30 — Short lines and header basmalah on native layouts (T5.2, P5)
+Status: proposed for GATE G3 (the threshold departs from the plan on evidence; the basmalah was
+decided by the owner at the T5.3 checkpoint)
+Date: 2026-10-22
+Context: Ḥafṣ takes its short (centred) lines from the 1441H print's own widths (`quran-qcf4`,
+G-020): under 90% of a full line. No such data exists for the other prints. P5 proposed: the
+Ḥafṣ ratio where a line holds the same items as the Ḥafṣ line, otherwise natural width under 90%.
+Evidence: on Ḥafṣ (KFGQPC Ḥafṣ font, the 30 short lines known) natural width under 90% of the
+median full line would call 1,486 of 8,790 full lines short; the narrowest full line is at 63%;
+at 60% no full line counts as short and 14 of the 30 short lines are found. The 90% rule is about
+printed widths, not natural ones.
+Decision (`mushaf_layout::native::short_lines`):
+- a line that holds the same first and last item as the Ḥafṣ line at that page and line takes the
+  Ḥafṣ print's width when that line is short;
+- any other line is short when its natural width is under **60%** of the median full line
+  (`NATURAL_SHORT_PPM`); its width is that share.
+Written to `data/render/uthmani-<r>-kfgqpc.line-widths.json` with each line's basis. Result: 29 to
+35 short lines per riwāyah (Ḥafṣ: 30). Lines that are short in a print but between 60% and 90% of
+natural width are drawn full; the spot check covers page ends and surah ends (G-107).
+- **Header basmalah (owner at the T5.3 checkpoint, 2026-10-22: "Own 27:30 words").** Header
+  basmalah lines draw the riwāyah's own words 27:30:5 to 27:30:8 in its resolved text. In Ḥafṣ,
+  Shuʿbah, Bazzi and Qunbul these equal 1:1:1 to 1:1:4 codepoint for codepoint (the Ḥafṣ goldens
+  are unchanged); Warsh, Qālūn, al-Dūrī and al-Sūsī do not number the basmalah of al-Fātiḥah and
+  keep 27:30 in their own spelling (D16 amended).
+
+## D31 — Overflow per riwāyah (T5.2, P6)
+Status: accepted with the Phase 5 plan; numbers for GATE G3
+Date: 2026-10-22
+Decision: D15's policy for every riwāyah, in the plan's order: one font scale per page (floor
+0.90), simple spaces tighten to 60%, a horizontal squeeze, each step reported. The DigitalKhatt
+riwāyāt keep Ḥafṣ's constants: their natural full-line widths have the same p90 (17,796 to 18,005
+against 17,800). Warsh and Qālūn (KFGQPC fonts, 2048 units per em, spacing only): `line_width`
+39,000, about the p90 of their natural full-line widths, as D15 chose for Ḥafṣ; pitch and margins
+keep the Ḥafṣ page proportions. `just golden` checks every page of every riwāyah: rule 6 (apart
+from the pinned G-101/G-103 words), every line within 0.1% of its target, no ink of adjacent lines
+touching, and writes `docs/review/phase5/overflow-<r>.md`.
+
+| Riwāyah | Pages blocked (G-102) | Pages scaled | At floor | Squeezed lines | Widest space median / p95 / max | G-045 (spacing alef) |
+|---|---|---|---|---|---|---|
+| shuba | 55 | 181 | 23 | 49 | 2.81 / 3.79 / 5.87 | 1274 |
+| warsh | 0 | 200 | 37 | 62 | 2.82 / 5.18 / 13.83 | n/a (KFGQPC font) |
+| qalun | 0 | 191 | 39 | 67 | 2.83 / 5.19 / 12.38 | n/a (KFGQPC font) |
+| bazzi | 41 | 214 | 32 | 78 | 2.71 / 3.79 / 5.69 | 1269 |
+| qunbul | 40 | 214 | 32 | 78 | 2.71 / 3.79 / 5.69 | 1273 |
+| duri_abuamr | 159 | 167 | 26 | 58 | 2.77 / 3.79 / 5.87 | 1060 |
+| susi | 159 | 164 | 26 | 56 | 2.77 / 3.79 / 5.87 | 1060 |
+
+Ḥafṣ for comparison (D15): 209 pages scaled, 32 at the floor, 65 squeezed lines, widest space
+2.85 / 3.79 / 5.87, G-045 1,377. Spacing-only justification leaves wider gaps in Warsh and Qālūn,
+as D3 measured.
+
+## D32 — Rule-5 edition notes per riwāyah (T5.2)
+Status: proposed for GATE G3
+Date: 2026-10-22
+- **Shuʿbah, Bazzi, Qunbul, al-Dūrī, al-Sūsī:** the same documented exception as Ḥafṣ (D2):
+  DigitalKhatt Madina, a 1421H design, draws the riwāyah's KFGQPC text (official v2.0; Bazzi v7
+  from the 2022 mirror, D13) on the riwāyah's own KFGQPC layout. The word-level difference from
+  the font's own text cannot be produced, since DigitalKhatt publishes no text for these readings;
+  every form that needed a row beyond Ḥafṣ is listed with its evidence and the owner's decision
+  (D28, G-102).
+- **Warsh, Qālūn:** text, layout data and font all come from one KFGQPC release (official v2.1);
+  no exception. Their line breaks inside ayahs are still transferred or fitted (D29).
 

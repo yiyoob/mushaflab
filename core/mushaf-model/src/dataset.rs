@@ -283,6 +283,7 @@ impl DataSet {
                 l.last.as_deref(),
                 l.centered,
                 l.correction,
+                l.fit.as_deref(),
             )?;
             lines.entry(l.layout_id).or_default().push(line);
         }
@@ -293,6 +294,7 @@ impl DataSet {
                 layout_id: l.layout_id.clone(),
                 script_id: l.script_id,
                 spine: l.spine_id,
+                riwayah: l.riwayah,
                 pages: l.pages,
                 lines_per_page: l.lines_per_page,
                 sources: from_json(&l.sources)?,
@@ -445,6 +447,7 @@ pub struct LayoutRow {
     pub pages: u32,
     pub lines_per_page: u32,
     pub sources: String,
+    pub riwayah: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -458,6 +461,7 @@ pub struct LineRow {
     pub last: Option<String>,
     pub centered: bool,
     pub correction: Option<String>,
+    pub fit: Option<String>,
 }
 
 /// A row holding canonical JSON: `key` is the path (patch files), group id or riwayah id.

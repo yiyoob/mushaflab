@@ -41,8 +41,11 @@ def test_schema_version_and_keys(tmp_path: Path) -> None:
     assert "sha256:layouts/uthmani-1441h.json" in meta
     assert not any(k.endswith(".corrections.json") for k in meta)
     assert con.execute("select script_id from scripts").fetchall() == [("uthmani",)]
-    assert con.execute("select layout_id, script_id from layouts").fetchall() == [
-        ("uthmani-1441h", "uthmani")
+    native = ["bazzi", "duri_abuamr", "qalun", "qunbul", "shuba", "susi", "warsh"]
+    assert con.execute(
+        "select layout_id, script_id, riwayah from layouts order by layout_id"
+    ).fetchall() == [("uthmani-1441h", "uthmani", None)] + [
+        (f"uthmani-{r}-kfgqpc", "uthmani", r) for r in native
     ]
     con.close()
 

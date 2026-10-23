@@ -64,11 +64,12 @@ create table clusters (
     kind text not null, text text not null, primary key (spine_id, id));
 create table layouts (
     layout_id text primary key, script_id text not null, spine_id text not null,
-    pages integer not null, lines_per_page integer not null, sources text not null);
+    pages integer not null, lines_per_page integer not null, sources text not null,
+    riwayah text);
 create table lines (
     layout_id text not null, page integer not null, line integer not null, type text not null,
     surah integer, first_item text, last_item text, centered integer not null,
-    correction text, primary key (layout_id, page, line));
+    correction text, fit text, primary key (layout_id, page, line));
 create table patch_files (path text primary key, spine_id text not null, body text not null);
 create table option_groups (id text primary key, body text not null);
 create table ayah_maps (riwayah_id text primary key, spine_id text not null, body text not null);
@@ -268,7 +269,7 @@ def _insert_spine(con: sqlite3.Connection, spine_id: str, manifest: dict, recs: 
 
 def _insert_layout(con: sqlite3.Connection, layout: dict) -> None:
     con.execute(
-        "insert into layouts values (?, ?, ?, ?, ?, ?)",
+        "insert into layouts values (?, ?, ?, ?, ?, ?, ?)",
         (
             layout["layout_id"],
             layout["script_id"],
@@ -276,10 +277,11 @@ def _insert_layout(con: sqlite3.Connection, layout: dict) -> None:
             layout["pages"],
             layout["lines_per_page"],
             json.dumps(layout["sources"], sort_keys=True),
+            layout.get("riwayah"),
         ),
     )
     con.executemany(
-        "insert into lines values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "insert into lines values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
             (
                 layout["layout_id"],
@@ -291,6 +293,7 @@ def _insert_layout(con: sqlite3.Connection, layout: dict) -> None:
                 ln.get("last"),
                 int(ln["centered"]),
                 ln.get("correction"),
+                ln.get("fit"),
             )
             for ln in layout["lines"]
         ],
@@ -322,14 +325,16 @@ def read_spine(db_path: Path) -> list[dict]:
     return recs
 
 
-def read_layout(db_path: Path) -> dict:
+def read_layout(db_path: Path, layout_id: str = "uthmani-1441h") -> dict:
     con = sqlite3.connect(db_path)
-    layout_id, script_id, spine_id, pages, per_page, srcs = con.execute(
-        "select layout_id, script_id, spine_id, pages, lines_per_page, sources from layouts"
+    layout_id, script_id, spine_id, pages, per_page, srcs, riwayah = con.execute(
+        "select layout_id, script_id, spine_id, pages, lines_per_page, sources, riwayah"
+        " from layouts where layout_id = ?",
+        (layout_id,),
     ).fetchone()
     lines = []
-    for page, line, kind, surah, first, last, centered, correction in con.execute(
-        "select page, line, type, surah, first_item, last_item, centered, correction"
+    for page, line, kind, surah, first, last, centered, correction, fit in con.execute(
+        "select page, line, type, surah, first_item, last_item, centered, correction, fit"
         " from lines where layout_id = ? order by page, line",
         (layout_id,),
     ):
@@ -341,17 +346,16 @@ def read_layout(db_path: Path) -> dict:
         rec["centered"] = bool(centered)
         if correction is not None:
             rec["correction"] = correction
+        if fit is not None:
+            rec["fit"] = fit
         lines.append(rec)
     con.close()
-    return {
-        "layout_id": layout_id,
-        "script_id": script_id,
-        "spine": spine_id,
-        "pages": pages,
-        "lines_per_page": per_page,
-        "sources": json.loads(srcs),
-        "lines": lines,
-    }
+    out: dict = {"layout_id": layout_id, "script_id": script_id, "spine": spine_id}
+    if riwayah is not None:
+        out["riwayah"] = riwayah
+    out |= {"pages": pages, "lines_per_page": per_page, "sources": json.loads(srcs)}
+    out["lines"] = lines
+    return out
 
 
 def main(argv: list[str]) -> int:

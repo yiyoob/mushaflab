@@ -21,7 +21,7 @@ data-archive *DEST:
     {{uv}} run python -m pipeline.archive {{DEST}}
 
 # Run the full ETL: check codepoint table, rebuild spine + layout files and the font-encoding
-# table (T3.1), compile build/mushaf.db
+# table (T3.1), riwayah profiles and native layouts (T5.1, T5.2), compile build/mushaf.db
 data-build:
     {{uv}} run python -m pipeline.codepoints check
     {{uv}} run python -m pipeline.spine build
@@ -35,8 +35,10 @@ data-build:
     {{uv}} run python -m pipeline.emit_patches write
     {{uv}} run python -m pipeline.ayah_maps write
     {{uv}} run python -m pipeline.profiles write
+    {{uv}} run python -m pipeline.ayah_lines write
     {{uv}} run python -m pipeline.phase4_report write
     {{uv}} run python -m pipeline.drift write
+    cargo run --release -q {{manifest}} -p mushaf-render-cli --bin mushaf-fitlines
     {{uv}} run python -m pipeline.compile_db
 
 # Integrity tests on spine, layout, ayah maps (needs `just data-build` first)

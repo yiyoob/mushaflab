@@ -135,8 +135,8 @@ pub fn load_db(db: &Path) -> Result<DataSet, Error> {
         )?,
         layouts: query(
             &con,
-            "select layout_id, script_id, spine_id, pages, lines_per_page, sources from layouts \
-             order by layout_id",
+            "select layout_id, script_id, spine_id, pages, lines_per_page, sources, riwayah \
+             from layouts order by layout_id",
             |r| {
                 Ok(LayoutRow {
                     layout_id: r.get(0)?,
@@ -145,13 +145,14 @@ pub fn load_db(db: &Path) -> Result<DataSet, Error> {
                     pages: r.get(3)?,
                     lines_per_page: r.get(4)?,
                     sources: r.get(5)?,
+                    riwayah: r.get(6)?,
                 })
             },
         )?,
         lines: query(
             &con,
-            "select layout_id, page, line, type, surah, first_item, last_item, centered, correction \
-             from lines order by layout_id, page, line",
+            "select layout_id, page, line, type, surah, first_item, last_item, centered, correction, \
+             fit from lines order by layout_id, page, line",
             |r| {
                 Ok(LineRow {
                     layout_id: r.get(0)?,
@@ -163,6 +164,7 @@ pub fn load_db(db: &Path) -> Result<DataSet, Error> {
                     last: r.get(6)?,
                     centered: r.get::<_, i64>(7)? != 0,
                     correction: r.get(8)?,
+                    fit: r.get(9)?,
                 })
             },
         )?,

@@ -1,0 +1,27 @@
+{
+  "profile": "warsh-uthmani-kfgqpc",
+  "riwayah": "warsh",
+  "script_id": "uthmani",
+  "layout_id": "uthmani-warsh-kfgqpc",
+  "spine": "hafs/v1",
+  "font": "fonts/kfgqpc/uthmanic_warsh_v21.ttf",
+  "line_widths": "data/render/uthmani-warsh-kfgqpc.line-widths.json",
+  "surah_names": "data/render/surah-names.json",
+  "note": "Native layout (T5.2, D29) drawn with the riwayah's own KFGQPC font (D2, D27): KFGQPC codepoints as stored (no encoding table), justified by spacing only. Font units of this font (2048 per em). line_width 39000: about the p90 of this font's natural full-line widths on the native layout (docs/review/phase5/layout-warsh.md), as D15 chose for Hafs; pitch and margins keep the Hafs page proportions (Hafs value x 39000/17800). The KFGQPC font draws U+06E4 itself, so no overline is added.",
+  "overline_marks": [],
+  "geometry": {
+    "line_width": 39000,
+    "line_pitch": 4162,
+    "margin_x": 1971,
+    "margin_top": 3286,
+    "margin_bottom": 1971,
+    "page_scale_floor": 900,
+    "overline_thickness": 96,
+    "overline_clearance": 153
+  },
+  "justify": {
+    "space_stretch": 1000,
+    "min_space": 600,
+    "letters": false
+  }
+}

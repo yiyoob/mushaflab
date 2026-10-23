@@ -17,6 +17,7 @@ from pathlib import Path
 
 from pipeline import (
     align,
+    ayah_lines,
     ayah_maps,
     codepoints,
     compile_db,
@@ -163,6 +164,8 @@ def check_phase5_files_current() -> list[str]:
     out = []
     if profiles.main(["", "check"]) != 0:
         out.append("data/profiles differ from a rebuild")
+    if ayah_lines.main(["", "check"]) != 0:
+        out.append("data/layout_inputs differ from a rebuild")
     if dk_riwayat.main(["", "check"]) != 0:
         out.append("riwayat encoding candidates or rows differ from a rebuild")
     return out
