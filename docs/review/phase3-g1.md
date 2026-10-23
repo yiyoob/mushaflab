@@ -114,6 +114,25 @@ loads). 83,863 of 83,865 spine items equal DigitalKhatt's own text after the dat
 conversion; 2 differ (2:97:5, 17:7:12), 3 differ only in word splitting (G-012), and 33 use a
 lossy row (G-040, your decision: DigitalKhatt's form for now).
 
+### 3a. G-024 items checked against the print (2026-10-22)
+
+Each word drawn twice at full size: the 1441H print's own word glyph (quran-qcf4) and our
+rendering. Sheets were looked at large, after the D17 lesson.
+
+- **Match the print:** ٱلۡمُصَۜيۡطِرُونَ 52:37:7 (small sīn under the ṣād; KFGQPC U+06DC becomes
+  DigitalKhatt U+06E3), مَجۡر۪ىٰهَا 11:41:6 (dot under the rāʾ; U+06EA becomes U+065C), the 277
+  words where KFGQPC's أٓ becomes DigitalKhatt's ـَٔا (e.g. ٱلۡـَٔاخِرِ 2:8:8, لِـَٔادَمَ 2:34:5), and
+  the 7 lossy words with yāʾ + hamza below (e.g. تِلۡقَآيِٕ 10:15:24, وَإِيتَآيِٕ 16:90:6, وَرَآيِٕ
+  42:51:11): the hamza is drawn below, as in the print.
+- **The 26 lossy U+06E4 words are the sajdah overline (G-040).** KFGQPC's own font draws U+06E4
+  as a line over the word, and the print overlines exactly these words (e.g. وَلِلَّهِ and يَسۡجُدُ
+  13:15, يَخِرُّونَ, لِلۡأَذۡقَانِ, سُجَّدٗا 17:107). DigitalKhatt has no such mark, so our pages draw
+  no overline on them.
+- **17:7:12 لِيَسُـُٔوا۟ (G-046):** the print has a small wāw and madda above the sīn, as DigitalKhatt's
+  text does; KFGQPC v2.0 (our spine) does not, so our page does not either.
+- **2:97:5 لِّجِبۡرِيلَ (G-047):** the print joins lām and jīm directly, as DigitalKhatt's text does;
+  KFGQPC v2.0 has a standalone tatweel there, which we draw (owner-approved identity row, D14).
+
 ## 4. Shaping integrity (rule 6, T3.5a)
 
 Every word on every page (84,428): no `.notdef`, no dotted circle (the font has none, G-042),
