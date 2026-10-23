@@ -62,7 +62,8 @@ def render() -> str:
         "width; every other open break takes the 1441H Hafs break (G-104, a hypothesis until "
         "the spot check, G-106).\n",
         "3. **Overflow (D31)**: `overflow-<r>.md`, every scaled page and squeezed line.\n",
-        "4. **Decisions waiting**: D29, D30 (short lines: 60% threshold on evidence), D32; the "
+        "4. **Decisions waiting**: D29, D30 (short lines: 60% threshold on evidence), D32, D33 "
+        "(display style as a render key, default style only); the "
         "open encoding groups (G-102, sheet `build/review/phase5/encoding.html` from "
         "`just review-phase5`); G-103; G-101.\n",
         "## Per riwayah\n",

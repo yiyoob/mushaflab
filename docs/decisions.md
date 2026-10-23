@@ -46,6 +46,7 @@ Consequences: what follows, what it rules out
 | D30 | Short lines and header basmalah on native layouts | proposed for GATE G3 (P5, threshold changed on evidence; basmalah decided by the owner) |
 | D31 | Overflow per riwāyah | accepted with the plan (P6); numbers for GATE G3 |
 | D32 | Rule-5 edition notes per riwāyah | proposed for GATE G3 |
+| D33 | Display style as a render key: (riwāyah, style), default style only in Phase 5 | accepted (owner requirement, relayed 2026-10-23); implements D36's Phase 5 part |
 | D36 | Display styles: Ḥijāzī and Maghribi for every riwāyah | accepted (scope); built in Phase 6 |
 
 ---
@@ -1026,6 +1027,29 @@ Date: 2026-10-22
   (D28, G-102).
 - **Warsh, Qālūn:** text, layout data and font all come from one KFGQPC release (official v2.1);
   no exception. Their line breaks inside ayahs are still transferred or fitted (D29).
+
+## D33 — Display style as a render key (T5.2, D2/D1 in Phase 5; D36)
+Status: accepted (owner requirement relayed by the planning session, 2026-10-23); Phase 5 part of
+D36
+Date: 2026-10-23
+Context: the owner wants every riwāyah displayable later in either script style, Ḥijāzī
+(Mashriqi) or Maghribi. The feature itself is Phase 6 (T6.7–T6.10, D36). Phase 5 must not
+hard-wire "riwāyah → font".
+Decision:
+- A render choice is keyed by **(riwāyah, style)**, `style` ∈ {`hijazi`, `maghribi`}. Each
+  render profile under `data/render/` carries its `style`; font, justification mode
+  (`justify.letters`: calligraphic or spacing only) and encoding table (or none, the identity
+  table) are read from that profile, so all three are chosen by (riwāyah, style).
+- Default style per riwāyah: its own print's, `maghribi` for Warsh and Qālūn (KFGQPC fonts,
+  spacing only, D27), `hijazi` for Ḥafṣ, Shuʿbah, Bazzi, Qunbul, al-Dūrī and al-Sūsī (DigitalKhatt
+  Madina, calligraphic, D2/D28). `mushaf_render::default_style`, `profile_path(riwāyah, style)`,
+  `Renderer::load_style`, and the CLI's `--style`.
+- Phase 5 implements and renders only the default style. Any other combination returns the error
+  "style … is not available yet (D36 …)"; there is no silent fallback
+  (`core/mushaf-render-cli/tests/cli.rs`).
+- Line layouts stay each riwāyah's own (D29) whatever the style.
+Consequences: Phase 6 adds a profile per new (riwāyah, style) and the conversion rows it needs
+(T6.7–T6.9); nothing in the core assumes one font per riwāyah.
 
 ## D36: Display styles, Ḥijāzī and Maghribi for every riwāyah
 Status: accepted (scope and phase); details decided in Phase 6
