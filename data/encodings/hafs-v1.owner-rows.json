@@ -1,5 +1,5 @@
 {
-  "note": "Rows the data cannot derive, each approved by the owner (D14). Never edited without an owner decision. At GATE G1 the owner decided 2:97:5 renders without the tatweel (G-047, hafs-v1.owner-words.json); this row stays so that the word still renders cluster by cluster when it is edited (rule 11).",
+  "note": "Rows the data cannot derive, each approved by the owner (D14). Never edited without an owner decision. At GATE G1 the owner decided 2:97:5 renders without the tatweel (G-047, hafs-v1.owner-words.json); this row stays so that the word still renders cluster by cluster when it is edited (rule 11). Owner-only since G-130: changes need an owner-signed commit (.github/scripts/check-approvals.sh); the owner re-affirmed this content by signing the commit that added this sentence.",
   "rows": [
     {
       "src": ["U+0640"],

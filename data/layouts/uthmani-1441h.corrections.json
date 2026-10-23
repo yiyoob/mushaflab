@@ -1,4 +1,5 @@
 {
+  "note": "Owner print-check corrections to the 1441H layout (G-011), applied by data/pipeline/ingest_layout.py. Owner-only since G-130: changes need an owner-signed commit (.github/scripts/check-approvals.sh); the owner re-affirmed this content by signing the commit that added this sentence.",
   "layout_id": "uthmani-1441h",
   "corrections": [
     {

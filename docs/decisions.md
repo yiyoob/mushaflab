@@ -476,7 +476,8 @@ Decisions (owner, 2026-10-22):
   release.
 - **2:97:5:** its standalone tatweel cluster has no counterpart in DigitalKhatt's text, so no
   row can be derived. The owner approved one identity row (U+0640 to U+0640; the font has a
-  tatweel glyph), kept in `data/encodings/hafs-v1.owner-rows.json` with the decision text.
+  tatweel glyph), kept in `data/encodings/hafs-v1.owner-rows.json` with the decision text
+  (owner-signed commits only since G-130).
   The 1441H text renders as stored.
 Consequences: free-mode edits that create a cluster form with no row cannot be converted yet;
 the edit API (Phase 7) must handle that (reported, never silently passed through). Marks that
@@ -768,7 +769,8 @@ Decision:
   arithmetic only. Because the marks are read from the resolved clusters, a free edit that adds
   or removes U+06E4 adds or removes the bar. The collision check counts the bar as ink (pitch
   1,900: no collisions).
-- **Owner word rows (c).** `data/encodings/hafs-v1.owner-words.json` lists spine items the owner
+- **Owner word rows (c).** `data/encodings/hafs-v1.owner-words.json` (owner-signed commits only,
+  G-130) lists spine items the owner
   decided to render in DigitalKhatt's own form; `dk_encoding.py` takes that form from the
   aligned DigitalKhatt word (never typed) into the table's `word_rows` (item, KFGQPC clusters,
   DK word). `EncodingTable::convert_item` uses a word row only when the item id and its
@@ -859,7 +861,8 @@ Decision:
 - **Owner at the T5.3 checkpoint (2026-10-22), on the full-size sheet
   `build/review/phase5/kfgqpc-rule6.html`: "Exempt 3, flag damma".** `uni06D6`, `_.035` and `up`
   (glyphs 109, 410, 114 in both fonts) are per-glyph exceptions, listed with the decision in
-  `data/render/kfgqpc-rule6-exceptions.json` and applied by `mushaf_shape::Exceptions`; they may be
+  `data/render/kfgqpc-rule6-exceptions.json` (owner-signed commits only, G-130) and applied by
+  `mushaf_shape::Exceptions`; they may be
   marks without an anchor, every other check still applies. `afii57455` (glyph 86), a damma after
   U+06E8 that the font does not show (Warsh and Qālūn 12:110:11 and 21:88:7), stays a defect
   (G-101): those four words render as the font draws them and remain pinned.
@@ -886,7 +889,7 @@ Decision:
   DigitalKhatt; every occurrence checked against rule 6).
 - A form converts only when the owner approved every group it belongs to:
   `data/encodings/hafs-v1.riwayat-owner.json` records the decisions (written only after one,
-  quoting it); the pipeline writes the approved rows to `hafs-v1.riwayat-rows.json`, which the core
+  quoting it; owner-signed commits only since G-130); the pipeline writes the approved rows to `hafs-v1.riwayat-rows.json`, which the core
   loads next to the Ḥafṣ table (`EncodingTable::extend_from_json`; a row that repeats a Ḥafṣ row is
   an error).
 - **Owner at the T5.3 checkpoint (2026-10-22): "All except U+06EC"** for the evidence-backed groups

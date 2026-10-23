@@ -1,5 +1,5 @@
 {
- "note": "Per-glyph rule-6 exceptions for the KFGQPC Warsh and Qalun fonts (D27, G-100). A glyph listed here may be a mark without an anchor attachment; every other rule-6 check still applies to it. Only the owner adds a glyph.",
+ "note": "Per-glyph rule-6 exceptions for the KFGQPC Warsh and Qalun fonts (D27, G-100). A glyph listed here may be a mark without an anchor attachment; every other rule-6 check still applies to it. Only the owner adds a glyph. Owner-only since G-130: changes need an owner-signed commit (.github/scripts/check-approvals.sh); the owner re-affirmed this content by signing the commit that added this sentence.",
  "fonts": {
   "fonts/kfgqpc/uthmanic_warsh_v21.ttf": [
    {

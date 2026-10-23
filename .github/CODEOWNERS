@@ -3,3 +3,9 @@
 /data/approvals/ @yiyoob
 /.github/allowed_signers @yiyoob
 /.github/scripts/check-approvals.sh @yiyoob
+# Owner decisions stored as data outside data/approvals/ (G-130).
+/data/encodings/hafs-v1.owner-rows.json @yiyoob
+/data/encodings/hafs-v1.owner-words.json @yiyoob
+/data/encodings/hafs-v1.riwayat-owner.json @yiyoob
+/data/render/kfgqpc-rule6-exceptions.json @yiyoob
+/data/layouts/uthmani-1441h.corrections.json @yiyoob

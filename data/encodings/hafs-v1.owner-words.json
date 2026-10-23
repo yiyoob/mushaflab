@@ -1,5 +1,5 @@
 {
-  "note": "Spine words the owner decided to render in DigitalKhatt's own form (DigitalKhatt's aligned word, taken from its pinned text by data/pipeline/dk_encoding.py, never typed). The spine itself keeps KFGQPC's text. Never edited without an owner decision.",
+  "note": "Spine words the owner decided to render in DigitalKhatt's own form (DigitalKhatt's aligned word, taken from its pinned text by data/pipeline/dk_encoding.py, never typed). The spine itself keeps KFGQPC's text. Never edited without an owner decision. Owner-only since G-130: changes need an owner-signed commit (.github/scripts/check-approvals.sh); the owner re-affirmed this content by signing the commit that added this sentence.",
   "words": [
     {
       "item": "17:7:12",

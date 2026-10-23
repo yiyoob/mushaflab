@@ -1,5 +1,5 @@
 {
- "note": "Owner decisions on the candidate rows of hafs-v1.riwayat-candidates.json (D28). Written only after an owner decision; each entry quotes it. Walkthrough 2026-10-23: forms of undecided groups approved one by one as owner rows; still blocked by the owner's choice: U+06DF on hamza-alef and madda forms, alef + U+06DF + fatha (Bazzi/Qunbul), Bazzi 2:71:4, 17:7:12 (U+200D), U+066E, U+06EC on dal, ha and waw (\"Keep blocked\").",
+ "note": "Owner decisions on the candidate rows of hafs-v1.riwayat-candidates.json (D28). Written only after an owner decision; each entry quotes it. Walkthrough 2026-10-23: forms of undecided groups approved one by one as owner rows; still blocked by the owner's choice: U+06DF on hamza-alef and madda forms, alef + U+06DF + fatha (Bazzi/Qunbul), Bazzi 2:71:4, 17:7:12 (U+200D), U+066E, U+06EC on dal, ha and waw (\"Keep blocked\"). Owner-only since G-130: changes need an owner-signed commit (.github/scripts/check-approvals.sh); the owner re-affirmed this content by signing the commit that added this sentence.",
  "groups": [
   {
    "group": "compose: known pairs",
