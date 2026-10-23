@@ -10,9 +10,9 @@ Every text line is tagged: `forced` (the ayah lines fix the break), `hafs` (the 
 | hafs | 7042 |
 | fitted | 0 |
 
-Target width for fitting: 16394 font units (median natural width of the lines whose breaks the data fix on both sides). Items whose width could not be measured (no encoding row yet, G-102): 56.
+Target width for fitting: 16382 font units (median natural width of the lines whose breaks the data fix on both sides). Items whose width could not be measured (no encoding row yet, G-102): 48.
 
-Natural widths of full lines (font units): p1 11973, median 15693, p90 18005, p99 20063. Profile `line_width`: 17800.
+Natural widths of full lines (font units): p1 11973, median 15693, p90 18008, p99 20063. Profile `line_width`: 17800.
 
 ## Fitted lines (0)
 

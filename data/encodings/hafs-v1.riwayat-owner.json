@@ -1,5 +1,5 @@
 {
- "note": "Owner decisions on the candidate rows of hafs-v1.riwayat-candidates.json (D28). Written only after an owner decision; each entry quotes it.",
+ "note": "Owner decisions on the candidate rows of hafs-v1.riwayat-candidates.json (D28). Written only after an owner decision; each entry quotes it. Walkthrough 2026-10-23: forms of undecided groups approved one by one as owner rows; still blocked by the owner's choice: U+06DF on hamza-alef and madda forms, alef + U+06DF + fatha (Bazzi/Qunbul), Bazzi 2:71:4, 17:7:12 (U+200D), U+066E, U+06EC on dal, ha and waw (\"Keep blocked\").",
  "groups": [
   {
    "group": "compose: known pairs",
@@ -77,5 +77,206 @@
    "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
   }
  ],
- "rows": []
+ "rows": [
+  {
+   "src": [
+    "U+0627 U+064E U+06DF"
+   ],
+   "dst": "U+0627 U+064E U+06EC",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/u06df-options.html: \"U+06EC on bare alef only\". KFGQPC writes the on-line dot as U+06DF (glyph \"side\" in the riwayah fonts); DigitalKhatt has no such glyph, and its U+06EC draws the dot beside a bare alef. Hamza-alef and madda forms stay blocked."
+  },
+  {
+   "src": [
+    "U+0627 U+064F U+06DF"
+   ],
+   "dst": "U+0627 U+064F U+06EC",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/u06df-options.html: \"U+06EC on bare alef only\". KFGQPC writes the on-line dot as U+06DF (glyph \"side\" in the riwayah fonts); DigitalKhatt has no such glyph, and its U+06EC draws the dot beside a bare alef. Hamza-alef and madda forms stay blocked."
+  },
+  {
+   "src": [
+    "U+0627 U+0650 U+06DF"
+   ],
+   "dst": "U+0627 U+0650 U+06EC",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/u06df-options.html: \"U+06EC on bare alef only\". KFGQPC writes the on-line dot as U+06DF (glyph \"side\" in the riwayah fonts); DigitalKhatt has no such glyph, and its U+06EC draws the dot beside a bare alef. Hamza-alef and madda forms stay blocked."
+  },
+  {
+   "src": [
+    "U+0621 U+065C"
+   ],
+   "dst": "U+0621 U+065C",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/encoding-open-U065C.html: \"Approve all 11\". Evidence: the KFGQPC Shu'bah font's U+065C glyph has the same outline as the KFGQPC Hafs font's U+06EA, which the data-derived Hafs table converts to DigitalKhatt U+065C."
+  },
+  {
+   "src": [
+    "U+0623 U+065C"
+   ],
+   "dst": "U+0627 U+034F U+0654 U+034F U+065C",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/encoding-open-U065C.html: \"Approve all 11\". Evidence: the KFGQPC Shu'bah font's U+065C glyph has the same outline as the KFGQPC Hafs font's U+06EA, which the data-derived Hafs table converts to DigitalKhatt U+065C. Owner, encoding walkthrough (2026-10-23), on build/review/phase5/hamza-options.html: \"Approve those passing\". Hamza codepoints converted by the single pattern each has in the Hafs rows: U+0623 -> U+0627 U+034F U+0654 U+034F (8,900 places), U+0624 -> U+0648 U+034F U+0654 U+034F (705), U+0654 -> U+0654 U+034F (495), U+0655 -> U+034F U+0654 U+034F (14); rule 6 passes on every occurrence."
+  },
+  {
+   "src": [
+    "U+062D U+065C"
+   ],
+   "dst": "U+062D U+065C",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/encoding-open-U065C.html: \"Approve all 11\". Evidence: the KFGQPC Shu'bah font's U+065C glyph has the same outline as the KFGQPC Hafs font's U+06EA, which the data-derived Hafs table converts to DigitalKhatt U+065C."
+  },
+  {
+   "src": [
+    "U+0631 U+0651 U+065C"
+   ],
+   "dst": "U+0631 U+0651 U+065C",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/encoding-open-U065C.html: \"Approve all 11\". Evidence: the KFGQPC Shu'bah font's U+065C glyph has the same outline as the KFGQPC Hafs font's U+06EA, which the data-derived Hafs table converts to DigitalKhatt U+065C."
+  },
+  {
+   "src": [
+    "U+0631 U+065C"
+   ],
+   "dst": "U+0631 U+065C",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/encoding-open-U065C.html: \"Approve all 11\". Evidence: the KFGQPC Shu'bah font's U+065C glyph has the same outline as the KFGQPC Hafs font's U+06EA, which the data-derived Hafs table converts to DigitalKhatt U+065C."
+  },
+  {
+   "src": [
+    "U+0631 U+065C U+06DA"
+   ],
+   "dst": "U+0631 U+065C U+06DA",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/encoding-open-U065C.html: \"Approve all 11\". Evidence: the KFGQPC Shu'bah font's U+065C glyph has the same outline as the KFGQPC Hafs font's U+06EA, which the data-derived Hafs table converts to DigitalKhatt U+065C."
+  },
+  {
+   "src": [
+    "U+0637 U+065C"
+   ],
+   "dst": "U+0637 U+065C",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/encoding-open-U065C.html: \"Approve all 11\". Evidence: the KFGQPC Shu'bah font's U+065C glyph has the same outline as the KFGQPC Hafs font's U+06EA, which the data-derived Hafs table converts to DigitalKhatt U+065C."
+  },
+  {
+   "src": [
+    "U+0640 U+0654 U+065C"
+   ],
+   "dst": "U+0640 U+0654 U+034F U+065C",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/encoding-open-U065C.html: \"Approve all 11\". Evidence: the KFGQPC Shu'bah font's U+065C glyph has the same outline as the KFGQPC Hafs font's U+06EA, which the data-derived Hafs table converts to DigitalKhatt U+065C. Owner, encoding walkthrough (2026-10-23), on build/review/phase5/hamza-options.html: \"Approve those passing\". Hamza codepoints converted by the single pattern each has in the Hafs rows: U+0623 -> U+0627 U+034F U+0654 U+034F (8,900 places), U+0624 -> U+0648 U+034F U+0654 U+034F (705), U+0654 -> U+0654 U+034F (495), U+0655 -> U+034F U+0654 U+034F (14); rule 6 passes on every occurrence."
+  },
+  {
+   "src": [
+    "U+0645 U+065C"
+   ],
+   "dst": "U+0645 U+065C",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/encoding-open-U065C.html: \"Approve all 11\". Evidence: the KFGQPC Shu'bah font's U+065C glyph has the same outline as the KFGQPC Hafs font's U+06EA, which the data-derived Hafs table converts to DigitalKhatt U+065C."
+  },
+  {
+   "src": [
+    "U+0647 U+065C"
+   ],
+   "dst": "U+0647 U+065C",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/encoding-open-U065C.html: \"Approve all 11\". Evidence: the KFGQPC Shu'bah font's U+065C glyph has the same outline as the KFGQPC Hafs font's U+06EA, which the data-derived Hafs table converts to DigitalKhatt U+065C."
+  },
+  {
+   "src": [
+    "U+064A U+065C"
+   ],
+   "dst": "U+064A U+065C",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/encoding-open-U065C.html: \"Approve all 11\". Evidence: the KFGQPC Shu'bah font's U+065C glyph has the same outline as the KFGQPC Hafs font's U+06EA, which the data-derived Hafs table converts to DigitalKhatt U+065C."
+  },
+  {
+   "src": [
+    "U+0623 U+06EA"
+   ],
+   "dst": "U+0627 U+034F U+0654 U+034F U+065C",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/hamza-options.html: \"Approve those passing\". Hamza codepoints converted by the single pattern each has in the Hafs rows: U+0623 -> U+0627 U+034F U+0654 U+034F (8,900 places), U+0624 -> U+0648 U+034F U+0654 U+034F (705), U+0654 -> U+0654 U+034F (495), U+0655 -> U+034F U+0654 U+034F (14); rule 6 passes on every occurrence."
+  },
+  {
+   "src": [
+    "U+0623 U+06ED"
+   ],
+   "dst": "U+0627 U+034F U+0654 U+034F U+06ED",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/hamza-options.html: \"Approve those passing\". Hamza codepoints converted by the single pattern each has in the Hafs rows: U+0623 -> U+0627 U+034F U+0654 U+034F (8,900 places), U+0624 -> U+0648 U+034F U+0654 U+034F (705), U+0654 -> U+0654 U+034F (495), U+0655 -> U+034F U+0654 U+034F (14); rule 6 passes on every occurrence."
+  },
+  {
+   "src": [
+    "U+0624 U+064B"
+   ],
+   "dst": "U+0648 U+034F U+0654 U+034F U+064B",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/hamza-options.html: \"Approve those passing\". Hamza codepoints converted by the single pattern each has in the Hafs rows: U+0623 -> U+0627 U+034F U+0654 U+034F (8,900 places), U+0624 -> U+0648 U+034F U+0654 U+034F (705), U+0654 -> U+0654 U+034F (495), U+0655 -> U+034F U+0654 U+034F (14); rule 6 passes on every occurrence."
+  },
+  {
+   "src": [
+    "U+0627 U+0654 U+06E1"
+   ],
+   "dst": "U+0627 U+0654 U+034F U+0652",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/hamza-options.html: \"Approve those passing\". Hamza codepoints converted by the single pattern each has in the Hafs rows: U+0623 -> U+0627 U+034F U+0654 U+034F (8,900 places), U+0624 -> U+0648 U+034F U+0654 U+034F (705), U+0654 -> U+0654 U+034F (495), U+0655 -> U+034F U+0654 U+034F (14); rule 6 passes on every occurrence."
+  },
+  {
+   "src": [
+    "U+0648 U+0655 U+0656"
+   ],
+   "dst": "U+0648 U+034F U+0654 U+034F U+08F2",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/hamza-options.html: \"Approve those passing\". Hamza codepoints converted by the single pattern each has in the Hafs rows: U+0623 -> U+0627 U+034F U+0654 U+034F (8,900 places), U+0624 -> U+0648 U+034F U+0654 U+034F (705), U+0654 -> U+0654 U+034F (495), U+0655 -> U+034F U+0654 U+034F (14); rule 6 passes on every occurrence."
+  },
+  {
+   "src": [
+    "U+064A U+0654 U+064E"
+   ],
+   "dst": "U+064A U+0654 U+034F U+064E",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/hamza-options.html: \"Approve those passing\". Hamza codepoints converted by the single pattern each has in the Hafs rows: U+0623 -> U+0627 U+034F U+0654 U+034F (8,900 places), U+0624 -> U+0648 U+034F U+0654 U+034F (705), U+0654 -> U+0654 U+034F (495), U+0655 -> U+034F U+0654 U+034F (14); rule 6 passes on every occurrence."
+  },
+  {
+   "src": [
+    "U+064A U+0654 U+064F"
+   ],
+   "dst": "U+064A U+0654 U+034F U+064F",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/hamza-options.html: \"Approve those passing\". Hamza codepoints converted by the single pattern each has in the Hafs rows: U+0623 -> U+0627 U+034F U+0654 U+034F (8,900 places), U+0624 -> U+0648 U+034F U+0654 U+034F (705), U+0654 -> U+0654 U+034F (495), U+0655 -> U+034F U+0654 U+034F (14); rule 6 passes on every occurrence."
+  },
+  {
+   "src": [
+    "U+064A U+0654 U+06E1"
+   ],
+   "dst": "U+064A U+0654 U+034F U+0652",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/hamza-options.html: \"Approve those passing\". Hamza codepoints converted by the single pattern each has in the Hafs rows: U+0623 -> U+0627 U+034F U+0654 U+034F (8,900 places), U+0624 -> U+0648 U+034F U+0654 U+034F (705), U+0654 -> U+0654 U+034F (495), U+0655 -> U+034F U+0654 U+034F (14); rule 6 passes on every occurrence."
+  },
+  {
+   "src": [
+    "U+064A U+0655 U+0650 U+06E2"
+   ],
+   "dst": "U+064A U+034F U+0654 U+034F U+0650 U+06E2",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/hamza-options.html: \"Approve those passing\". Hamza codepoints converted by the single pattern each has in the Hafs rows: U+0623 -> U+0627 U+034F U+0654 U+034F (8,900 places), U+0624 -> U+0648 U+034F U+0654 U+034F (705), U+0654 -> U+0654 U+034F (495), U+0655 -> U+034F U+0654 U+034F (14); rule 6 passes on every occurrence."
+  },
+  {
+   "src": [
+    "U+0622"
+   ],
+   "dst": "U+0622",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/small-groups.html: \"Approve identity\". No Hafs evidence (Hafs never uses U+0622); rule 6 passes and the drawing matches the KFGQPC font."
+  },
+  {
+   "src": [
+    "U+062E U+06EC"
+   ],
+   "dst": "U+062E U+06EC",
+   "date": "2026-10-23",
+   "decision": "Owner, encoding walkthrough (2026-10-23), on build/review/phase5/small-groups.html: \"Approve khaa form\". U+06EC on khaa: rule 6 passes and the dot sits over the khaa as in the KFGQPC font; the other U+06EC forms on new bases stay blocked."
+  }
+ ]
 }

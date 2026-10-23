@@ -904,6 +904,22 @@ Consequences:
   12:110:11). The sheet the owner saw had checked six examples per form; it now checks every
   occurrence. These words are pinned (any change fails) and their pages are flagged in the
   overflow reports and contact sheets (G-103), for the owner at G3.
+- **Walkthrough of the undecided groups (owner, 2026-10-23, group by group on focused sheets).**
+  25 forms approved as owner rows in `hafs-v1.riwayat-owner.json`, each with its derivation:
+  - U+06DF: the KFGQPC riwāyah fonts draw it as glyph `side`, a spacing dot on the line;
+    DigitalKhatt has no such glyph. "U+06EC on bare alef only": alef + vowel + U+06DF becomes
+    alef + vowel + U+06EC, which DigitalKhatt draws beside the alef (3 forms; al-Dūrī and al-Sūsī
+    138 places each). Hamza-alef and madda forms stay blocked.
+  - U+065C (Shuʿbah): the Shuʿbah font's U+065C has the same outline as the Ḥafṣ font's U+06EA, which
+    the Ḥafṣ table converts to DigitalKhatt U+065C. "Approve all 11".
+  - Hamza (U+0623, U+0624, U+0654, U+0655): each has a single pattern in the Ḥafṣ rows (8,900 / 705 /
+    495 / 14 places), missed before because those rows differ in length. "Approve those passing":
+    every form whose occurrences all pass rule 6.
+  - U+0622 identity (no Ḥafṣ evidence; matches the KFGQPC drawing) and U+06EC on khāʾ.
+  - "Keep blocked": 17:7:12 in al-Dūrī/al-Sūsī (U+200D; a tatweel carrier passes rule 6 but loses
+    the visible hamza), U+066E (no DigitalKhatt glyph), U+06EC on dāl, hāʾ and wāw, Bazzi 2:71:4.
+  Result: 483 rows; 169 places stay without a row (G-102); blocked pages Shuʿbah 2, Bazzi 33, Qunbul
+  32, al-Dūrī 22, al-Sūsī 22 (were 55 / 41 / 40 / 159 / 159). No new rule-6 finding appeared.
 
 ## D29 — Native layouts: Ḥafṣ breaks inside each riwāyah's KFGQPC ayah lines (T5.2; D1 final form)
 Status: accepted by the owner at GATE G3 (2026-10-23: "do whatever you recommend", on the recommendation listed in the G3 record below);
@@ -1013,13 +1029,13 @@ touching, and writes `docs/review/phase5/overflow-<r>.md`.
 
 | Riwāyah | Pages blocked (G-102) | Pages scaled | At floor | Squeezed lines | Widest space median / p95 / max | G-045 (spacing alef) |
 |---|---|---|---|---|---|---|
-| shuba | 55 | 181 | 23 | 49 | 2.81 / 3.79 / 5.87 | 1274 |
+| shuba | 2 | 209 | 32 | 66 | 2.85 / 3.79 / 5.87 | 1380 |
 | warsh | 0 | 200 | 37 | 62 | 2.82 / 5.18 / 13.83 | n/a (KFGQPC font) |
 | qalun | 0 | 191 | 39 | 67 | 2.83 / 5.18 / 12.38 | n/a (KFGQPC font) |
-| bazzi | 41 | 214 | 32 | 78 | 2.71 / 3.79 / 5.69 | 1269 |
-| qunbul | 40 | 214 | 32 | 78 | 2.71 / 3.79 / 5.69 | 1273 |
-| duri_abuamr | 159 | 167 | 26 | 58 | 2.77 / 3.79 / 5.87 | 1060 |
-| susi | 159 | 164 | 26 | 56 | 2.77 / 3.79 / 5.87 | 1060 |
+| bazzi | 33 | 216 | 34 | 84 | 2.73 / 3.79 / 5.69 | 1283 |
+| qunbul | 32 | 216 | 34 | 84 | 2.72 / 3.79 / 5.69 | 1287 |
+| duri_abuamr | 22 | 202 | 32 | 68 | 2.77 / 3.79 / 5.87 | 1343 |
+| susi | 22 | 199 | 31 | 65 | 2.77 / 3.79 / 5.87 | 1343 |
 
 Ḥafṣ for comparison (D15): 209 pages scaled, 32 at the floor, 65 squeezed lines, widest space
 2.85 / 3.79 / 5.87, G-045 1,377. Spacing-only justification leaves wider gaps in Warsh and Qālūn,
@@ -1093,9 +1109,9 @@ answered "do whatever you recommend" (2026-10-23, in the Phase 5 session). Recor
   font fix or an escape exists; no rows withdrawn.
 - **G-101** (missing damma, Warsh/Qālūn font): an open defect, to be fixed before public release
   (Phase 10), like G-045.
-- **Not decided at the gate, by their nature:** the undecided encoding groups (G-102) need the
-  owner's per-group review on the sheet (D2 forbids approving a row without it), and stay blocked
-  until then; the Warsh/Qālūn reference print (G-106) and page 1 line 2 (G-023) wait for a print
+- **Not decided at the gate, by their nature:** the undecided encoding groups (G-102) needed the
+  owner's per-group review on the sheet (D2 forbids approving a row without it); the owner then went
+  through them the same day (D28, walkthrough), which leaves 169 places blocked; the Warsh/Qālūn reference print (G-106) and page 1 line 2 (G-023) wait for a print
   of KFGQPC's own edition.
 - PR #3 is merged by the owner.
 
