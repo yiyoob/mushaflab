@@ -564,6 +564,10 @@ const KFGQPC_PENDING: &str = "tests/golden/shape/kfgqpc-rule6-pending.json";
 #[ignore = "run by `just golden` (release)"]
 fn kfgqpc_riwayat_words_pass_rule_6() {
     let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let exceptions = mushaf_shape::Exceptions::from_json(
+        &fs::read_to_string(repo().join("data/render/kfgqpc-rule6-exceptions.json")).unwrap(),
+    )
+    .unwrap();
     let mut found = Vec::new();
     for (riwayah, font_path) in KFGQPC_FONTS {
         let font = mushaf_shape::FontData::new(fs::read(repo().join(font_path)).unwrap()).unwrap();
@@ -580,7 +584,9 @@ fn kfgqpc_riwayat_words_pass_rule_6() {
             let chars = table.convert(&cl).unwrap().chars;
             let glyphs = shaper.shape(&chars, &[]).unwrap();
             for v in check_word(&font, &shaper, &chars, &[], &glyphs).unwrap() {
-                found.push(format!("{riwayah} {}: {v:?}", it.id));
+                if !exceptions.allows(font_path, &v) {
+                    found.push(format!("{riwayah} {}: {v:?}", it.id));
+                }
             }
         }
     }
@@ -598,5 +604,69 @@ fn kfgqpc_riwayat_words_pass_rule_6() {
     assert!(
         found.iter().all(|f| f.contains("UnattachedMark")),
         "only unattached marks may be pending"
+    );
+}
+
+/// Riwāyāt drawn with DigitalKhatt Madina besides Ḥafṣ (D2).
+const DK_RIWAYAT: [&str; 5] = ["shuba", "bazzi", "qunbul", "duri_abuamr", "susi"];
+const DK_PENDING: &str = "tests/golden/shape/dk-riwayat-rule6-pending.json";
+
+/// T5.3, rule 6 for Shuʿbah, Bazzi, Qunbul, al-Dūrī and al-Sūsī: every resolved item converts
+/// with the Ḥafṣ table plus the owner-approved rows (`hafs-v1.riwayat-rows.json`, D28) and,
+/// shaped in DigitalKhatt Madina, passes every check. Two kinds of item are pinned in
+/// `DK_PENDING` and listed as blocked: a cluster form whose group the owner has not decided yet
+/// cannot convert (G-102), and a few words leave a mark unattached in a context Ḥafṣ never has
+/// (G-103). Any other failure fails.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn dk_riwayat_words_pass_rule_6() {
+    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let r = Renderer::load(&repo(), "hafs").unwrap();
+    let mut table = r.table.clone();
+    table
+        .extend_from_json(
+            &fs::read_to_string(repo().join("data/encodings/hafs-v1.riwayat-rows.json")).unwrap(),
+        )
+        .unwrap();
+    let shaper = r.font.shaper();
+    let mut found = Vec::new();
+    for riwayah in DK_RIWAYAT {
+        let sel = mushaf_resolve::Selection {
+            riwayah: riwayah.into(),
+            ..Default::default()
+        };
+        let resolved =
+            mushaf_resolve::resolve_profile(&ds, &sel, None, mushaf_resolve::Mode::Data).unwrap();
+        for it in &resolved.items {
+            let cl: Vec<&[char]> = it.clusters.iter().map(|c| c.cps.0.as_slice()).collect();
+            let chars = match table.convert_item(&it.id.to_string(), &cl) {
+                Ok(c) => c.chars,
+                Err(u) => {
+                    found.push(format!("{riwayah} {}: no row for {}", it.id, u.cps));
+                    continue;
+                }
+            };
+            let glyphs = shaper.shape(&chars, &[]).unwrap();
+            for v in check_word(&r.font, &shaper, &chars, &[], &glyphs).unwrap() {
+                found.push(format!("{riwayah} {}: {v:?}", it.id));
+            }
+        }
+    }
+    let path = repo().join(DK_PENDING);
+    if std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some() {
+        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        fs::write(&path, serde_json::to_string_pretty(&found).unwrap() + "\n").unwrap();
+        return;
+    }
+    let pending: Vec<String> = serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+    assert_eq!(
+        found, pending,
+        "DigitalKhatt riwayat: rule-6 findings differ from the pinned list awaiting the owner"
+    );
+    assert!(
+        found
+            .iter()
+            .all(|f| f.contains("no row for") || f.contains("UnattachedMark")),
+        "only unconvertible forms and unattached marks may be pending"
     );
 }

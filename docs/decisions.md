@@ -40,7 +40,8 @@ Consequences: what follows, what it rules out
 | D21 | Difference-kind tags: what the data can and cannot classify | accepted: C, rows owner-signed (2026-10-22) |
 | D22 | Round-trip check for raw patches | accepted (Phase 4 plan, 2026-10-22) |
 | D26 | Riwāyah profiles and surah transitions | accepted with the Phase 5 plan (2026-10-22) |
-| D27 | Warsh and Qālūn on their KFGQPC fonts: TrueType outlines, spacing-only justification | accepted with the Phase 5 plan (P4); rule-6 exceptions pending (G-100) |
+| D27 | Warsh and Qālūn on their KFGQPC fonts: TrueType outlines, spacing-only justification | accepted with the Phase 5 plan (P4); per-glyph exceptions decided (2026-10-22) |
+| D28 | DigitalKhatt rows for cluster forms outside Ḥafṣ | accepted (approach with the plan, P3); groups decided at the T5.3 checkpoint (2026-10-22) |
 
 ---
 
@@ -847,5 +848,51 @@ Decision:
   142 (Qālūn) marks unanchored, in four glyphs (the same counts S2 found): pinned in
   `tests/golden/shape/kfgqpc-rule6-pending.json`, so any change fails, until the owner decides
   per glyph (G-100). No blanket waiver.
+- **Owner at the T5.3 checkpoint (2026-10-22), on the full-size sheet
+  `build/review/phase5/kfgqpc-rule6.html`: "Exempt 3, flag damma".** `uni06D6`, `_.035` and `up`
+  (glyphs 109, 410, 114 in both fonts) are per-glyph exceptions, listed with the decision in
+  `data/render/kfgqpc-rule6-exceptions.json` and applied by `mushaf_shape::Exceptions`; they may be
+  marks without an anchor, every other check still applies. `afii57455` (glyph 86), a damma after
+  U+06E8 that the font does not show (Warsh and Qālūn 12:110:11 and 21:88:7), stays a defect
+  (G-101): those four words render as the font draws them and remain pinned.
 - U+200F (G-017), which Warsh and Qālūn keep at 14 places, shapes without a glyph or violation.
+
+## D28 — DigitalKhatt rows for cluster forms outside Ḥafṣ (T5.3, plan P3)
+Status: accepted (approach approved with the Phase 5 plan; groups decided by the owner at the
+T5.3 checkpoint, 2026-10-22)
+Date: 2026-10-22
+Context: D2 draws Shuʿbah, Bazzi, Qunbul, al-Dūrī and al-Sūsī with DigitalKhatt Madina through
+the data-derived Ḥafṣ table (D14). 494 cluster forms of these texts have no Ḥafṣ row (most of
+them al-Dūrī/al-Sūsī: alef with a vowel and U+06EC or U+06EA; Bazzi's digit ayah numbers), and
+no second text of these readings exists to derive rows from. D2 allows rows for such forms only
+with the owner's approval and forbids inventing them.
+Decision:
+- `pipeline/dk_riwayat.py` lists every such form with its evidence and a candidate:
+  `number` (Arabic-Indic ayah numbers, G-070: the DigitalKhatt form of the KFGQPC ayah sign of the
+  same value, a Ḥafṣ row); `compose` (each codepoint has exactly one DigitalKhatt image in the
+  equal-length Ḥafṣ rows; base+mark pairs no Ḥafṣ row has are named); `open` (a codepoint without
+  a single image: an identity proposal shown for review only, marked "no evidence"). Forms are
+  grouped by kind and by the mark that is new to a base. Output:
+  `data/encodings/hafs-v1.riwayat-candidates.json` (tracked) and the sheet
+  `build/review/phase5/encoding.html` (each example word in the riwāyah's KFGQPC font and in
+  DigitalKhatt; every occurrence checked against rule 6).
+- A form converts only when the owner approved every group it belongs to:
+  `data/encodings/hafs-v1.riwayat-owner.json` records the decisions (written only after one,
+  quoting it); the pipeline writes the approved rows to `hafs-v1.riwayat-rows.json`, which the core
+  loads next to the Ḥafṣ table (`EncodingTable::extend_from_json`; a row that repeats a Ḥafṣ row is
+  an error).
+- **Owner at the T5.3 checkpoint (2026-10-22): "All except U+06EC"** for the evidence-backed groups
+  (15 groups: known pairs, numbers, and the marks U+064C, U+064E, U+064F, U+0650, U+0651, U+0653,
+  U+0670, U+06D8, U+06DB, U+06E1, U+06E2, U+06EA, U+06ED on new bases; 458 rows), and **"Decide
+  per group later"** for the nine open groups (U+0622, U+0623, U+0624, U+0654, U+0655, U+065C,
+  U+066E, U+06DF, U+200D) and for U+06EC on new bases.
+- Ayah numbers convert by value (Bazzi, and Shuʿbah's one digit number at 2:286, G-016).
+Consequences:
+- Words with a form from an undecided group cannot convert: 612 places, pinned in
+  `tests/golden/shape/dk-riwayat-rule6-pending.json` and listed as blocked in the G3 report
+  (G-102). Rule 6 still fails them; nothing is drawn silently.
+- Shaping the whole texts found 16 words where an approved or Ḥafṣ row leaves a mark unattached in
+  a context Ḥafṣ never has (alef + U+06EC after lām or hāʾ; the small nūn U+06E8 on a tatweel in
+  12:110:11). The sheet the owner saw had checked six examples per form; it now checks every
+  occurrence. These words are pinned and blocked as well (G-103), for the owner at G3.
 

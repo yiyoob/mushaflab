@@ -20,6 +20,7 @@ from pipeline import (
     ayah_maps,
     codepoints,
     compile_db,
+    dk_riwayat,
     drift,
     emit_patches,
     ingest_layout,
@@ -159,7 +160,12 @@ def check_db() -> list[str]:
 
 
 def check_phase5_files_current() -> list[str]:
-    return [] if profiles.main(["", "check"]) == 0 else ["data/profiles differ from a rebuild"]
+    out = []
+    if profiles.main(["", "check"]) != 0:
+        out.append("data/profiles differ from a rebuild")
+    if dk_riwayat.main(["", "check"]) != 0:
+        out.append("riwayat encoding candidates or rows differ from a rebuild")
+    return out
 
 
 CHECKS: dict[str, Callable[[], list[str]]] = {

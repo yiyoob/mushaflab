@@ -51,6 +51,30 @@ struct WireRow {
     lossy: bool,
 }
 
+/// `data/encodings/<spine>.riwayat-rows.json` (T5.3, D28): rows for cluster forms that occur only
+/// outside Ḥafṣ, each from an owner-approved group or an owner row.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ExtraWire {
+    schema: u32,
+    spine: String,
+    from: String,
+    to: String,
+    #[allow(dead_code)]
+    note: String,
+    rows: Vec<ExtraRow>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ExtraRow {
+    src: Vec<Cps>,
+    dst: Cps,
+    kind: String,
+    #[allow(dead_code)]
+    groups: Vec<String>,
+}
+
 /// sha256 over `id TAB converted cps LF` for every spine item, computed by the pipeline.
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -142,6 +166,36 @@ impl EncodingTable {
             max_seq,
             identity: false,
         })
+    }
+
+    /// Adds the approved rows for the other riwāyāt (T5.3, D28). A row for a form the table
+    /// already converts is an error: these rows only cover forms Ḥafṣ does not have.
+    pub fn extend_from_json(&mut self, text: &str) -> Result<(), Error> {
+        let wire: ExtraWire = mushaf_model::from_json(text)?;
+        if wire.schema != 1
+            || wire.from != "kfgqpc"
+            || wire.to != self.to
+            || wire.spine != self.spine
+        {
+            return Err(Error::new("extra rows are for another table"));
+        }
+        for r in wire.rows {
+            let target = Target {
+                dst: r.dst.0,
+                lossy: false,
+            };
+            let src: Vec<Vec<char>> = r.src.into_iter().map(|c| c.0).collect();
+            let dup = match (r.kind.as_str(), src.len()) {
+                ("cluster" | "owner", 1) => self.clusters.insert(src[0].clone(), target).is_some(),
+                ("sequence", n) if n >= 1 => self.sequences.insert(src, target).is_some(),
+                (kind, _) => return Err(Error::new(format!("bad extra row kind {kind:?}"))),
+            };
+            if dup {
+                return Err(Error::new("an extra row repeats a row of the table"));
+            }
+        }
+        self.max_seq = self.sequences.keys().map(Vec::len).max().unwrap_or(0);
+        Ok(())
     }
 
     /// The table of a font that reads KFGQPC's encoding: each cluster converts to itself.
@@ -295,6 +349,32 @@ mod tests {
             "another item converts cluster by cluster"
         );
         assert!(t.convert_item("1:1:1", &cl[..1]).is_ok());
+    }
+
+    #[test]
+    fn extra_rows_add_forms_but_never_replace_rows() {
+        let mut t = EncodingTable::from_json(TABLE).unwrap();
+        let extra = r#"{"schema": 1, "spine": "t/v1", "from": "kfgqpc", "to": "f", "note": "",
+          "rows": [{"src": ["U+007A"], "dst": "U+005A", "kind": "cluster", "groups": ["g"]},
+                   {"src": ["U+0031", "U+0032"], "dst": "U+0040", "kind": "sequence", "groups": ["n"]}]}"#;
+        t.extend_from_json(extra).unwrap();
+        assert_eq!(
+            conv(&t, "a z 1 2")
+                .unwrap()
+                .chars
+                .iter()
+                .collect::<String>(),
+            "aZ@"
+        );
+        let mut t = EncodingTable::from_json(TABLE).unwrap();
+        assert!(
+            t.extend_from_json(&extra.replace("U+007A", "U+0061"))
+                .is_err()
+        );
+        assert!(
+            t.extend_from_json(&extra.replace("\"t/v1\"", "\"t/v2\""))
+                .is_err()
+        );
     }
 
     #[test]

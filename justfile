@@ -27,6 +27,7 @@ data-build:
     {{uv}} run python -m pipeline.spine build
     {{uv}} run python -m pipeline.ingest_layout build
     {{uv}} run python -m pipeline.dk_encoding build
+    {{uv}} run python -m pipeline.dk_riwayat write
     {{uv}} run python -m pipeline.line_widths build
     {{uv}} run python -m pipeline.surah_names build
     {{uv}} run python -m pipeline.ingest_riwayah write
@@ -75,6 +76,11 @@ roundtrip *RIWAYAT:
 # HTML review sheets for the owner (T4.8): build/review/phase4/<riwayah>.html, not tracked
 review-sheets *RIWAYAT:
     {{uv}} run python -m pipeline.review_sheets {{RIWAYAT}}
+
+# Phase 5 review sheets: build/review/phase5/ (encoding candidates, G-100 marks), not tracked
+review-phase5:
+    {{uv}} run python -m pipeline.dk_riwayat write
+    {{uv}} run python -m pipeline.review_phase5
 
 # SVG + PNG via reference renderer, e.g. just render PAGE=1 RIWAYAH=hafs
 render *ARGS:

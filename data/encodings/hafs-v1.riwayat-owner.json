@@ -1,0 +1,81 @@
+{
+ "note": "Owner decisions on the candidate rows of hafs-v1.riwayat-candidates.json (D28). Written only after an owner decision; each entry quotes it.",
+ "groups": [
+  {
+   "group": "compose: known pairs",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "mark U+064C on new bases",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "mark U+064E on new bases",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "mark U+064F on new bases",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "mark U+0650 on new bases",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "mark U+0651 on new bases",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "mark U+0653 on new bases",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "mark U+0670 on new bases",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "mark U+06D8 on new bases",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "mark U+06DB on new bases",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "mark U+06E1 on new bases",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "mark U+06E2 on new bases",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "mark U+06EA on new bases",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "mark U+06ED on new bases",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  },
+  {
+   "group": "number",
+   "date": "2026-10-22",
+   "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/encoding.html: \"All except U+06EC\" - approve every compose and number group except \"mark U+06EC on new bases\" (its candidates leave the mark unattached in DigitalKhatt Madina); the open groups stay pending (\"Decide per group later\")."
+  }
+ ],
+ "rows": []
+}
