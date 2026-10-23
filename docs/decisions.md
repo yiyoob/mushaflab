@@ -19,7 +19,7 @@ Consequences: what follows, what it rules out
 
 | ID | Title | Status |
 |---|---|---|
-| D1 | Line policy for non-Ḥafṣ riwāyāt | accepted: native layouts; final form proposed at GATE G3 (D29) |
+| D1 | Line policy for non-Ḥafṣ riwāyāt | accepted: native layouts; final form D29 (GATE G3, 2026-10-23) |
 | D2 | Font per riwāyah | accepted: hybrid (DigitalKhatt + KFGQPC) |
 | D3 | Justification implementation | accepted: Rust port on harfrust |
 | D4 | Draw path | accepted with the Phase 3 plan: positioned glyph outlines |
@@ -42,11 +42,11 @@ Consequences: what follows, what it rules out
 | D26 | Riwāyah profiles and surah transitions | accepted with the Phase 5 plan (2026-10-22) |
 | D27 | Warsh and Qālūn on their KFGQPC fonts: TrueType outlines, spacing-only justification | accepted with the Phase 5 plan (P4); per-glyph exceptions decided (2026-10-22) |
 | D28 | DigitalKhatt rows for cluster forms outside Ḥafṣ | accepted (approach with the plan, P3); groups decided at the T5.3 checkpoint (2026-10-22) |
-| D29 | Native layouts: Ḥafṣ breaks inside each riwāyah's KFGQPC ayah lines (D1 final form) | proposed for GATE G3 (approach approved with the plan, P1/P2) |
-| D30 | Short lines and header basmalah on native layouts | proposed for GATE G3 (P5, threshold changed on evidence; basmalah decided by the owner) |
-| D31 | Overflow per riwāyah | accepted with the plan (P6); numbers for GATE G3 |
-| D32 | Rule-5 edition notes per riwāyah | proposed for GATE G3 |
-| D33 | Display style as a render key: (riwāyah, style), default style only in Phase 5 | accepted (owner requirement, relayed 2026-10-23); implements D36's Phase 5 part |
+| D29 | Native layouts: Ḥafṣ breaks inside each riwāyah's KFGQPC ayah lines (D1 final form) | accepted at GATE G3 (2026-10-23); Warsh/Qālūn breaks unverified (G-104) |
+| D30 | Short lines and header basmalah on native layouts | accepted at GATE G3 (2026-10-23), 60% threshold |
+| D31 | Overflow per riwāyah | accepted (plan P6; numbers reviewed at GATE G3, 2026-10-23) |
+| D32 | Rule-5 edition notes per riwāyah | accepted at GATE G3 (2026-10-23) |
+| D33 | Display style as a render key: (riwāyah, style), default style only in Phase 5 | accepted (owner requirement, relayed 2026-10-23; confirmed at GATE G3); implements D36's Phase 5 part |
 | D36 | Display styles: Ḥijāzī and Maghribi for every riwāyah | accepted (scope); built in Phase 6 |
 
 ---
@@ -906,8 +906,8 @@ Consequences:
   overflow reports and contact sheets (G-103), for the owner at G3.
 
 ## D29 — Native layouts: Ḥafṣ breaks inside each riwāyah's KFGQPC ayah lines (T5.2; D1 final form)
-Status: proposed for GATE G3 (approach approved with the Phase 5 plan as P1 and P2, 2026-10-22;
-the plan's questions were not answered separately, so the recommended options were taken)
+Status: accepted by the owner at GATE G3 (2026-10-23: "do whatever you recommend", on the recommendation listed in the G3 record below);
+the breaks of Warsh and Qālūn stay unverified until a reference print exists (G-104, G-106)
 Date: 2026-10-22
 Context: D1 chose native layouts per riwāyah: KFGQPC's page and lines per ayah as hard
 constraints, word-level breaks inside multi-line ayahs fitted, every fitted or fallback line
@@ -964,15 +964,15 @@ too (different ayah lines and numbering on page 7); on its page 8, where its aya
 KFGQPC, 2 of 9 transferred breaks differ: a warning for Warsh and Qālūn, not proof. Warsh and
 Qālūn need KFGQPC's own printing to be checked (G-104, G-105).
 
-Proposed for D1 (owner at GATE G3): **final = this rule**, with the spot check of P7 deciding
+D1 final form (owner at GATE G3, 2026-10-23): **this rule**. Proposed before the gate as: final = this rule, with the spot check of P7 deciding
 whether the transferred breaks stand. Spot check: establish each QuranFlash book's edition on 5
 pages (which ayah starts each line, against the KFGQPC data), then compare all fitted lines of
 al-Dūrī and al-Sūsī, 30 fitted lines each of Warsh and Qālūn spread over the muṣḥaf, 20 random
 `hafs` lines per riwāyah, every page-crossing ayah, and page 1 (G-106).
 
 ## D30 — Short lines and header basmalah on native layouts (T5.2, P5)
-Status: proposed for GATE G3 (the threshold departs from the plan on evidence; the basmalah was
-decided by the owner at the T5.3 checkpoint)
+Status: accepted by the owner at GATE G3 (2026-10-23: "do whatever you recommend", on the recommendation listed in the G3 record below), 60% threshold;
+the basmalah was decided by the owner at the T5.3 checkpoint
 Date: 2026-10-22
 Context: Ḥafṣ takes its short (centred) lines from the 1441H print's own widths (`quran-qcf4`,
 G-020): under 90% of a full line. No such data exists for the other prints. P5 proposed: the
@@ -1000,7 +1000,7 @@ natural width are drawn full; the spot check covers page ends and surah ends (G-
   keep 27:30 in their own spelling (D16 amended).
 
 ## D31 — Overflow per riwāyah (T5.2, P6)
-Status: accepted with the Phase 5 plan; numbers for GATE G3
+Status: accepted with the Phase 5 plan; numbers reviewed at GATE G3 (2026-10-23)
 Date: 2026-10-22
 Decision: D15's policy for every riwāyah, in the plan's order: one font scale per page (floor
 0.90), simple spaces tighten to 60%, a horizontal squeeze, each step reported. The DigitalKhatt
@@ -1026,7 +1026,7 @@ touching, and writes `docs/review/phase5/overflow-<r>.md`.
 as D3 measured.
 
 ## D32 — Rule-5 edition notes per riwāyah (T5.2)
-Status: proposed for GATE G3
+Status: accepted by the owner at GATE G3 (2026-10-23: "do whatever you recommend", on the recommendation listed in the G3 record below)
 Date: 2026-10-22
 - **Shuʿbah, Bazzi, Qunbul, al-Dūrī, al-Sūsī:** the same documented exception as Ḥafṣ (D2):
   DigitalKhatt Madina, a 1421H design, draws the riwāyah's KFGQPC text (official v2.0; Bazzi v7
@@ -1038,7 +1038,7 @@ Date: 2026-10-22
   no exception. Their line breaks inside ayahs are still transferred or fitted (D29).
 
 ## D33 — Display style as a render key (T5.2, D2/D1 in Phase 5; D36)
-Status: accepted (owner requirement relayed by the planning session, 2026-10-23); Phase 5 part of
+Status: accepted (owner requirement relayed by the planning session, 2026-10-23; confirmed at GATE G3); Phase 5 part of
 D36
 Date: 2026-10-23
 Context: the owner wants every riwāyah displayable later in either script style, Ḥijāzī
@@ -1082,4 +1082,20 @@ a `style` (`hijazi`, `maghribi`) and are looked up by (riwāyah, style)
 `--style`). Each riwāyah's default style is the one rendered (Warsh and Qālūn `maghribi` with their
 KFGQPC fonts and spacing-only justification; the others `hijazi` with DigitalKhatt Madina);
 any other combination is refused with a reason naming this decision.
+
+## GATE G3 — Phase 5 review: passed (2026-10-23)
+The owner asked which decisions were needed, was given a list with a recommendation for each, and
+answered "do whatever you recommend" (2026-10-23, in the Phase 5 session). Recorded as:
+- **Accepted:** D29 (the final form of D1), D30 (short lines, 60% threshold), D31, D32; D33
+  confirmed. The transferred Ḥafṣ breaks are supported by the Shuʿbah spot check and stay a
+  hypothesis for the other riwāyāt, Warsh and Qālūn in particular (G-104, G-106).
+- **G-103** (16 words with an unattached mark in DigitalKhatt): keep them drawn and flagged until a
+  font fix or an escape exists; no rows withdrawn.
+- **G-101** (missing damma, Warsh/Qālūn font): an open defect, to be fixed before public release
+  (Phase 10), like G-045.
+- **Not decided at the gate, by their nature:** the undecided encoding groups (G-102) need the
+  owner's per-group review on the sheet (D2 forbids approving a row without it), and stay blocked
+  until then; the Warsh/Qālūn reference print (G-106) and page 1 line 2 (G-023) wait for a print
+  of KFGQPC's own edition.
+- PR #3 is merged by the owner.
 
