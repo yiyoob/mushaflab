@@ -1,0 +1,132 @@
+{
+  "canonical": true,
+  "draw_sha256": "5f56b1dc7685d0f639b51cd3fe419c3a1b7883d73467543881cb462ef1013924",
+  "layout_id": "uthmani-warsh-kfgqpc",
+  "lines": [
+    {
+      "baseline": 1307740,
+      "kind": {
+        "kind": "surah_name",
+        "surah": 1
+      },
+      "left": 1225728,
+      "letter_gain": 0,
+      "line": 1,
+      "natural": 296832,
+      "right": 1522560,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 296832,
+      "width": 296832
+    },
+    {
+      "baseline": 1574108,
+      "kind": {
+        "kind": "basmalah"
+      },
+      "left": 933888,
+      "letter_gain": 0,
+      "line": 2,
+      "natural": 880512,
+      "right": 1814400,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 880512,
+      "width": 880512
+    },
+    {
+      "baseline": 1840476,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 599923,
+      "letter_gain": 0,
+      "line": 3,
+      "natural": 1364672,
+      "right": 2148366,
+      "short_ppm": 620370,
+      "squeeze": null,
+      "target": 1548443,
+      "width": 1548443
+    },
+    {
+      "baseline": 2106844,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 563461,
+      "letter_gain": 0,
+      "line": 4,
+      "natural": 1456384,
+      "right": 2184827,
+      "short_ppm": 649586,
+      "squeeze": null,
+      "target": 1621366,
+      "width": 1621366
+    },
+    {
+      "baseline": 2373212,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 698142,
+      "letter_gain": 0,
+      "line": 5,
+      "natural": 1195200,
+      "right": 2050147,
+      "short_ppm": 541669,
+      "squeeze": null,
+      "target": 1352005,
+      "width": 1352005
+    },
+    {
+      "baseline": 2639580,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 399149,
+      "letter_gain": 0,
+      "line": 6,
+      "natural": 1661312,
+      "right": 2349139,
+      "short_ppm": 781246,
+      "squeeze": null,
+      "target": 1949990,
+      "width": 1949990
+    },
+    {
+      "baseline": 2905948,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 607961,
+      "letter_gain": 0,
+      "line": 7,
+      "natural": 1302144,
+      "right": 2140327,
+      "short_ppm": 613929,
+      "squeeze": null,
+      "target": 1532366,
+      "width": 1532366
+    },
+    {
+      "baseline": 3172316,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 921786,
+      "letter_gain": 0,
+      "line": 8,
+      "natural": 627136,
+      "right": 1826503,
+      "short_ppm": 362467,
+      "squeeze": null,
+      "target": 904717,
+      "width": 904717
+    }
+  ],
+  "notes": [],
+  "page": 1,
+  "riwayah": "warsh",
+  "scale": 65536
+}

@@ -193,7 +193,7 @@ fn report_md(
 
 fn widths_json(layout_id: &str, short: &ShortLines) -> String {
     let mut s = format!(
-        "{{\n \"layout_id\": \"{layout_id}\",\n \"rule\": \"P5 (D30): the Hafs print's width when the line holds the same items as the Hafs line at that page and line, else short when the natural width is under 600000 ppm of the median full line (calibrated on Hafs)\",\n \"basis\": [\n"
+        "{{\n \"layout_id\": \"{layout_id}\",\n \"rule\": \"P5 (D30): the Hafs print's width when the line holds the same items as the Hafs line at that page and line; its own natural share when that Hafs line is short but holds other items; else short when the natural width is under 600000 ppm of the median full line (calibrated on Hafs)\",\n \"basis\": [\n"
     );
     let basis: Vec<String> = short
         .iter()

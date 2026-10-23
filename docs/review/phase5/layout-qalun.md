@@ -12,7 +12,7 @@ Every text line is tagged: `forced` (the ayah lines fix the break), `hafs` (the 
 
 Target width for fitting: 35324 font units (median natural width of the lines whose breaks the data fix on both sides). Items whose width could not be measured (no encoding row yet, G-102): 0.
 
-Natural widths of full lines (font units): p1 25542, median 33777, p90 38958, p99 43748. Profile `line_width`: 39000.
+Natural widths of full lines (font units): p1 25585, median 33782, p90 38958, p99 43748. Profile `line_width`: 39000.
 
 ## Fitted lines (220)
 
@@ -243,11 +243,13 @@ Natural widths of full lines (font units): p1 25542, median 33777, p90 38958, p9
 
 6850 lines on 604 pages take the Hafs break (listed in the layout file as `"fit":"hafs"`).
 
-## Short lines (35, P5)
+## Short lines (37, P5)
 
 | Page:line | Width (ppm of a full line) | Basis |
 |---|---|---|
-| 1:5 | 541846 | width |
+| 1:3 | 620573 | hafs_position |
+| 1:4 | 649799 | hafs_position |
+| 1:5 | 541846 | hafs_position |
 | 1:6 | 781246 | hafs |
 | 1:7 | 613929 | hafs |
 | 1:8 | 362467 | hafs |
@@ -279,6 +281,6 @@ Natural widths of full lines (font units): p1 25542, median 33777, p90 38958, p9
 | 603:10 | 656983 | hafs |
 | 603:15 | 622336 | hafs |
 | 604:4 | 548588 | hafs |
-| 604:9 | 418106 | width |
+| 604:9 | 418106 | hafs_position |
 | 604:14 | 672802 | hafs |
 | 604:15 | 498918 | hafs |

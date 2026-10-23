@@ -884,3 +884,109 @@ fn list_or_none(items: impl Iterator<Item = String>) -> String {
         v.join(", ") + "\n"
     }
 }
+
+/// T5.4: where each riwāyah's golden pages come from. Cases named by the plan (3:133, 2:10,
+/// 2:184, the numbering of al-Fātiḥah) are located through the alignment with the Ḥafṣ spine: the
+/// page holding the first item of the riwāyah's text at or after that Ḥafṣ ayah's first word.
+/// What these pages show about the readings is a **hypothesis** (G-074): the goldens pin what the
+/// KFGQPC data render, never a claim about the qirāʾah.
+const NATIVE_CASES: [(&str, (u32, u32)); 4] = [
+    ("fatiha", (1, 1)),
+    ("2:10", (2, 10)),
+    ("2:184", (2, 184)),
+    ("3:133", (3, 133)),
+];
+/// A page-crossing ayah that every non-Ḥafṣ riwāyah has (4:44, ingest report T4.1): the page it
+/// starts on.
+const CROSSING: (u32, u32) = (4, 44);
+const NATIVE_PAGES: &str = "tests/golden/pages/native-pages.json";
+
+fn golden_page_choice(
+    r: &Renderer,
+    resolved: &mushaf_resolve::Resolved,
+    mapping: &mushaf_layout::Mapping,
+) -> Vec<(String, u32)> {
+    let spine = &r.data.spines[&r.profile.spine];
+    let page_of_spine_ayah = |(s, a): (u32, u32)| -> u32 {
+        let first = mushaf_model::ItemRef::spine(s, a, 1);
+        let pos = spine.position(&first).unwrap();
+        let k = resolved
+            .items
+            .iter()
+            .position(|it| {
+                let (mushaf_resolve::Origin::Spine { pos: p }
+                | mushaf_resolve::Origin::Inserted { anchor: p }) = it.origin;
+                p >= pos
+            })
+            .unwrap();
+        mapping
+            .lines
+            .iter()
+            .find(|l| l.items.contains(&k))
+            .unwrap()
+            .page
+    };
+    let mut out: Vec<(String, u32)> = NATIVE_CASES
+        .iter()
+        .map(|(name, key)| (name.to_string(), page_of_spine_ayah(*key)))
+        .collect();
+    out.push(("crossing 4:44".into(), page_of_spine_ayah(CROSSING)));
+    out
+}
+
+/// T5.4: golden pages per riwāyah. The page list itself is pinned in `NATIVE_PAGES` (so a change
+/// in layout or alignment shows), and every page in it is pinned like Ḥafṣ's goldens: the draw
+/// list's hash and its line fit, plus the PNG within a pixel tolerance. A page that cannot be
+/// drawn yet (G-102) is pinned as blocked.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn native_golden_pages() {
+    use mushaf_render::fit_checked;
+    let update = std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some();
+    let mut chosen = serde_json::Map::new();
+    for riwayah in NATIVE {
+        let r = Renderer::load(&repo(), riwayah).unwrap();
+        let resolved = r.resolve(None).unwrap();
+        let mapping = r.map(&resolved).unwrap();
+        let shaper = r.font.shaper();
+        let pages = golden_page_choice(&r, &resolved, &mapping);
+        chosen.insert(riwayah.into(), serde_json::json!(pages));
+        let mut done = BTreeSet::new();
+        for (_, page) in pages {
+            if !done.insert(page) {
+                continue;
+            }
+            let name = format!("{riwayah}-p{page:03}");
+            let cp = fit_checked(&r, &shaper, &resolved, &mapping, page).unwrap();
+            match cp.fit {
+                Some(fit) => check_golden(&name, &r.draw(&fit).unwrap()),
+                None => {
+                    let json = serde_json::to_string_pretty(&serde_json::json!({
+                        "page": page,
+                        "riwayah": riwayah,
+                        "blocked": cp.blocked,
+                    }))
+                    .unwrap()
+                        + "\n";
+                    let path = repo().join(format!("tests/golden/pages/{name}.json"));
+                    if update {
+                        fs::write(&path, json).unwrap();
+                    } else {
+                        assert_eq!(json, fs::read_to_string(&path).unwrap(), "{name}");
+                    }
+                }
+            }
+        }
+    }
+    let text = serde_json::to_string_pretty(&chosen).unwrap() + "\n";
+    let path = repo().join(NATIVE_PAGES);
+    if update {
+        fs::write(&path, text).unwrap();
+    } else {
+        assert_eq!(
+            text,
+            fs::read_to_string(&path).unwrap(),
+            "golden page list changed"
+        );
+    }
+}

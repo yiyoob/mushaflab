@@ -1,0 +1,132 @@
+{
+  "canonical": true,
+  "draw_sha256": "59ed2189a241a7af41863d19f81fa703684f2283aba574d203fcac18329de25e",
+  "layout_id": "uthmani-bazzi-kfgqpc",
+  "lines": [
+    {
+      "baseline": 596992,
+      "kind": {
+        "kind": "surah_name",
+        "surah": 1
+      },
+      "left": 555808,
+      "letter_gain": 0,
+      "line": 1,
+      "natural": 142784,
+      "right": 698592,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 142784,
+      "width": 142784
+    },
+    {
+      "baseline": 718592,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 358431,
+      "letter_gain": 0,
+      "line": 2,
+      "natural": 528896,
+      "right": 895970,
+      "short_ppm": 471857,
+      "squeeze": null,
+      "target": 537539,
+      "width": 537539
+    },
+    {
+      "baseline": 840192,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 270806,
+      "letter_gain": 199488,
+      "line": 3,
+      "natural": 476352,
+      "right": 983595,
+      "short_ppm": 625693,
+      "squeeze": null,
+      "target": 712789,
+      "width": 712789
+    },
+    {
+      "baseline": 961792,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 159931,
+      "letter_gain": 161664,
+      "line": 4,
+      "natural": 715072,
+      "right": 1094469,
+      "short_ppm": 820346,
+      "squeeze": null,
+      "target": 934538,
+      "width": 934538
+    },
+    {
+      "baseline": 1083392,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 158118,
+      "letter_gain": 235520,
+      "line": 5,
+      "natural": 651008,
+      "right": 1096282,
+      "short_ppm": 823529,
+      "squeeze": null,
+      "target": 938164,
+      "width": 938164
+    },
+    {
+      "baseline": 1204992,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 182203,
+      "letter_gain": 0,
+      "line": 6,
+      "natural": 852160,
+      "right": 1072198,
+      "short_ppm": 781246,
+      "squeeze": null,
+      "target": 889995,
+      "width": 889995
+    },
+    {
+      "baseline": 1326592,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 277507,
+      "letter_gain": 70976,
+      "line": 7,
+      "natural": 595712,
+      "right": 976894,
+      "short_ppm": 613929,
+      "squeeze": null,
+      "target": 699387,
+      "width": 699387
+    },
+    {
+      "baseline": 1448192,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 420739,
+      "letter_gain": 101312,
+      "line": 8,
+      "natural": 291008,
+      "right": 833661,
+      "short_ppm": 362467,
+      "squeeze": null,
+      "target": 412922,
+      "width": 412922
+    }
+  ],
+  "notes": [],
+  "page": 1,
+  "riwayah": "bazzi",
+  "scale": 65536
+}

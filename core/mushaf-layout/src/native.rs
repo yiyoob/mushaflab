@@ -519,6 +519,9 @@ pub fn lines_per_page(layout: &Layout) -> BTreeMap<u32, u32> {
 pub enum ShortBasis {
     /// The Ḥafṣ line at the same page and line holds the same items and is short in the print.
     Hafs,
+    /// The Ḥafṣ line at the same page and line is short in the print but holds other items: the
+    /// line is short at its own natural share of a full line.
+    HafsPosition,
     /// Its natural width is under `NATURAL_SHORT_PPM` of the median full line.
     Width,
 }
@@ -568,6 +571,16 @@ pub fn short_lines(
             if let Some(&ppm) = hafs_short.get(&key) {
                 out.insert(key, (ppm, ShortBasis::Hafs));
             }
+        } else if hafs_short.contains_key(&key)
+            && let Some(w) = r.natural
+        {
+            out.insert(
+                key,
+                (
+                    (w * 1_000_000 / median).min(1_000_000),
+                    ShortBasis::HafsPosition,
+                ),
+            );
         } else if let Some(w) = r.natural {
             let ppm = w * 1_000_000 / median;
             if ppm < NATURAL_SHORT_PPM {

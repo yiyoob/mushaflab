@@ -973,10 +973,14 @@ printed widths, not natural ones.
 Decision (`mushaf_layout::native::short_lines`):
 - a line that holds the same first and last item as the Ḥafṣ line at that page and line takes the
   Ḥafṣ print's width when that line is short;
+- a line at a page and line where the Ḥafṣ print has a short line, but holding other items, is
+  short at its own natural share of a full line (added after looking at Warsh page 1, where
+  al-Fātiḥah's lines hold other words than Ḥafṣ's and would otherwise be stretched full; 4 lines
+  each in Warsh and Qālūn);
 - any other line is short when its natural width is under **60%** of the median full line
   (`NATURAL_SHORT_PPM`); its width is that share.
 Written to `data/render/uthmani-<r>-kfgqpc.line-widths.json` with each line's basis. Result: 29 to
-35 short lines per riwāyah (Ḥafṣ: 30). Lines that are short in a print but between 60% and 90% of
+37 short lines per riwāyah (Ḥafṣ: 30). Lines that are short in a print but between 60% and 90% of
 natural width are drawn full; the spot check covers page ends and surah ends (G-107).
 - **Header basmalah (owner at the T5.3 checkpoint, 2026-10-22: "Own 27:30 words").** Header
   basmalah lines draw the riwāyah's own words 27:30:5 to 27:30:8 in its resolved text. In Ḥafṣ,

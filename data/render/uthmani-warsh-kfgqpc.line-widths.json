@@ -1,8 +1,10 @@
 {
  "layout_id": "uthmani-warsh-kfgqpc",
- "rule": "P5 (D30): the Hafs print's width when the line holds the same items as the Hafs line at that page and line, else short when the natural width is under 600000 ppm of the median full line (calibrated on Hafs)",
+ "rule": "P5 (D30): the Hafs print's width when the line holds the same items as the Hafs line at that page and line; its own natural share when that Hafs line is short but holds other items; else short when the natural width is under 600000 ppm of the median full line (calibrated on Hafs)",
  "basis": [
-  {"page": 1, "line": 5, "basis": "width"},
+  {"page": 1, "line": 3, "basis": "hafs_position"},
+  {"page": 1, "line": 4, "basis": "hafs_position"},
+  {"page": 1, "line": 5, "basis": "hafs_position"},
   {"page": 1, "line": 6, "basis": "hafs"},
   {"page": 1, "line": 7, "basis": "hafs"},
   {"page": 1, "line": 8, "basis": "hafs"},
@@ -34,11 +36,13 @@
   {"page": 603, "line": 10, "basis": "hafs"},
   {"page": 603, "line": 15, "basis": "hafs"},
   {"page": 604, "line": 4, "basis": "hafs"},
-  {"page": 604, "line": 9, "basis": "width"},
+  {"page": 604, "line": 9, "basis": "hafs_position"},
   {"page": 604, "line": 14, "basis": "hafs"},
   {"page": 604, "line": 15, "basis": "hafs"}
  ],
  "short_lines": [
+  {"page": 1, "line": 3, "width_ppm": 620370},
+  {"page": 1, "line": 4, "width_ppm": 649586},
   {"page": 1, "line": 5, "width_ppm": 541669},
   {"page": 1, "line": 6, "width_ppm": 781246},
   {"page": 1, "line": 7, "width_ppm": 613929},

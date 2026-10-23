@@ -1,6 +1,6 @@
 {
  "layout_id": "uthmani-bazzi-kfgqpc",
- "rule": "P5 (D30): the Hafs print's width when the line holds the same items as the Hafs line at that page and line, else short when the natural width is under 600000 ppm of the median full line (calibrated on Hafs)",
+ "rule": "P5 (D30): the Hafs print's width when the line holds the same items as the Hafs line at that page and line; its own natural share when that Hafs line is short but holds other items; else short when the natural width is under 600000 ppm of the median full line (calibrated on Hafs)",
  "basis": [
   {"page": 1, "line": 2, "basis": "hafs"},
   {"page": 1, "line": 3, "basis": "hafs"},
