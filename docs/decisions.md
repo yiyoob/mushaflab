@@ -40,6 +40,7 @@ Consequences: what follows, what it rules out
 | D21 | Difference-kind tags: what the data can and cannot classify | accepted: C, rows owner-signed (2026-10-22) |
 | D22 | Round-trip check for raw patches | accepted (Phase 4 plan, 2026-10-22) |
 | D26 | Riwāyah profiles and surah transitions | accepted with the Phase 5 plan (2026-10-22) |
+| D27 | Warsh and Qālūn on their KFGQPC fonts: TrueType outlines, spacing-only justification | accepted with the Phase 5 plan (P4); rule-6 exceptions pending (G-100) |
 
 ---
 
@@ -813,4 +814,38 @@ Decision:
   option groups in Phase 6.
 Consequences: resolution of a riwāyah no longer hard-codes file paths (the round-trip tool still
 reads `patches/raw/<r>.yaml` directly, which the profile test shows gives the same result).
+
+## D27 — Warsh and Qālūn on their KFGQPC fonts (T5.3, plan P4)
+Status: accepted (approved with the Phase 5 plan, 2026-10-22); the rule-6 exceptions it found
+are pending the owner (G-100)
+Date: 2026-10-22
+Context: D2 renders Warsh and Qālūn with their own KFGQPC fonts (Maghribi letterforms), justified
+by spacing only. Those fonts are TrueType (glyf, 2048 units per em, 843 of 1351 glyphs
+composite, 221 components with a transform), while the renderer read only CFF2; and they come
+from the official zips, not from a file of their own.
+Decision:
+- **Fonts tracked** as `fonts/kfgqpc/uthmanic_warsh_v21.ttf` and `uthmanic_qaloun_v21.ttf`,
+  byte-identical to the font member of the pinned official v2.1 zips. `fonts/FONTS.json` lists
+  them with `member` and `sha256`; `license_check` verifies the bytes against that sha256 and,
+  when the pinned zip is present, against the member itself.
+- **TrueType outlines (D4 addendum)**: `PathOp::Quad` (quadratic segment; SVG `Q`, Canvas
+  `quadraticCurveTo`, CoreGraphics and Android `quadTo`). Contours start at their first on-curve
+  point; the implied on-curve midpoint of two off-curve points is exact in 26.6; composite
+  glyphs are flattened with their F2Dot14 transforms in integer arithmetic (rounded half up),
+  offsets unscaled; point-matched components and scaled offsets are rejected (neither font uses
+  them). Checked against fontTools on every 25th glyph of the Warsh font within 2/64 unit
+  (fontTools transforms in floating point).
+- **Identity encoding**: the fonts read KFGQPC's codepoints as stored (S2: no `.notdef` or dotted
+  circle in their own text), so `EncodingTable::identity` passes every cluster through, one span
+  per cluster. A render profile with no encoding table uses it.
+- **Spacing-only justification**: `Params::letters = false` (render profile
+  `justify.letters`) skips letter stretching, so spaces take the whole difference; the D15
+  overflow path (tighten, then squeeze) is unchanged. A space next to a KFGQPC ayah sign
+  (U+FC00 onwards) is an ayah space, as one next to DigitalKhatt's U+06DD.
+- **Rule 6**: every resolved Warsh and Qālūn item shaped in its font has no `.notdef`, no
+  inserted dotted circle and a valid cluster map (`just golden`). The fonts leave 60 (Warsh) and
+  142 (Qālūn) marks unanchored, in four glyphs (the same counts S2 found): pinned in
+  `tests/golden/shape/kfgqpc-rule6-pending.json`, so any change fails, until the owner decides
+  per glyph (G-100). No blanket waiver.
+- U+200F (G-017), which Warsh and Qālūn keep at 14 places, shapes without a glyph or violation.
 

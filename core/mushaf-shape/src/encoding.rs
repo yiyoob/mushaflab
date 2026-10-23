@@ -4,6 +4,9 @@
 //! as `data/encodings/<spine>.kfgqpc-to-<font>.json`. This module only applies it, exactly as
 //! the pipeline does: at each position the longest matching sequence row wins, else the
 //! cluster row; a cluster with no row is an error, never passed through unchanged.
+//!
+//! A font made for KFGQPC's own encoding (the KFGQPC Warsh and Qālūn fonts, D2) uses the
+//! identity table instead: every cluster is drawn exactly as stored (T5.3).
 
 use std::collections::BTreeMap;
 use std::ops::Range;
@@ -75,6 +78,7 @@ pub struct EncodingTable {
     clusters: BTreeMap<Vec<char>, Target>,
     sequences: BTreeMap<Vec<Vec<char>>, Target>,
     max_seq: usize,
+    identity: bool,
 }
 
 /// Which source clusters produced which characters of the converted text.
@@ -136,7 +140,26 @@ impl EncodingTable {
             clusters,
             sequences,
             max_seq,
+            identity: false,
         })
+    }
+
+    /// The table of a font that reads KFGQPC's encoding: each cluster converts to itself.
+    pub fn identity(spine: &str) -> Self {
+        EncodingTable {
+            spine: spine.into(),
+            to: "kfgqpc".into(),
+            converted_spine: Digest {
+                items: 0,
+                sha256: String::new(),
+            },
+            lossy_items: Vec::new(),
+            word_rows: BTreeMap::new(),
+            clusters: BTreeMap::new(),
+            sequences: BTreeMap::new(),
+            max_seq: 0,
+            identity: true,
+        }
     }
 
     /// Convert a spine item: its owner word row (D18) when the table lists this item with
@@ -164,6 +187,18 @@ impl EncodingTable {
             chars: Vec::new(),
             spans: Vec::new(),
         };
+        if self.identity {
+            for (i, c) in clusters.iter().enumerate() {
+                let start = out.chars.len();
+                out.chars.extend_from_slice(c);
+                out.spans.push(Span {
+                    clusters: i..i + 1,
+                    chars: start..out.chars.len(),
+                    lossy: false,
+                });
+            }
+            return Ok(out);
+        }
         let mut i = 0;
         while i < clusters.len() {
             let (n, target) = self.lookup(&clusters[i..]).ok_or_else(|| Unmapped {
@@ -260,6 +295,16 @@ mod tests {
             "another item converts cluster by cluster"
         );
         assert!(t.convert_item("1:1:1", &cl[..1]).is_ok());
+    }
+
+    #[test]
+    fn the_identity_table_keeps_every_cluster_as_stored() {
+        let t = EncodingTable::identity("t/v1");
+        let c = conv(&t, "a zy q").unwrap();
+        assert_eq!(c.chars.iter().collect::<String>(), "azyq");
+        assert_eq!(c.spans[1].clusters, 1..2);
+        assert_eq!(c.spans[1].chars, 1..3);
+        assert!(c.spans.iter().all(|s| !s.lossy));
     }
 
     #[test]

@@ -236,6 +236,9 @@ fn g015_pause_signs_after_small_meem_sit_over_their_letter() {
                     .flat_map(|op| match *op {
                         mushaf_draw::PathOp::Move { x, .. }
                         | mushaf_draw::PathOp::Line { x, .. } => vec![i64::from(x)],
+                        mushaf_draw::PathOp::Quad { x1, x, .. } => {
+                            vec![i64::from(x1), i64::from(x)]
+                        }
                         mushaf_draw::PathOp::Cubic { x1, x2, x, .. } => {
                             vec![i64::from(x1), i64::from(x2), i64::from(x)]
                         }
@@ -541,5 +544,59 @@ fn adjacent_lines_never_collide_at_the_profile_pitch() {
             .iter()
             .any(|p| p.upper == 14 && p.lower == 15 && p.collides),
         "the detector misses a known collision"
+    );
+}
+
+/// Fonts of the riwāyāt that draw KFGQPC's encoding as stored (D2): the KFGQPC Warsh and Qālūn
+/// fonts, official v2.1. Their render profiles (T5.2) name the same files.
+const KFGQPC_FONTS: [(&str, &str); 2] = [
+    ("warsh", "fonts/kfgqpc/uthmanic_warsh_v21.ttf"),
+    ("qalun", "fonts/kfgqpc/uthmanic_qaloun_v21.ttf"),
+];
+const KFGQPC_PENDING: &str = "tests/golden/shape/kfgqpc-rule6-pending.json";
+
+/// T5.3, rule 6 for Warsh and Qālūn: every resolved item of the riwāyah, shaped alone in its
+/// KFGQPC font (as stored, identity encoding), has no `.notdef`, no inserted dotted circle, a
+/// valid cluster map and every mark attached. The font leaves a few marks unanchored; they are
+/// pinned in `KFGQPC_PENDING` until the owner decides on them (G-101), and any other
+/// violation fails.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn kfgqpc_riwayat_words_pass_rule_6() {
+    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let mut found = Vec::new();
+    for (riwayah, font_path) in KFGQPC_FONTS {
+        let font = mushaf_shape::FontData::new(fs::read(repo().join(font_path)).unwrap()).unwrap();
+        let shaper = font.shaper();
+        let sel = mushaf_resolve::Selection {
+            riwayah: riwayah.into(),
+            ..Default::default()
+        };
+        let resolved =
+            mushaf_resolve::resolve_profile(&ds, &sel, None, mushaf_resolve::Mode::Data).unwrap();
+        let table = mushaf_shape::EncodingTable::identity(&ds.profiles[riwayah].spine);
+        for it in &resolved.items {
+            let cl: Vec<&[char]> = it.clusters.iter().map(|c| c.cps.0.as_slice()).collect();
+            let chars = table.convert(&cl).unwrap().chars;
+            let glyphs = shaper.shape(&chars, &[]).unwrap();
+            for v in check_word(&font, &shaper, &chars, &[], &glyphs).unwrap() {
+                found.push(format!("{riwayah} {}: {v:?}", it.id));
+            }
+        }
+    }
+    let path = repo().join(KFGQPC_PENDING);
+    if std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some() {
+        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        fs::write(&path, serde_json::to_string_pretty(&found).unwrap() + "\n").unwrap();
+        return;
+    }
+    let pending: Vec<String> = serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+    assert_eq!(
+        found, pending,
+        "rule-6 findings for the KFGQPC fonts differ from the pinned list awaiting the owner"
+    );
+    assert!(
+        found.iter().all(|f| f.contains("UnattachedMark")),
+        "only unattached marks may be pending"
     );
 }

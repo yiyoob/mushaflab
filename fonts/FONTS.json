@@ -4,6 +4,20 @@
       "path": "fonts/digitalkhatt/hb-madina.otf",
       "source": "digitalkhatt-hb-madina-font",
       "use": "Mashriqi riwayat incl. Hafs (D2); HarfBuzz build with cvNN stretch features (D3)"
+    },
+    {
+      "path": "fonts/kfgqpc/uthmanic_warsh_v21.ttf",
+      "source": "kfgqpc-official-warsh",
+      "member": "UthmanicWarsh_v2-1 font/uthmanic_warsh_v21.ttf",
+      "sha256": "b436fb89e1d26f827cd6a3c4d632fb68a49cc954c4ac90699a9502da25555230",
+      "use": "Warsh and Qalun (D2): KFGQPC's own font for the riwayah, Maghribi letterforms, read as stored (identity encoding); spacing-only justification (T5.3)"
+    },
+    {
+      "path": "fonts/kfgqpc/uthmanic_qaloun_v21.ttf",
+      "source": "kfgqpc-official-qalun",
+      "member": "UthmanicQaloun_v2-1 font/uthmanic_qaloun_v21.ttf",
+      "sha256": "67b5c938383b6382f3cc10d01829db5a87aed05f56bd0216521b8654ab318f9a",
+      "use": "Warsh and Qalun (D2): KFGQPC's own font for the riwayah, Maghribi letterforms, read as stored (identity encoding); spacing-only justification (T5.3)"
     }
   ]
 }

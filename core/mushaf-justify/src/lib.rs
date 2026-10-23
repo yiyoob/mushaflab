@@ -42,6 +42,9 @@ pub struct Params {
     pub space_stretch: i64,
     /// Narrowest simple space on an overfull line, in 1/1000 of normal.
     pub min_space: i64,
+    /// Whether letters stretch (fonts with DigitalKhatt's `cvNN` features). When false, the
+    /// spaces alone take the difference (spacing-only justification, D2, T5.3).
+    pub letters: bool,
 }
 
 impl Default for Params {
@@ -49,6 +52,7 @@ impl Default for Params {
         Params {
             space_stretch: 1000,
             min_space: 600,
+            letters: true,
         }
     }
 }
@@ -111,10 +115,16 @@ struct LineInfo {
     spaces: Vec<(usize, SpaceKind)>,
 }
 
+/// KFGQPC ayah signs: U+FC00 + (n - 1), drawn by KFGQPC fonts only (G-013).
+fn is_kfgqpc_ayah_sign(c: char) -> bool {
+    ('\u{FC00}'..='\u{FDFF}').contains(&c)
+}
+
 fn is_aya_space(text: &[char], i: usize) -> bool {
     let prev = if i > 0 { Some(text[i - 1]) } else { None };
     let next = text.get(i + 1).copied();
-    prev.is_some_and(|c| ('\u{0660}'..='\u{0669}').contains(&c)) || next == Some(AYAH_END)
+    prev.is_some_and(|c| ('\u{0660}'..='\u{0669}').contains(&c) || is_kfgqpc_ayah_sign(c))
+        || next.is_some_and(|c| c == AYAH_END || is_kfgqpc_ayah_sign(c))
 }
 
 /// `analyzeLineForJust`: words, sub-words of joined base letters, and space kinds.
@@ -649,7 +659,7 @@ pub fn justify_line(
         let mut current = natural + stretch;
         let mut features = input.manual.clone();
         let mut letter_gain = 0;
-        if target > current {
+        if target > current && params.letters {
             let mut j = Justifier {
                 shaper,
                 text: &input.text,

@@ -48,6 +48,9 @@ fn path_d(path: &[PathOp]) -> String {
         match *op {
             PathOp::Move { x, y } => write!(d, "M{} {}", f(x), f(y)),
             PathOp::Line { x, y } => write!(d, "L{} {}", f(x), f(y)),
+            PathOp::Quad { x1, y1, x, y } => {
+                write!(d, "Q{} {} {} {}", f(x1), f(y1), f(x), f(y))
+            }
             PathOp::Cubic {
                 x1,
                 y1,

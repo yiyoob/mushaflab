@@ -70,6 +70,13 @@ pub struct Geometry {
 pub struct JustifySettings {
     pub space_stretch: i64,
     pub min_space: i64,
+    /// Letter stretching (DigitalKhatt fonts); `false` justifies by spacing only (D2, T5.3).
+    #[serde(default = "letters_default")]
+    pub letters: bool,
+}
+
+fn letters_default() -> bool {
+    true
 }
 
 impl Profile {
@@ -81,6 +88,7 @@ impl Profile {
         Params {
             space_stretch: self.justify.space_stretch,
             min_space: self.justify.min_space,
+            letters: self.justify.letters,
         }
     }
 }

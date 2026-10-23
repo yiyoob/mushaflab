@@ -44,6 +44,7 @@ fn glyph_path(pb: &mut PathBuilder, outline: &[PathOp], (x, y, sx, sy): (i64, i6
         match *op {
             PathOp::Move { x, y } => pb.move_to(px(x), py(y)),
             PathOp::Line { x, y } => pb.line_to(px(x), py(y)),
+            PathOp::Quad { x1, y1, x, y } => pb.quad_to(px(x1), py(y1), px(x), py(y)),
             PathOp::Cubic {
                 x1,
                 y1,
@@ -64,6 +65,7 @@ fn page_path(path: &[PathOp]) -> Option<tiny_skia::Path> {
         match *op {
             PathOp::Move { x, y } => pb.move_to(p(x), p(y)),
             PathOp::Line { x, y } => pb.line_to(p(x), p(y)),
+            PathOp::Quad { x1, y1, x, y } => pb.quad_to(p(x1), p(y1), p(x), p(y)),
             PathOp::Cubic {
                 x1,
                 y1,
