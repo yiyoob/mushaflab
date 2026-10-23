@@ -39,6 +39,7 @@ Consequences: what follows, what it rules out
 | D20 | Phase 4 derivation pipeline: ingest, aligner, differ, emitter | accepted (Phase 4 plan, 2026-10-22) |
 | D21 | Difference-kind tags: what the data can and cannot classify | accepted: C, rows owner-signed (2026-10-22) |
 | D22 | Round-trip check for raw patches | accepted (Phase 4 plan, 2026-10-22) |
+| D36 | Display styles: Ḥijāzī and Maghribi for every riwāyah | accepted (scope); built in Phase 6 |
 
 ---
 
@@ -785,4 +786,21 @@ work that anchors the mark to the *preceding* letter (D17 anchored it to the fol
 (c) an upstream report to DigitalKhatt (owner's call).
 - No separate decision was recorded for G-041 (page 2 line 5) and G-043 (hizb sign spacing);
   they stay open with their current rendering.
+
+## D36: Display styles, Ḥijāzī and Maghribi for every riwāyah
+Status: accepted (scope and phase); details decided in Phase 6
+Date: 2026-10-23
+Context: The owner wants the script style to be independent of the riwāyah, so that a user
+can show any muṣḥaf in Ḥijāzī (Mashriqi) or Maghribi style.
+Evidence: the KFGQPC texts encode style-specific mark conventions in their codepoints (G-006;
+e.g. sukūn U+06E1 vs U+0652); the Maghribi letterforms (fā'/qāf dotting) come from the KFGQPC
+Warsh/Qālūn fonts (S2); DigitalKhatt has no Maghribi design; no other Maghribi font is pinned.
+Decision (owner, 2026-10-23): build it in **Phase 6 (T6.7–T6.10)**, after the encoding conversion
+layer it depends on. Phase 5 prepares for it by keying font, justification mode and encoding
+table by **(riwāyah, style)**, with a default style per riwāyah (Maghribi for Warsh/Qālūn,
+Ḥijāzī for the rest), and implements only the defaults.
+Consequences: style conversion is a render-time transformation from owner-confirmed rows,
+never a change to the spine or patches; a combination a font cannot render correctly is
+reported as unavailable rather than drawn wrongly (rule 6); line breaks remain each
+riwāyah's own (D1).
 
