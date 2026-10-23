@@ -4,9 +4,7 @@
 //! contain; every GDEF mark glyph placed by an anchor (its offsets change when the `mark` and
 //! `mkmk` features are switched off: the test spike S2 used); and glyph clusters that are
 //! valid, monotone character indices starting at 0, so every input character belongs to
-//! exactly one glyph cluster; and no combining mark drawn by a spacing glyph (a character whose
-//! own glyph is a GDEF mark, shaped into a non-mark glyph with an advance in its own cluster:
-//! G-045, U+0670 turned into an upright spacing alef by the font's `rclt`).
+//! exactly one glyph cluster.
 
 use mushaf_model::Error;
 use serde::Serialize;
@@ -27,12 +25,6 @@ pub enum Violation {
     UnattachedMark {
         glyph: u32,
         cluster: u32,
-    },
-    /// A mark character drawn by a spacing, non-mark glyph (G-045).
-    SpacingMark {
-        glyph: u32,
-        cluster: u32,
-        advance: i32,
     },
     /// Clusters out of range, not monotone, or not starting at the first character.
     ClusterMap {
@@ -74,19 +66,6 @@ pub fn check_word(
             out.push(Violation::DottedCircle {
                 glyph_index: i,
                 cluster: g.cluster,
-            });
-        }
-    }
-    for g in glyphs {
-        let mark_char = text
-            .get(g.cluster as usize)
-            .and_then(|c| font.nominal_glyph(*c))
-            .is_some_and(|n| font.glyph_class(n) == MARK_CLASS);
-        if mark_char && font.glyph_class(g.glyph) != MARK_CLASS && g.x_advance != 0 {
-            out.push(Violation::SpacingMark {
-                glyph: g.glyph,
-                cluster: g.cluster,
-                advance: g.x_advance,
             });
         }
     }

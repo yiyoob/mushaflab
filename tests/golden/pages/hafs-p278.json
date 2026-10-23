@@ -1,10 +1,10 @@
 {
   "canonical": true,
-  "draw_sha256": "188f857e044ff7cb70c97d0710727145026f6120ad8fefc2e9b3320e60ed236f",
+  "draw_sha256": "29818a94d310bc23a1b249f5d8619c4909788cabc19e4dcd24e85e5ef045c92b",
   "layout_id": "uthmani-1441h",
   "lines": [
     {
-      "baseline": 172185,
+      "baseline": 171392,
       "kind": {
         "kind": "text"
       },
@@ -19,7 +19,7 @@
       "width": 1139200
     },
     {
-      "baseline": 295065,
+      "baseline": 292992,
       "kind": {
         "kind": "text"
       },
@@ -34,7 +34,7 @@
       "width": 1139200
     },
     {
-      "baseline": 417945,
+      "baseline": 414592,
       "kind": {
         "kind": "text"
       },
@@ -49,7 +49,7 @@
       "width": 1139200
     },
     {
-      "baseline": 540825,
+      "baseline": 536192,
       "kind": {
         "kind": "text"
       },
@@ -64,7 +64,7 @@
       "width": 1139200
     },
     {
-      "baseline": 663705,
+      "baseline": 657792,
       "kind": {
         "kind": "text"
       },
@@ -79,7 +79,7 @@
       "width": 1139200
     },
     {
-      "baseline": 786585,
+      "baseline": 779392,
       "kind": {
         "kind": "text"
       },
@@ -94,7 +94,7 @@
       "width": 1139200
     },
     {
-      "baseline": 909465,
+      "baseline": 900992,
       "kind": {
         "kind": "text"
       },
@@ -109,7 +109,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1032345,
+      "baseline": 1022592,
       "kind": {
         "kind": "text"
       },
@@ -124,7 +124,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1155225,
+      "baseline": 1144192,
       "kind": {
         "kind": "text"
       },
@@ -139,7 +139,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1278105,
+      "baseline": 1265792,
       "kind": {
         "kind": "text"
       },
@@ -154,7 +154,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1400985,
+      "baseline": 1387392,
       "kind": {
         "kind": "text"
       },
@@ -169,7 +169,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1523865,
+      "baseline": 1508992,
       "kind": {
         "kind": "text"
       },
@@ -184,7 +184,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1646745,
+      "baseline": 1630592,
       "kind": {
         "kind": "text"
       },
@@ -199,7 +199,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1769625,
+      "baseline": 1752192,
       "kind": {
         "kind": "text"
       },
@@ -214,7 +214,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1892505,
+      "baseline": 1873792,
       "kind": {
         "kind": "text"
       },

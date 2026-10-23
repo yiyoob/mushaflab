@@ -1,10 +1,10 @@
 {
   "canonical": true,
-  "draw_sha256": "a7e16d672e23b2b87e5cb0b22b7ef42ebdd3d64ee6d015f4fe97ed17d04116e2",
+  "draw_sha256": "341ba075e219b35abaafa0181e33c5e3f811bab3d20a5a5bf9e80fc5b607371c",
   "layout_id": "uthmani-1441h",
   "lines": [
     {
-      "baseline": 172185,
+      "baseline": 171392,
       "kind": {
         "kind": "surah_name",
         "surah": 47
@@ -20,7 +20,7 @@
       "width": 103040
     },
     {
-      "baseline": 295065,
+      "baseline": 292992,
       "kind": {
         "kind": "basmalah"
       },
@@ -35,7 +35,7 @@
       "width": 463936
     },
     {
-      "baseline": 417945,
+      "baseline": 414592,
       "kind": {
         "kind": "text"
       },
@@ -50,7 +50,7 @@
       "width": 1265786
     },
     {
-      "baseline": 540825,
+      "baseline": 536192,
       "kind": {
         "kind": "text"
       },
@@ -65,40 +65,43 @@
       "width": 1265786
     },
     {
-      "baseline": 663705,
+      "baseline": 657792,
       "kind": {
         "kind": "text"
       },
       "left": 57600,
       "letter_gain": 0,
       "line": 5,
-      "natural": 1339392,
+      "natural": 1351104,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": [
         1265786,
-        1316352
+        1328064
       ],
       "target": 1265786,
-      "width": 1316352
+      "width": 1328064
     },
     {
-      "baseline": 786585,
+      "baseline": 779392,
       "kind": {
         "kind": "text"
       },
       "left": 57600,
       "letter_gain": 0,
       "line": 6,
-      "natural": 1283328,
+      "natural": 1295040,
       "right": 1196800,
       "short_ppm": null,
-      "squeeze": null,
+      "squeeze": [
+        1265786,
+        1269440
+      ],
       "target": 1265786,
-      "width": 1265786
+      "width": 1269440
     },
     {
-      "baseline": 909465,
+      "baseline": 900992,
       "kind": {
         "kind": "text"
       },
@@ -116,14 +119,14 @@
       "width": 1439936
     },
     {
-      "baseline": 1032345,
+      "baseline": 1022592,
       "kind": {
         "kind": "text"
       },
       "left": 57600,
       "letter_gain": 0,
       "line": 8,
-      "natural": 1274752,
+      "natural": 1286464,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
@@ -131,7 +134,7 @@
       "width": 1265786
     },
     {
-      "baseline": 1155225,
+      "baseline": 1144192,
       "kind": {
         "kind": "text"
       },
@@ -146,7 +149,7 @@
       "width": 1265786
     },
     {
-      "baseline": 1278105,
+      "baseline": 1265792,
       "kind": {
         "kind": "text"
       },
@@ -164,7 +167,7 @@
       "width": 1316160
     },
     {
-      "baseline": 1400985,
+      "baseline": 1387392,
       "kind": {
         "kind": "text"
       },
@@ -179,14 +182,14 @@
       "width": 1265786
     },
     {
-      "baseline": 1523865,
+      "baseline": 1508992,
       "kind": {
         "kind": "text"
       },
       "left": 57600,
-      "letter_gain": 37120,
+      "letter_gain": 22528,
       "line": 12,
-      "natural": 1158080,
+      "natural": 1169792,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
@@ -194,7 +197,7 @@
       "width": 1265786
     },
     {
-      "baseline": 1646745,
+      "baseline": 1630592,
       "kind": {
         "kind": "text"
       },
@@ -209,7 +212,7 @@
       "width": 1265786
     },
     {
-      "baseline": 1769625,
+      "baseline": 1752192,
       "kind": {
         "kind": "text"
       },
@@ -227,14 +230,14 @@
       "width": 1287168
     },
     {
-      "baseline": 1892505,
+      "baseline": 1873792,
       "kind": {
         "kind": "text"
       },
       "left": 57600,
       "letter_gain": 59264,
       "line": 15,
-      "natural": 1110272,
+      "natural": 1121984,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
@@ -254,7 +257,12 @@
     {
       "kind": "squeezed",
       "line": 5,
-      "x_scale": 63018
+      "x_scale": 62462
+    },
+    {
+      "kind": "squeezed",
+      "line": 6,
+      "x_scale": 65347
     },
     {
       "kind": "squeezed",

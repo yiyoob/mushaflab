@@ -1,10 +1,10 @@
 {
   "canonical": true,
-  "draw_sha256": "7df090aa3e474b156c2845d360bfac708d17fd31740e68d6f687410ab56dc493",
+  "draw_sha256": "ef2a5ad55ef9853858bc71500cce88089de8a69f1a6286d5f623f8f281f2a3cb",
   "layout_id": "uthmani-1441h",
   "lines": [
     {
-      "baseline": 172185,
+      "baseline": 171392,
       "kind": {
         "kind": "text"
       },
@@ -19,7 +19,7 @@
       "width": 1139200
     },
     {
-      "baseline": 295065,
+      "baseline": 292992,
       "kind": {
         "kind": "text"
       },
@@ -34,7 +34,7 @@
       "width": 1139200
     },
     {
-      "baseline": 417945,
+      "baseline": 414592,
       "kind": {
         "kind": "text"
       },
@@ -49,7 +49,7 @@
       "width": 1139200
     },
     {
-      "baseline": 540825,
+      "baseline": 536192,
       "kind": {
         "kind": "text"
       },
@@ -64,7 +64,7 @@
       "width": 1139200
     },
     {
-      "baseline": 663705,
+      "baseline": 657792,
       "kind": {
         "kind": "text"
       },
@@ -79,7 +79,7 @@
       "width": 1139200
     },
     {
-      "baseline": 786585,
+      "baseline": 779392,
       "kind": {
         "kind": "text"
       },
@@ -94,7 +94,7 @@
       "width": 1139200
     },
     {
-      "baseline": 909465,
+      "baseline": 900992,
       "kind": {
         "kind": "text"
       },
@@ -109,7 +109,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1032345,
+      "baseline": 1022592,
       "kind": {
         "kind": "text"
       },
@@ -124,7 +124,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1155225,
+      "baseline": 1144192,
       "kind": {
         "kind": "text"
       },
@@ -139,7 +139,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1278105,
+      "baseline": 1265792,
       "kind": {
         "kind": "text"
       },
@@ -154,7 +154,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1400985,
+      "baseline": 1387392,
       "kind": {
         "kind": "text"
       },
@@ -169,7 +169,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1523865,
+      "baseline": 1508992,
       "kind": {
         "kind": "text"
       },
@@ -184,7 +184,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1646745,
+      "baseline": 1630592,
       "kind": {
         "kind": "text"
       },
@@ -199,14 +199,14 @@
       "width": 1139200
     },
     {
-      "baseline": 1769625,
+      "baseline": 1752192,
       "kind": {
         "kind": "text"
       },
       "left": 57600,
       "letter_gain": 0,
       "line": 14,
-      "natural": 1075008,
+      "natural": 1086720,
       "right": 1196800,
       "short_ppm": null,
       "squeeze": null,
@@ -214,7 +214,7 @@
       "width": 1139200
     },
     {
-      "baseline": 1892505,
+      "baseline": 1873792,
       "kind": {
         "kind": "text"
       },

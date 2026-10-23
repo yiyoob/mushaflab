@@ -69,26 +69,3 @@ fn the_word_cache_returns_what_shaping_returns() {
     let s = sh.cache_stats();
     assert_eq!((s.hits, s.misses), (1, 1));
 }
-
-#[test]
-fn a_mark_drawn_by_a_spacing_glyph_is_caught_and_the_derived_font_has_none() {
-    // G-045: in the pinned font, rclt turns U+0670 after reh into a spacing upright alef.
-    // Synthetic letters (reh, fatha, superscript alef, tah), not a word of the text.
-    let text = "\u{0631}\u{064E}\u{0670}\u{0637}";
-    assert!(
-        check(text)
-            .iter()
-            .any(|v| matches!(v, Violation::SpacingMark { cluster: 2, .. }))
-    );
-    // the D17 render font keeps it an anchored mark
-    let bytes =
-        std::fs::read(common::repo().join("fonts/digitalkhatt/hb-madina-mushaflab.otf")).unwrap();
-    let font = mushaf_shape::FontData::new(bytes).unwrap();
-    let sh = font.shaper();
-    let chars: Vec<char> = text.chars().collect();
-    let glyphs = sh.shape(&chars, &[]).unwrap();
-    assert_eq!(
-        check_word(&font, &sh, &chars, &[], &glyphs).unwrap(),
-        vec![]
-    );
-}

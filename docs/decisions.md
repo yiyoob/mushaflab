@@ -32,7 +32,7 @@ Consequences: what follows, what it rules out
 | D11 | Spine file format and item IDs | accepted (Phase 1 plan) |
 | D12 | Core model: formats, patch semantics, DB access | accepted (Phase 2 plan); P2 addendum approved (2026-10-22) |
 | D13 | Phase 4 inputs: Bazzi source, single-source, encoding handling | accepted (2026-10-22) |
-| D17 | Derived render font: the superscript alef stays a mark (G-045) | accepted: option B (owner, GATE G1, 2026-10-22) |
+| D17 | Superscript alef after non-joining letters (G-045) | rejected by the owner after review; reverted (2026-10-22) |
 | D16 | Manual overrides, header text, and the "edited" marker in draw output | accepted with the Phase 3 plan |
 | D15 | Page geometry, short lines and overflow (Ḥafṣ, 1441H) | accepted with the Phase 3 plan; numbers for review at G1 |
 | D14 | KFGQPC to DigitalKhatt Madina encoding table (Ḥafṣ) | accepted (approach with the Phase 3 plan; lossy and owner rows decided 2026-10-22) |
@@ -512,9 +512,7 @@ check (`mushaf-render-cli/src/collide.rs`, in `just golden`) rasterises each lin
 outlines and header frames and tests every pair of adjacent lines on all 604 pages (8,442
 pairs). At 1,900 none touch. The tightest collision-free pitch is 1,890 (page 410, lines
 14-15: a stretched letter's tail above a pause sign); at the print's pitch of about 1,780, 7
-pairs would collide (1,800: 3; 1,850: 1). 1,900 was kept (owner, G1). **Changed to 1,920 (owner, G1, 2026-10-22)** after the D17 font:
-lines re-justified, and page 410 lines 14-15 then touched by a hairline at 1,900 (needs 1,920);
-every other pair is clear at 1,820. At 1,920 none of the 8,442 pairs touch.
+pairs would collide (1,800: 3; 1,850: 1). 1,900 is kept.
 
 | Line pitch | Pairs that collide |
 |---|---|
@@ -523,8 +521,7 @@ every other pair is clear at 1,820. At 1,920 none of the 8,442 pairs touch.
 | 1,780 (the print's proportion) | 7 |
 | 1,800 | 3 |
 | 1,850 | 1 |
-| 1,900 (kept until D17) | 0 |
-| | With the D17 font: 1,780: 6; 1,850: 1; 1,900: 1; **1,920 (chosen): 0** |
+| **1,900 (chosen)** | **0** |
 
 Consequences: page scale depends on the resolved page, so an edit or a riwāyah change can change
 a whole page's size (deterministically). Wide spaces on loose lines are the price of few
@@ -708,44 +705,19 @@ Owner decisions at GATE G2, given in the planning session and relayed to the Pha
 - **Hypotheses (G-074):** the plan's expected cases (Warsh 1:4→1:3, 3:133, 2:10, 2:184) stay
   documented observations, not tests, until a cited source is available.
 
-## D17 — Derived render font: the superscript alef stays a mark (G-045)
-Status: accepted (owner, GATE G1, 2026-10-22: option B)
+## D17 — Superscript alef after non-joining letters (G-045)
+Status: rejected by the owner after reviewing the rendered pages; reverted (2026-10-22)
 Date: 2026-10-22
-Context: at G1 the owner found صِرَٰطَ on page 1 drawn with a gap between rāʾ and ṭāʾ. The
-pinned DigitalKhatt Madina font (`digitalkhatt-hb-madina-font`) maps U+0670 to one of three
-glyphs: in joining contexts its contextual lookups pick the anchored marks `glyph00102`
-(5,923 times in the Ḥafṣ spine) or `glyph00104` (2,426); every U+0670 they leave is then mapped
-by a plain single substitution in an `rclt` lookup (66) to `glyph00103`, a GDEF base glyph with
-an advance: an upright alef standing in a gap. That happens 1,377 times in 1,373 words on 518
-pages, always after a non-joining letter (و 566, ذ 490, ر 271, د 29, ز 12, ء 8, ا 1). The 1441H
-print (`quran-qcf4` word glyphs, traced from the print) draws a superscript alef with the letters
-joined in all 11 words compared (ٱلصِّرَٰطَ, صِرَٰطَ, ذَٰلِكَ, ٱلصَّوَٰعِقِ, فَٱدَّٰرَٰٔتُمۡ, جَزَٰٓؤُا۟,
-سَوۡءَٰتِهِمَا, سَمَٰوَٰتٖ, وَرَٰوَدَتۡهُ, فَٱلزَّٰجِرَٰتِ, ٱلرَّٰحِمِينَ); no spacing form occurs.
-The shaping-integrity check had not caught it: the glyph is a base, not a mark.
-Options:
-- A: set `rclt`=0 on U+0670 at run time. On every U+0670 it leaves 7,063 words with an
-  unanchored plain `uni0670` (rclt's contextual lookups are what choose the anchored marks);
-  restricted to the 1,377 spacing places it looks right but all 1,377 marks are unanchored.
-  Either way rule 6 fails without an exception.
-- B: a derived font: the pinned font with that one substitution changed to `glyph00102`, one of
-  the font's own anchored superscript-alef marks.
-Decision: **B** (owner). `data/pipeline/derived_font.py` (`just data-build`) builds
-`fonts/digitalkhatt/hb-madina-mushaflab.otf` from the pinned source: it checks that exactly one
-substitution in the whole GSUB maps uni0670 to glyph00103, that it belongs to an `rclt` lookup,
-and that glyph00102 is a GDEF mark; it renames the font ("DigitalKhatt New Madina Mushaflab",
-version string naming the patch; SIL OFL 1.1 modified version, no Reserved Font Name declared);
-it recalculates no timestamp. Only GSUB, `name` and `head`'s whole-file checksum differ from the
-pinned font; outlines are byte-identical (test). The build record
-`fonts/digitalkhatt/hb-madina-mushaflab.json` gives the source sha256, the patch and the output
-sha256, and `license_check` accepts the derived font only against it.
-Result: all 9,726 U+0670 in the spine are anchored marks (7,300 glyph00102, 2,426 glyph00104).
-1,742 lines on 518 pages change (`docs/review/g045-changed-lines.md`: 1,503 with reshaped
-words, 239 re-fit because 38 pages get a larger page scale); squeezed lines drop from 65 to 62.
-Kept guarantees: rule 6 on every word of all 604 pages, with a new check that no mark character
-is drawn by a spacing glyph (`Violation::SpacingMark`); justifier parity with the oracle, which
-now also runs with the derived font (4,121 more lines, exact); line fit within 0.1%; G-015;
-the ink-collision check, which required line pitch 1,920 (D15).
-Consequences: the render profile uses the derived font; the pinned original stays tracked as its
-source and for the HarfBuzz parity, oracle and outline tests. A new DigitalKhatt release would be
-re-patched by the same checked step (or the check fails).
+Context: G-045. The pinned DigitalKhatt Madina font's `rclt` maps U+0670 after a non-joining
+letter (1,377 places, 518 pages) to `glyph00103`, a spacing upright alef in a gap; the owner's
+1441H reference shows a small alef over the join (صِرَٰطَ, page 1).
+Tried (commit 1f5a0e5): a derived font with that one substitution changed to `glyph00102`, an
+anchored superscript-alef mark (all 9,726 U+0670 anchored; rule 6, oracle parity, line fit and
+collisions kept; line pitch 1,920). Rejected: on the rendered pages the anchored mark sits on the
+stem of the following letter (e.g. on the ṭāʾ of صِرَٰطَ), which reads as a standing alif on top
+of the ط. The comparison sheet used before had been looked at too small to show this. An
+earlier option, `rclt`=0 on U+0670 at run time, leaves the alef unanchored (rule 6) and was not
+taken.
+Decision (owner): go back to the previous rendering (pinned font, line pitch 1,900). G-045 stays
+open; any new fix must be judged on full-size rendered lines against the print before it lands.
 

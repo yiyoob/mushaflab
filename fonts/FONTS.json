@@ -3,13 +3,7 @@
     {
       "path": "fonts/digitalkhatt/hb-madina.otf",
       "source": "digitalkhatt-hb-madina-font",
-      "use": "The pinned original: source of the derived render font, and the font of the HarfBuzz parity and justifier oracle tests (D3)."
-    },
-    {
-      "path": "fonts/digitalkhatt/hb-madina-mushaflab.otf",
-      "derived_from": "digitalkhatt-hb-madina-font",
-      "record": "fonts/digitalkhatt/hb-madina-mushaflab.json",
-      "use": "Render font for Hafs (D17): the pinned hb/ Madina font with one rclt substitution changed (U+0670 stays a superscript mark, G-045). Built by data/pipeline/derived_font.py."
+      "use": "Mashriqi riwayat incl. Hafs (D2); HarfBuzz build with cvNN stretch features (D3)"
     }
   ]
 }

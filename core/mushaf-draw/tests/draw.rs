@@ -104,9 +104,8 @@ fn env() -> Env {
         table: EncodingTable::from_json(&read(&profile.encoding)).unwrap(),
         widths: LineWidths::from_json(&read(&profile.line_widths)).unwrap(),
         names: SurahNames::from_json(&read(&profile.surah_names)).unwrap(),
-        // the render font of the profile (D17), not the pinned original
-        font: FontData::new(fs::read(repo().join(&profile.font)).unwrap()).unwrap(),
-        outlines: Outlines::new(&fs::read(repo().join(&profile.font)).unwrap()).unwrap(),
+        font: FontData::new(font_bytes()).unwrap(),
+        outlines: Outlines::new(&font_bytes()).unwrap(),
         profile,
     }
 }
