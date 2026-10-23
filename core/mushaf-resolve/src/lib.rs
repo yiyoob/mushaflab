@@ -16,7 +16,7 @@ mod engine;
 mod options;
 
 pub use engine::resolve_patches;
-pub use options::{LintNote, Selection, resolve};
+pub use options::{LintNote, Selection, resolve, resolve_profile};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Mode {
@@ -168,6 +168,8 @@ pub enum ResolveError {
     NotInAffects { group: String, patch: String },
     /// `Mode::Data` and the report is not empty.
     Strict(Vec<Diagnostic>),
+    /// The selection names a riwāyah with no profile (T5.1).
+    UnknownRiwayah { riwayah: String },
 }
 
 impl fmt::Display for ResolveError {
@@ -224,6 +226,9 @@ impl fmt::Display for ResolveError {
             }
             ResolveError::Strict(report) => {
                 write!(f, "data mode: {} report entries: {report:?}", report.len())
+            }
+            ResolveError::UnknownRiwayah { riwayah } => {
+                write!(f, "no profile for riwayah {riwayah:?}")
             }
         }
     }

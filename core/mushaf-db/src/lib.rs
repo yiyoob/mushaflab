@@ -14,7 +14,7 @@ use mushaf_model::{
 use rusqlite::{Connection, OpenFlags, Row};
 use sha2::{Digest, Sha256};
 
-pub const SCHEMA_VERSION: &str = "2";
+pub const SCHEMA_VERSION: &str = "3";
 
 fn io(path: &Path, e: impl std::fmt::Display) -> Error {
     Error::new(format!("{}: {e}", path.display()))
@@ -191,6 +191,17 @@ pub fn load_db(db: &Path) -> Result<DataSet, Error> {
         ayah_maps: query(
             &con,
             "select riwayah_id, spine_id, body from ayah_maps order by riwayah_id",
+            |r| {
+                Ok(BodyRow {
+                    key: r.get(0)?,
+                    spine_id: r.get(1)?,
+                    body: r.get(2)?,
+                })
+            },
+        )?,
+        profiles: query(
+            &con,
+            "select riwayah_id, spine_id, body from profiles order by riwayah_id",
             |r| {
                 Ok(BodyRow {
                     key: r.get(0)?,

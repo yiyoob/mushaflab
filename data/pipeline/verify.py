@@ -25,6 +25,7 @@ from pipeline import (
     ingest_layout,
     ingest_riwayah,
     phase4_report,
+    profiles,
     sources,
     spine,
 )
@@ -157,9 +158,14 @@ def check_db() -> list[str]:
     return out
 
 
+def check_phase5_files_current() -> list[str]:
+    return [] if profiles.main(["", "check"]) == 0 else ["data/profiles differ from a rebuild"]
+
+
 CHECKS: dict[str, Callable[[], list[str]]] = {
     "sources": check_sources,
     "tracked files current": check_tracked_files_current,
+    "phase 5 files current": check_phase5_files_current,
     "lines per page": check_lines_per_page,
     "every item once, in order": check_every_item_once_in_order,
     "line types": check_line_types,

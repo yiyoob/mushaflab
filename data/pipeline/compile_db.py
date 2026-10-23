@@ -4,7 +4,8 @@
 
 The DB is a build artifact (rule 3) holding exactly the tracked data under a data root:
 spines (`spine/<name>/v<k>/`), layouts (`layouts/*.json`), patch files (`patches/**/*.yaml`),
-option groups (`options/*.yaml`) and ayah maps (`ayah_maps/*.yaml`). Rows are inserted in a
+option groups (`options/*.yaml`), ayah maps (`ayah_maps/*.yaml`) and riwayah profiles
+(`profiles/*.yaml`, T5.1). Rows are inserted in a
 fixed order into a fresh file, so the same inputs give a byte-identical DB. Spine text is
 stored as real codepoints (the app's form); patch files, option groups and ayah maps as
 canonical JSON, which the Rust core parses with the same types as the YAML files (D12).
@@ -28,13 +29,25 @@ import yaml
 from pipeline import spine
 from pipeline.codepoints import TABLE_PATH
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 DATA_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DB = DATA_ROOT.parent / "build" / "mushaf.db"
 SPINE_ID = f"hafs/v{spine.SPINE_VERSION}"
 
 # Keys whose values are not strings (every other scalar must be a string).
-INT_KEYS = frozenset({"seq", "at", "width_em_delta", "stretch", "surah", "ayah"})
+INT_KEYS = frozenset(
+    {
+        "seq",
+        "at",
+        "width_em_delta",
+        "stretch",
+        "surah",
+        "ayah",
+        "page",
+        "name_line",
+        "basmalah_line",
+    }
+)
 BOOL_KEYS = frozenset({"single_source"})
 NULL_KEYS = frozenset({"rule_id"})
 MERGE_TAG = "tag:yaml.org,2002:merge"
@@ -59,6 +72,7 @@ create table lines (
 create table patch_files (path text primary key, spine_id text not null, body text not null);
 create table option_groups (id text primary key, body text not null);
 create table ayah_maps (riwayah_id text primary key, spine_id text not null, body text not null);
+create table profiles (riwayah_id text primary key, spine_id text not null, body text not null);
 """
 
 
@@ -167,9 +181,10 @@ def build(db_path: Path = DEFAULT_DB, root: Path = DATA_ROOT) -> None:
     patch_files = [(p, load_yaml(p)) for p in yaml_files(root, "patches")]
     option_files = [(p, load_yaml(p, ascii_only=False)) for p in yaml_files(root, "options")]
     ayah_maps = [(p, load_yaml(p)) for p in yaml_files(root, "ayah_maps")]
+    profiles = [(p, load_yaml(p)) for p in yaml_files(root, "profiles")]
 
     inputs = [d / f for d in spine_dirs(root) for f in ("items.jsonl", "manifest.json")]
-    inputs += [p for p, _ in layouts + patch_files + option_files + ayah_maps]
+    inputs += [p for p, _ in layouts + patch_files + option_files + ayah_maps + profiles]
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
     tmp = db_path.with_name(db_path.name + ".tmp")
@@ -208,6 +223,15 @@ def build(db_path: Path = DEFAULT_DB, root: Path = DATA_ROOT) -> None:
         seen.add(data["riwayah"])
         con.execute(
             "insert into ayah_maps values (?, ?, ?)",
+            (data["riwayah"], data["spine"], canonical_json(data)),
+        )
+    seen = set()
+    for p, data in profiles:
+        if not isinstance(data, dict) or data.get("riwayah") in seen:
+            raise DataError(f"{p}: profile without a riwayah, or a duplicate riwayah")
+        seen.add(data["riwayah"])
+        con.execute(
+            "insert into profiles values (?, ?, ?)",
             (data["riwayah"], data["spine"], canonical_json(data)),
         )
     con.commit()

@@ -33,6 +33,7 @@ data-build:
     {{uv}} run python -m pipeline.align write
     {{uv}} run python -m pipeline.emit_patches write
     {{uv}} run python -m pipeline.ayah_maps write
+    {{uv}} run python -m pipeline.profiles write
     {{uv}} run python -m pipeline.phase4_report write
     {{uv}} run python -m pipeline.drift write
     {{uv}} run python -m pipeline.compile_db

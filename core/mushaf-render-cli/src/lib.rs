@@ -15,7 +15,7 @@ use mushaf_layout::fit::{
 };
 use mushaf_layout::{Mapping, map_lines};
 use mushaf_model::{DataSet, EditOverlay, Error};
-use mushaf_resolve::{Mode, Resolved, resolve_patches};
+use mushaf_resolve::{Mode, Resolved, Selection, resolve_profile};
 use mushaf_shape::{EncodingTable, FontData};
 
 /// Profiles by riwayah (Phase 3: Hafs only).
@@ -74,18 +74,20 @@ impl Renderer {
         })
     }
 
-    /// Hafs is the spine itself: no patch files. An overlay (free edits) resolves in free mode.
+    /// Resolves through the riwāyah's profile (T5.1). An overlay (free edits) resolves in free
+    /// mode.
     pub fn resolve(&self, overlay: Option<&EditOverlay>) -> Result<Resolved, Error> {
-        let spine = &self.data.spines[&self.profile.spine];
-        let patches: Vec<_> = overlay
-            .map(|o| o.patches.iter().collect())
-            .unwrap_or_default();
+        let sel = Selection {
+            riwayah: self.profile.riwayah.clone(),
+            ..Selection::default()
+        };
         let mode = if overlay.is_some() {
             Mode::Free
         } else {
             Mode::Data
         };
-        resolve_patches(spine, &patches, mode).map_err(|e| Error::new(format!("resolve: {e:?}")))
+        resolve_profile(&self.data, &sel, overlay, mode)
+            .map_err(|e| Error::new(format!("resolve: {e:?}")))
     }
 
     pub fn map(&self, resolved: &Resolved) -> Result<Mapping, Error> {
