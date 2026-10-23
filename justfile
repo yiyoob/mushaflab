@@ -84,6 +84,12 @@ review-phase5:
     {{uv}} run python -m pipeline.dk_riwayat write
     {{uv}} run python -m pipeline.review_phase5
 
+# GATE G3 contact sheets (T5.5): every page of every riwayah, 24 per sheet, in
+# docs/review/phase5/contact/ (untracked PNG), then the tracked review index
+contact-sheets *RIWAYAT:
+    cargo run --release -q {{manifest}} -p mushaf-render-cli --bin mushaf-contact -- {{RIWAYAT}}
+    {{uv}} run python -m pipeline.phase5_readme write
+
 # SVG + PNG via reference renderer, e.g. just render PAGE=1 RIWAYAH=hafs
 render *ARGS:
     #!/usr/bin/env bash

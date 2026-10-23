@@ -27,6 +27,7 @@ from pipeline import (
     ingest_layout,
     ingest_riwayah,
     phase4_report,
+    phase5_readme,
     profiles,
     sources,
     spine,
@@ -168,6 +169,8 @@ def check_phase5_files_current() -> list[str]:
         out.append("data/layout_inputs differ from a rebuild")
     if dk_riwayat.main(["", "check"]) != 0:
         out.append("riwayat encoding candidates or rows differ from a rebuild")
+    if phase5_readme.main(["", "check"]) != 0:
+        out.append("docs/review/phase5/README.md differs from a rebuild")
     return out
 
 
