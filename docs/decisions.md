@@ -46,6 +46,7 @@ Consequences: what follows, what it rules out
 | D30 | Short lines and header basmalah on native layouts | proposed for GATE G3 (P5, threshold changed on evidence; basmalah decided by the owner) |
 | D31 | Overflow per riwāyah | accepted with the plan (P6); numbers for GATE G3 |
 | D32 | Rule-5 edition notes per riwāyah | proposed for GATE G3 |
+| D36 | Display styles: Ḥijāzī and Maghribi for every riwāyah | accepted (scope); built in Phase 6 |
 
 ---
 
@@ -1025,4 +1026,21 @@ Date: 2026-10-22
   (D28, G-102).
 - **Warsh, Qālūn:** text, layout data and font all come from one KFGQPC release (official v2.1);
   no exception. Their line breaks inside ayahs are still transferred or fitted (D29).
+
+## D36: Display styles, Ḥijāzī and Maghribi for every riwāyah
+Status: accepted (scope and phase); details decided in Phase 6
+Date: 2026-10-23
+Context: The owner wants the script style to be independent of the riwāyah, so that a user
+can show any muṣḥaf in Ḥijāzī (Mashriqi) or Maghribi style.
+Evidence: the KFGQPC texts encode style-specific mark conventions in their codepoints (G-006;
+e.g. sukūn U+06E1 vs U+0652); the Maghribi letterforms (fā'/qāf dotting) come from the KFGQPC
+Warsh/Qālūn fonts (S2); DigitalKhatt has no Maghribi design; no other Maghribi font is pinned.
+Decision (owner, 2026-10-23): build it in **Phase 6 (T6.7–T6.10)**, after the encoding conversion
+layer it depends on. Phase 5 prepares for it by keying font, justification mode and encoding
+table by **(riwāyah, style)**, with a default style per riwāyah (Maghribi for Warsh/Qālūn,
+Ḥijāzī for the rest), and implements only the defaults.
+Consequences: style conversion is a render-time transformation from owner-confirmed rows,
+never a change to the spine or patches; a combination a font cannot render correctly is
+reported as unavailable rather than drawn wrongly (rule 6); line breaks remain each
+riwāyah's own (D1).
 

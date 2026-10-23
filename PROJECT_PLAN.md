@@ -358,7 +358,13 @@ Goal: replace raw diffs with rules so toggling works. This is where "complete ch
 - **T6.5 Rule review sheets.** For each rule, an HTML sheet listing every application with context and source.
 - **T6.6 Ṭarīq layer.** Model a second ṭarīq as an option group where the sources distinguish ṭuruq, starting with one riwāyah.
 
-**GATE G4:** owner reviews rule registers and sheets and sets `cross-checked` or `muqri-verified` where warranted.
+**Display styles: Ḥijāzī and Maghribi for every riwāyah (owner, 2026-10-23, D36).** Any riwāyah can be shown in either script style. Phase 5 keys fonts and justification by (riwāyah, style) and renders only each riwāyah's default style (Maghribi for Warsh/Qālūn, Ḥijāzī for the rest).
+- **T6.7 Encoding conversion layer** (deferred here by D13). One documented, tested conversion between KFGQPC mark conventions, built from owner-confirmed rows (the `data/approvals/` pattern of D21). Rows are data-derived where parallel evidence exists, never invented. It is applied only at render time; spine and patches stay codepoint-exact. *Accept:* conversion round-trips, and every converted codepoint traces to a confirmed row.
+- **T6.8 Style conventions.** For each style, its mark conventions (sukūn, waṣl sign, pause signs, dotting): which differ, the evidence for each, and the owner-confirmed conversion rows between Ḥijāzī and Maghribi. Any convention without evidence stays unconverted and is reported, never guessed.
+- **T6.9 Font coverage per (riwāyah, style)**, an S2-style audit. Every combination must pass rule 6 (no `.notdef`, dotted circle, unattached or spacing mark). Fill gaps with the escape-hatch mapping, a documented derived font, or by marking the combination unavailable. Justification is calligraphic where a font supports it (Ḥijāzī: DigitalKhatt) and spacing-only otherwise (Maghribi, until a calligraphic Maghribi font exists). Line breaks always stay the riwāyah's own layout (D1); overflow follows T5.2.
+- **T6.10 Style switch and goldens.** A runtime style option per muṣḥaf, plus golden pages for every riwāyah in its non-default style. *Accept:* rule-6 integrity and line fit on all pages of every available (riwāyah, style); the owner reviews samples at GATE G4.
+
+**GATE G4:** the owner reviews rule registers and sheets, sets `cross-checked` or `muqri-verified` where warranted, and reviews the display-style samples.
 
 ---
 
