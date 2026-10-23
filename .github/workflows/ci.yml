@@ -49,6 +49,10 @@ jobs:
         env:
           MUSHAF_REQUIRE_SOURCES: "1"
         run: just lint core-test core-targets data-test data-verify
+      - name: Goldens, line fit and shaping integrity on all 604 pages (T3.5, T3.5a)
+        env:
+          MUSHAF_REQUIRE_SOURCES: "1"
+        run: just golden
       - name: Round-trip raw patches vs KFGQPC (T4.6, D22)
         env:
           MUSHAF_REQUIRE_SOURCES: "1"

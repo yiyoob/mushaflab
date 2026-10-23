@@ -8,6 +8,8 @@ publish.workspace = true
 [dependencies]
 mushaf-model.workspace = true
 mushaf-resolve.workspace = true
+mushaf-shape.workspace = true
+mushaf-justify.workspace = true
 serde.workspace = true
 
 [dev-dependencies]

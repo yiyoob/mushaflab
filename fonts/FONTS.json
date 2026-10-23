@@ -1,0 +1,9 @@
+{
+  "fonts": [
+    {
+      "path": "fonts/digitalkhatt/hb-madina.otf",
+      "source": "digitalkhatt-hb-madina-font",
+      "use": "Mashriqi riwayat incl. Hafs (D2); HarfBuzz build with cvNN stretch features (D3)"
+    }
+  ]
+}

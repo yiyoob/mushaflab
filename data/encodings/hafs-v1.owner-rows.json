@@ -1,0 +1,11 @@
+{
+  "note": "Rows the data cannot derive, each approved by the owner (D14). Never edited without an owner decision. At GATE G1 the owner decided 2:97:5 renders without the tatweel (G-047, hafs-v1.owner-words.json); this row stays so that the word still renders cluster by cluster when it is edited (rule 11).",
+  "rows": [
+    {
+      "src": ["U+0640"],
+      "dst": "U+0640",
+      "date": "2026-10-22",
+      "decision": "Owner, Phase 3 (T3.1): identity row for the standalone tatweel cluster in 2:97:5, which DigitalKhatt's text does not have; the DigitalKhatt Madina font has a tatweel glyph. The 1441H text renders as stored."
+    }
+  ]
+}

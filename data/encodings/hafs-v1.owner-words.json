@@ -1,0 +1,15 @@
+{
+  "note": "Spine words the owner decided to render in DigitalKhatt's own form (DigitalKhatt's aligned word, taken from its pinned text by data/pipeline/dk_encoding.py, never typed). The spine itself keeps KFGQPC's text. Never edited without an owner decision.",
+  "words": [
+    {
+      "item": "17:7:12",
+      "date": "2026-10-22",
+      "decision": "Owner at GATE G1 (G-046): the 1441H print (quran-qcf4 word glyph) and DigitalKhatt's text have a small waw and madda above the seen that KFGQPC v2.0 lacks; render DigitalKhatt's form."
+    },
+    {
+      "item": "2:97:5",
+      "date": "2026-10-22",
+      "decision": "Owner at GATE G1 (G-047): no tatweel between lam and jeem, as in the 1441H print and DigitalKhatt's text; render DigitalKhatt's form (replaces the identity row for U+0640 approved in T3.1)."
+    }
+  ]
+}

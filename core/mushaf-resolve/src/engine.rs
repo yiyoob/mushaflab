@@ -511,10 +511,17 @@ pub fn resolve_patches(
     if mode == Mode::Data && !report.is_empty() {
         return Err(ResolveError::Strict(report));
     }
+    let mut user_patches: Vec<String> = patches
+        .iter()
+        .filter(|p| p.layer() == Layer::User)
+        .map(|p| p.id.clone())
+        .collect();
+    user_patches.sort();
     Ok(Resolved {
         items,
         report,
         choices: BTreeMap::new(),
         lint: Vec::new(),
+        user_patches,
     })
 }

@@ -9,6 +9,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "brotli>=1.1",
     "fonttools>=4.67.0",
     "pytest",
     "ruff",

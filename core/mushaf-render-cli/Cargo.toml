@@ -5,13 +5,32 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
+[lib]
+name = "mushaf_render"
+path = "src/lib.rs"
+
+[[bin]]
+name = "mushaf-render"
+path = "src/main.rs"
+
+[[bin]]
+name = "mushaf-bench"
+path = "src/bench.rs"
+
 [dependencies]
 mushaf-model.workspace = true
+mushaf-db.workspace = true
 mushaf-resolve.workspace = true
 mushaf-layout.workspace = true
 mushaf-shape.workspace = true
 mushaf-justify.workspace = true
 mushaf-draw.workspace = true
+resvg.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+sha2.workspace = true
 
 [lints]
 workspace = true

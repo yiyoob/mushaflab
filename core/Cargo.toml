@@ -37,6 +37,12 @@ rusqlite = { version = "=0.40.2", features = ["bundled"] }
 proptest = { version = "=1.12.0", default-features = false, features = ["std"] }
 sha2 = "=0.11.1"
 zip = { version = "=9.0.5", default-features = false, features = ["deflate"] }
+# Shaping (D3): pinned exactly; read-fonts is the version harfrust itself uses.
+harfrust = "=0.14.0"
+read-fonts = { version = "=0.45.1", default-features = false, features = ["std"] }
+regex = { version = "=1.13.1", default-features = false, features = ["std", "unicode-perl"] }
+# Host only (reference renderer): SVG to PNG, no text or system fonts (pages are all paths).
+resvg = { version = "=0.48.1", default-features = false }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

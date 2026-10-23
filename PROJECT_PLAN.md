@@ -309,7 +309,7 @@ Goal: prove rendering and justification end to end on desktop before any mobile 
 - **T3.6 Perf harness.** Resolve + shape + justify per page, with caching keyed by `(word, state hash)`. Record desktop numbers. The 16 ms/page budget is verified on a device in Phase 8.
 - **T3.7 Edit demo.** Insert a mark (small sīn) and a letter, widen a word, and confirm the line still closes. *Accept:* golden images and line-fit tests.
 
-**GATE G1:** owner reviews 10 rendered pages against the printed muṣḥaf. (D5 is already decided: website first.)
+**GATE G1:** owner reviews 10 rendered pages against the printed muṣḥaf. (D5 is already decided: website first.) **Passed 2026-10-22 (owner); see the G1 record in `docs/decisions.md`. Known deviation from the print: G-045.**
 
 ---
 

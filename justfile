@@ -20,11 +20,15 @@ data-pin:
 data-archive *DEST:
     {{uv}} run python -m pipeline.archive {{DEST}}
 
-# Run the full ETL: check codepoint table, rebuild spine + layout files, compile build/mushaf.db
+# Run the full ETL: check codepoint table, rebuild spine + layout files and the font-encoding
+# table (T3.1), compile build/mushaf.db
 data-build:
     {{uv}} run python -m pipeline.codepoints check
     {{uv}} run python -m pipeline.spine build
     {{uv}} run python -m pipeline.ingest_layout build
+    {{uv}} run python -m pipeline.dk_encoding build
+    {{uv}} run python -m pipeline.line_widths build
+    {{uv}} run python -m pipeline.surah_names build
     {{uv}} run python -m pipeline.ingest_riwayah write
     {{uv}} run python -m pipeline.align write
     {{uv}} run python -m pipeline.emit_patches write
@@ -83,14 +87,19 @@ render *ARGS:
             *) echo "render: unknown argument '$arg' (expected PAGE=<n> RIWAYAH=<id>)" >&2; exit 2 ;;
         esac
     done
-    echo "render PAGE=$PAGE RIWAYAH=$RIWAYAH: not implemented yet (T3.4)" >&2
-    exit 1
+    cargo run --release --quiet {{manifest}} -p mushaf-render-cli --bin mushaf-render -- --page "$PAGE" --riwayah "$RIWAYAH"
 
-# Golden image + line-fit + shaping-integrity tests
-golden: (_todo "T3.5")
+# Golden image + line-fit + shaping-integrity tests (release; all 604 pages)
+golden:
+    cargo test --release {{manifest}} -p mushaf-render-cli --test golden -- --ignored
 
-# Page resolve+shape+justify timing
-bench: (_todo "T3.6")
+# Rewrite tests/golden/pages after a reviewed, intended change (then commit the diff)
+golden-update:
+    MUSHAF_UPDATE_GOLDEN=1 cargo test --release {{manifest}} -p mushaf-render-cli --test golden -- --ignored
+
+# Page resolve+shape+justify timing (release, this machine; T3.6)
+bench:
+    cargo run --release --quiet {{manifest}} -p mushaf-render-cli --bin mushaf-bench
 
 # rustfmt/clippy, ruff, license check
 lint:
