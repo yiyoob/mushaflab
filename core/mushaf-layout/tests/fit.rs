@@ -35,7 +35,7 @@ fn env() -> Env {
     let profile = Profile::from_json(&read("data/render/hafs-uthmani-1441h.json")).unwrap();
     Env {
         ds: mushaf_db::load_dir(&repo().join("data")).unwrap(),
-        table: EncodingTable::from_json(&read(&profile.encoding)).unwrap(),
+        table: profile.encoding_table(|p| Ok(read(p))).unwrap(),
         widths: LineWidths::from_json(&read(&profile.line_widths)).unwrap(),
         names: SurahNames::from_json(&read(&profile.surah_names)).unwrap(),
         font: FontData::new(fs::read(repo().join(&profile.font)).unwrap()).unwrap(),
@@ -46,7 +46,8 @@ fn env() -> Env {
 fn fit(e: &Env, resolved: &Resolved, page: u32) -> FitPage {
     let spine = &e.ds.spines[&e.profile.spine];
     let layout = &e.ds.layouts[&e.profile.layout_id];
-    let basmalah = basmalah_words(spine, &e.table).unwrap();
+    let base = resolve_patches(spine, &[], Mode::Data).unwrap();
+    let basmalah = basmalah_words(&base, &e.table).unwrap();
     let data = FitData {
         profile: &e.profile,
         table: &e.table,

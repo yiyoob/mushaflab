@@ -17,6 +17,14 @@ path = "src/main.rs"
 name = "mushaf-bench"
 path = "src/bench.rs"
 
+[[bin]]
+name = "mushaf-fitlines"
+path = "src/fitlines.rs"
+
+[[bin]]
+name = "mushaf-contact"
+path = "src/contact.rs"
+
 [dependencies]
 mushaf-model.workspace = true
 mushaf-db.workspace = true

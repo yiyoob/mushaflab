@@ -6,8 +6,10 @@
 //! valid, monotone character indices starting at 0, so every input character belongs to
 //! exactly one glyph cluster.
 
+use std::collections::{BTreeMap, BTreeSet};
+
 use mushaf_model::Error;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{FeatureRange, FontData, ShapedGlyph, Shaper};
 
@@ -105,4 +107,75 @@ pub fn check_word(
         }
     }
     Ok(out)
+}
+
+/// Owner-approved per-glyph rule-6 exceptions (D27, G-100):
+/// `data/render/kfgqpc-rule6-exceptions.json`. A listed glyph of a listed font may be a mark
+/// placed without an anchor attachment; every other check still applies to it.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Exceptions {
+    by_font: BTreeMap<String, BTreeSet<u32>>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ExceptionsWire {
+    #[allow(dead_code)]
+    note: String,
+    fonts: BTreeMap<String, Vec<ExceptionWire>>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ExceptionWire {
+    glyph: u32,
+    #[allow(dead_code)]
+    name: String,
+    #[allow(dead_code)]
+    date: String,
+    #[allow(dead_code)]
+    decision: String,
+}
+
+impl Exceptions {
+    pub fn from_json(text: &str) -> Result<Self, Error> {
+        let w: ExceptionsWire = mushaf_model::from_json(text)?;
+        Ok(Exceptions {
+            by_font: w
+                .fonts
+                .into_iter()
+                .map(|(f, gs)| (f, gs.into_iter().map(|g| g.glyph).collect()))
+                .collect(),
+        })
+    }
+
+    /// Whether `v`, found in `font` (its repository path), is an approved exception.
+    pub fn allows(&self, font: &str, v: &Violation) -> bool {
+        matches!(v, Violation::UnattachedMark { glyph, .. }
+            if self.by_font.get(font).is_some_and(|gs| gs.contains(glyph)))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn exceptions_cover_only_unattached_listed_glyphs_of_their_font() {
+        let e = Exceptions::from_json(
+            r#"{"note": "", "fonts": {"f.ttf": [{"glyph": 7, "name": "x", "date": "d", "decision": "y"}]}}"#,
+        )
+        .unwrap();
+        let mark = |glyph| Violation::UnattachedMark { glyph, cluster: 0 };
+        assert!(e.allows("f.ttf", &mark(7)));
+        assert!(!e.allows("f.ttf", &mark(8)));
+        assert!(!e.allows("g.ttf", &mark(7)));
+        assert!(!e.allows(
+            "f.ttf",
+            &Violation::Notdef {
+                glyph_index: 0,
+                cluster: 0
+            }
+        ));
+    }
 }

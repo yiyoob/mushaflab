@@ -13,19 +13,45 @@ use mushaf_justify::Regexps;
 use mushaf_layout::fit::{
     FitData, FitPage, LineWidths, Profile, SurahNames, basmalah_words, fit_page,
 };
-use mushaf_layout::{Mapping, map_lines};
+use mushaf_layout::{Mapping, map_lines, map_lines_on};
 use mushaf_model::{DataSet, EditOverlay, Error};
-use mushaf_resolve::{Mode, Resolved, resolve_patches};
-use mushaf_shape::{EncodingTable, FontData};
+use mushaf_resolve::{Mode, Resolved, Selection, resolve_profile};
+use mushaf_shape::{EncodingTable, Exceptions, FontData, Violation, check_word};
 
-/// Profiles by riwayah (Phase 3: Hafs only).
-pub fn profile_path(riwayah: &str) -> Result<&'static str, Error> {
+/// A riwāyah's default display style (D36): Maghribi for Warsh and Qālūn, Ḥijāzī for the rest.
+pub fn default_style(riwayah: &str) -> Result<&'static str, Error> {
     match riwayah {
-        "hafs" => Ok("data/render/hafs-uthmani-1441h.json"),
-        other => Err(Error::new(format!(
-            "riwayah {other:?} has no render profile yet (Phase 3 renders hafs; others are Phase 5)"
-        ))),
+        "warsh" | "qalun" => Ok("maghribi"),
+        "hafs" | "shuba" | "bazzi" | "qunbul" | "duri_abuamr" | "susi" => Ok("hijazi"),
+        other => Err(Error::new(format!("unknown riwayah {other:?}"))),
     }
+}
+
+/// Render profiles by (riwāyah, style) (D36): Ḥafṣ on the 1441H layout, the others on their
+/// native KFGQPC layouts (T5.2). Only each riwāyah's default style exists in Phase 5.
+pub fn profile_path(riwayah: &str, style: &str) -> Result<String, Error> {
+    if style != default_style(riwayah)? {
+        return Err(Error::new(format!(
+            "style {style:?} of riwayah {riwayah:?} is not available yet (D36: other styles are \
+             built in Phase 6, T6.7-T6.10)"
+        )));
+    }
+    Ok(match riwayah {
+        "hafs" => "data/render/hafs-uthmani-1441h.json".into(),
+        _ => format!("data/render/{riwayah}-uthmani-kfgqpc.json"),
+    })
+}
+
+/// Owner-approved per-glyph rule-6 exceptions (D27, G-100).
+pub const EXCEPTIONS: &str = "data/render/kfgqpc-rule6-exceptions.json";
+
+/// A page checked against rule 6 (T5.2): drawn, or blocked because a word cannot be converted
+/// to the font's encoding yet (G-102). `violations` lists every word that breaks rule 6 apart
+/// from the owner's exceptions; a page with any is not shown as fit (the caller decides).
+pub struct CheckedPage {
+    pub fit: Option<FitPage>,
+    pub blocked: Option<String>,
+    pub violations: Vec<(String, Violation)>,
 }
 
 pub struct Renderer {
@@ -37,6 +63,10 @@ pub struct Renderer {
     pub names: SurahNames,
     pub font: FontData,
     pub outlines: Outlines,
+    /// The riwāyah's resolved text without edits: what a native layout's anchors name.
+    pub base: Resolved,
+    /// Owner-approved per-glyph rule-6 exceptions (D27).
+    pub exceptions: Exceptions,
     pub basmalah: Vec<Vec<char>>,
     pub regexps: Regexps,
 }
@@ -46,10 +76,21 @@ fn read(repo: &Path, rel: &str) -> Result<String, Error> {
 }
 
 impl Renderer {
+    /// The riwāyah in its default style (D36).
     pub fn load(repo: &Path, riwayah: &str) -> Result<Self, Error> {
-        let profile = Profile::from_json(&read(repo, profile_path(riwayah)?)?)?;
+        Self::load_style(repo, riwayah, default_style(riwayah)?)
+    }
+
+    pub fn load_style(repo: &Path, riwayah: &str, style: &str) -> Result<Self, Error> {
+        let profile = Profile::from_json(&read(repo, &profile_path(riwayah, style)?)?)?;
+        if profile.riwayah != riwayah || profile.style != style {
+            return Err(Error::new(format!(
+                "render profile {} is for {} in style {}",
+                profile.profile, profile.riwayah, profile.style
+            )));
+        }
         let data = mushaf_db::load_dir(&repo.join("data"))?;
-        let table = EncodingTable::from_json(&read(repo, &profile.encoding)?)?;
+        let table = profile.encoding_table(|p| read(repo, p))?;
         let spine = data
             .spines
             .get(&profile.spine)
@@ -57,7 +98,13 @@ impl Renderer {
         if table.spine != spine.id {
             return Err(Error::new("encoding table is for another spine"));
         }
-        let basmalah = basmalah_words(spine, &table)?;
+        let sel = Selection {
+            riwayah: profile.riwayah.clone(),
+            ..Selection::default()
+        };
+        let base = resolve_profile(&data, &sel, None, Mode::Data)
+            .map_err(|e| Error::new(format!("resolve: {e:?}")))?;
+        let basmalah = basmalah_words(&base, &table)?;
         let bytes = fs::read(repo.join(&profile.font))
             .map_err(|e| Error::new(format!("{}: {e}", profile.font)))?;
         Ok(Renderer {
@@ -67,6 +114,8 @@ impl Renderer {
             outlines: Outlines::new(&bytes)?,
             font: FontData::new(bytes)?,
             basmalah,
+            base,
+            exceptions: Exceptions::from_json(&read(repo, EXCEPTIONS)?)?,
             table,
             data,
             profile,
@@ -74,18 +123,20 @@ impl Renderer {
         })
     }
 
-    /// Hafs is the spine itself: no patch files. An overlay (free edits) resolves in free mode.
+    /// Resolves through the riwāyah's profile (T5.1). An overlay (free edits) resolves in free
+    /// mode.
     pub fn resolve(&self, overlay: Option<&EditOverlay>) -> Result<Resolved, Error> {
-        let spine = &self.data.spines[&self.profile.spine];
-        let patches: Vec<_> = overlay
-            .map(|o| o.patches.iter().collect())
-            .unwrap_or_default();
+        let sel = Selection {
+            riwayah: self.profile.riwayah.clone(),
+            ..Selection::default()
+        };
         let mode = if overlay.is_some() {
             Mode::Free
         } else {
             Mode::Data
         };
-        resolve_patches(spine, &patches, mode).map_err(|e| Error::new(format!("resolve: {e:?}")))
+        resolve_profile(&self.data, &sel, overlay, mode)
+            .map_err(|e| Error::new(format!("resolve: {e:?}")))
     }
 
     pub fn map(&self, resolved: &Resolved) -> Result<Mapping, Error> {
@@ -95,7 +146,17 @@ impl Renderer {
             .layouts
             .get(&self.profile.layout_id)
             .ok_or_else(|| Error::new(format!("no layout {}", self.profile.layout_id)))?;
-        map_lines(layout, spine, resolved).map_err(|e| Error::new(e.to_string()))
+        match &layout.riwayah {
+            None => map_lines(layout, spine, resolved),
+            Some(r) if *r == self.profile.riwayah => map_lines_on(layout, &self.base, resolved),
+            Some(r) => {
+                return Err(Error::new(format!(
+                    "layout {} is for {r}, not {}",
+                    layout.layout_id, self.profile.riwayah
+                )));
+            }
+        }
+        .map_err(|e| Error::new(e.to_string()))
     }
 
     pub fn fit(&self, resolved: &Resolved, mapping: &Mapping, page: u32) -> Result<FitPage, Error> {
@@ -129,6 +190,46 @@ impl Renderer {
         let mapping = self.map(&resolved)?;
         self.draw(&self.fit(&resolved, &mapping, page)?)
     }
+}
+
+/// Fit a page and check every word against rule 6 (with the owner's exceptions).
+pub fn fit_checked(
+    r: &Renderer,
+    shaper: &mushaf_shape::Shaper,
+    resolved: &Resolved,
+    mapping: &Mapping,
+    page: u32,
+) -> Result<CheckedPage, Error> {
+    let fit = match fit_with(r, shaper, resolved, mapping, page) {
+        Ok(f) => f,
+        Err(e) if e.to_string().contains("no encoding row") => {
+            return Ok(CheckedPage {
+                fit: None,
+                blocked: Some(e.to_string()),
+                violations: Vec::new(),
+            });
+        }
+        Err(e) => return Err(e),
+    };
+    let mut violations = Vec::new();
+    for l in &fit.lines {
+        for w in &l.words {
+            for v in check_word(&r.font, shaper, &w.chars, &w.features, &w.glyphs)? {
+                if !r.exceptions.allows(&r.profile.font, &v) {
+                    let at = w
+                        .item
+                        .map(|i| resolved.items[i].id.to_string())
+                        .unwrap_or_else(|| format!("{page}:{} header", l.line));
+                    violations.push((at, v));
+                }
+            }
+        }
+    }
+    Ok(CheckedPage {
+        fit: Some(fit),
+        blocked: None,
+        violations,
+    })
 }
 
 /// Fit a page with a given shaper (whose word cache may be shared across pages, T3.6).

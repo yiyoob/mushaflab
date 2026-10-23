@@ -4,6 +4,9 @@
 //! as `data/encodings/<spine>.kfgqpc-to-<font>.json`. This module only applies it, exactly as
 //! the pipeline does: at each position the longest matching sequence row wins, else the
 //! cluster row; a cluster with no row is an error, never passed through unchanged.
+//!
+//! A font made for KFGQPC's own encoding (the KFGQPC Warsh and Qālūn fonts, D2) uses the
+//! identity table instead: every cluster is drawn exactly as stored (T5.3).
 
 use std::collections::BTreeMap;
 use std::ops::Range;
@@ -48,6 +51,30 @@ struct WireRow {
     lossy: bool,
 }
 
+/// `data/encodings/<spine>.riwayat-rows.json` (T5.3, D28): rows for cluster forms that occur only
+/// outside Ḥafṣ, each from an owner-approved group or an owner row.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ExtraWire {
+    schema: u32,
+    spine: String,
+    from: String,
+    to: String,
+    #[allow(dead_code)]
+    note: String,
+    rows: Vec<ExtraRow>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ExtraRow {
+    src: Vec<Cps>,
+    dst: Cps,
+    kind: String,
+    #[allow(dead_code)]
+    groups: Vec<String>,
+}
+
 /// sha256 over `id TAB converted cps LF` for every spine item, computed by the pipeline.
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -75,6 +102,7 @@ pub struct EncodingTable {
     clusters: BTreeMap<Vec<char>, Target>,
     sequences: BTreeMap<Vec<Vec<char>>, Target>,
     max_seq: usize,
+    identity: bool,
 }
 
 /// Which source clusters produced which characters of the converted text.
@@ -136,7 +164,56 @@ impl EncodingTable {
             clusters,
             sequences,
             max_seq,
+            identity: false,
         })
+    }
+
+    /// Adds the approved rows for the other riwāyāt (T5.3, D28). A row for a form the table
+    /// already converts is an error: these rows only cover forms Ḥafṣ does not have.
+    pub fn extend_from_json(&mut self, text: &str) -> Result<(), Error> {
+        let wire: ExtraWire = mushaf_model::from_json(text)?;
+        if wire.schema != 1
+            || wire.from != "kfgqpc"
+            || wire.to != self.to
+            || wire.spine != self.spine
+        {
+            return Err(Error::new("extra rows are for another table"));
+        }
+        for r in wire.rows {
+            let target = Target {
+                dst: r.dst.0,
+                lossy: false,
+            };
+            let src: Vec<Vec<char>> = r.src.into_iter().map(|c| c.0).collect();
+            let dup = match (r.kind.as_str(), src.len()) {
+                ("cluster" | "owner", 1) => self.clusters.insert(src[0].clone(), target).is_some(),
+                ("sequence", n) if n >= 1 => self.sequences.insert(src, target).is_some(),
+                (kind, _) => return Err(Error::new(format!("bad extra row kind {kind:?}"))),
+            };
+            if dup {
+                return Err(Error::new("an extra row repeats a row of the table"));
+            }
+        }
+        self.max_seq = self.sequences.keys().map(Vec::len).max().unwrap_or(0);
+        Ok(())
+    }
+
+    /// The table of a font that reads KFGQPC's encoding: each cluster converts to itself.
+    pub fn identity(spine: &str) -> Self {
+        EncodingTable {
+            spine: spine.into(),
+            to: "kfgqpc".into(),
+            converted_spine: Digest {
+                items: 0,
+                sha256: String::new(),
+            },
+            lossy_items: Vec::new(),
+            word_rows: BTreeMap::new(),
+            clusters: BTreeMap::new(),
+            sequences: BTreeMap::new(),
+            max_seq: 0,
+            identity: true,
+        }
     }
 
     /// Convert a spine item: its owner word row (D18) when the table lists this item with
@@ -164,6 +241,18 @@ impl EncodingTable {
             chars: Vec::new(),
             spans: Vec::new(),
         };
+        if self.identity {
+            for (i, c) in clusters.iter().enumerate() {
+                let start = out.chars.len();
+                out.chars.extend_from_slice(c);
+                out.spans.push(Span {
+                    clusters: i..i + 1,
+                    chars: start..out.chars.len(),
+                    lossy: false,
+                });
+            }
+            return Ok(out);
+        }
         let mut i = 0;
         while i < clusters.len() {
             let (n, target) = self.lookup(&clusters[i..]).ok_or_else(|| Unmapped {
@@ -260,6 +349,42 @@ mod tests {
             "another item converts cluster by cluster"
         );
         assert!(t.convert_item("1:1:1", &cl[..1]).is_ok());
+    }
+
+    #[test]
+    fn extra_rows_add_forms_but_never_replace_rows() {
+        let mut t = EncodingTable::from_json(TABLE).unwrap();
+        let extra = r#"{"schema": 1, "spine": "t/v1", "from": "kfgqpc", "to": "f", "note": "",
+          "rows": [{"src": ["U+007A"], "dst": "U+005A", "kind": "cluster", "groups": ["g"]},
+                   {"src": ["U+0031", "U+0032"], "dst": "U+0040", "kind": "sequence", "groups": ["n"]}]}"#;
+        t.extend_from_json(extra).unwrap();
+        assert_eq!(
+            conv(&t, "a z 1 2")
+                .unwrap()
+                .chars
+                .iter()
+                .collect::<String>(),
+            "aZ@"
+        );
+        let mut t = EncodingTable::from_json(TABLE).unwrap();
+        assert!(
+            t.extend_from_json(&extra.replace("U+007A", "U+0061"))
+                .is_err()
+        );
+        assert!(
+            t.extend_from_json(&extra.replace("\"t/v1\"", "\"t/v2\""))
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn the_identity_table_keeps_every_cluster_as_stored() {
+        let t = EncodingTable::identity("t/v1");
+        let c = conv(&t, "a zy q").unwrap();
+        assert_eq!(c.chars.iter().collect::<String>(), "azyq");
+        assert_eq!(c.spans[1].clusters, 1..2);
+        assert_eq!(c.spans[1].chars, 1..3);
+        assert!(c.spans.iter().all(|s| !s.lossy));
     }
 
     #[test]

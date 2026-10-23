@@ -1,0 +1,45 @@
+{
+ "note": "Per-glyph rule-6 exceptions for the KFGQPC Warsh and Qalun fonts (D27, G-100). A glyph listed here may be a mark without an anchor attachment; every other rule-6 check still applies to it. Only the owner adds a glyph.",
+ "fonts": {
+  "fonts/kfgqpc/uthmanic_warsh_v21.ttf": [
+   {
+    "glyph": 109,
+    "name": "uni06D6",
+    "date": "2026-10-22",
+    "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/kfgqpc-rule6.html: \"Exempt 3, flag damma\" - uni06D6, _.035 and up are placed as the font designs them (rule-6 exception for these glyphs only); afii57455 (a damma after U+06E8 that the font does not show) stays a listed defect (G-101)."
+   },
+   {
+    "glyph": 114,
+    "name": "up",
+    "date": "2026-10-22",
+    "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/kfgqpc-rule6.html: \"Exempt 3, flag damma\" - uni06D6, _.035 and up are placed as the font designs them (rule-6 exception for these glyphs only); afii57455 (a damma after U+06E8 that the font does not show) stays a listed defect (G-101)."
+   },
+   {
+    "glyph": 410,
+    "name": "_.035",
+    "date": "2026-10-22",
+    "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/kfgqpc-rule6.html: \"Exempt 3, flag damma\" - uni06D6, _.035 and up are placed as the font designs them (rule-6 exception for these glyphs only); afii57455 (a damma after U+06E8 that the font does not show) stays a listed defect (G-101)."
+   }
+  ],
+  "fonts/kfgqpc/uthmanic_qaloun_v21.ttf": [
+   {
+    "glyph": 109,
+    "name": "uni06D6",
+    "date": "2026-10-22",
+    "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/kfgqpc-rule6.html: \"Exempt 3, flag damma\" - uni06D6, _.035 and up are placed as the font designs them (rule-6 exception for these glyphs only); afii57455 (a damma after U+06E8 that the font does not show) stays a listed defect (G-101)."
+   },
+   {
+    "glyph": 114,
+    "name": "up",
+    "date": "2026-10-22",
+    "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/kfgqpc-rule6.html: \"Exempt 3, flag damma\" - uni06D6, _.035 and up are placed as the font designs them (rule-6 exception for these glyphs only); afii57455 (a damma after U+06E8 that the font does not show) stays a listed defect (G-101)."
+   },
+   {
+    "glyph": 410,
+    "name": "_.035",
+    "date": "2026-10-22",
+    "decision": "Owner, Phase 5 checkpoint (T5.3, 2026-10-22), on build/review/phase5/kfgqpc-rule6.html: \"Exempt 3, flag damma\" - uni06D6, _.035 and up are placed as the font designs them (rule-6 exception for these glyphs only); afii57455 (a damma after U+06E8 that the font does not show) stays a listed defect (G-101)."
+   }
+  ]
+ }
+}

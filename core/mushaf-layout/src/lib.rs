@@ -8,13 +8,20 @@
 //! anchor contributes nothing, so its line starts (or ends) at the next surviving item.
 //! Because anchors never decrease in reading order, each line holds a contiguous run of
 //! resolved items, and the runs cover all of them in order.
+//!
+//! A riwāyah's native layout (T5.2, D29) names items of that riwāyah's resolved text, inserted
+//! ones included (`map_lines_on`): an item belongs to the line of its own id in that text, or,
+//! for an item an edit overlay inserted, of the nearest id its insert chain starts from.
 
 pub mod fit;
+pub mod native;
 
 use std::fmt;
 use std::ops::Range;
 
-use mushaf_model::{Layout, LineKind, Spine};
+use std::collections::BTreeMap;
+
+use mushaf_model::{ItemRef, Layout, LineKind, Spine};
 use mushaf_resolve::{Origin, Resolved};
 use serde::Serialize;
 
@@ -64,6 +71,11 @@ pub enum LayoutError {
     OutOfOrder {
         item: String,
     },
+    /// A native layout used for another riwāyah's text, or an item whose insert chain reaches
+    /// no item of the riwāyah's text.
+    NotInStream {
+        item: String,
+    },
 }
 
 impl fmt::Display for LayoutError {
@@ -83,6 +95,9 @@ impl fmt::Display for LayoutError {
             }
             LayoutError::NotCovered => f.write_str("text lines do not cover every spine item"),
             LayoutError::OutOfOrder { item } => write!(f, "resolved item {item} is out of order"),
+            LayoutError::NotInStream { item } => {
+                write!(f, "item {item} has no anchor in the layout's riwayah text")
+            }
         }
     }
 }
@@ -132,10 +147,80 @@ pub fn map_lines(
     resolved: &Resolved,
 ) -> Result<Mapping, LayoutError> {
     let starts = line_starts(layout, spine)?;
+    assign(layout, &starts, resolved, |it| {
+        let (Origin::Spine { pos: anchor } | Origin::Inserted { anchor }) = it.origin;
+        Ok(anchor)
+    })
+}
+
+/// Line mapping on a native layout (T5.2): `base` is the riwāyah's resolved text the layout
+/// names (data mode), `resolved` the same text with any edit overlay.
+pub fn map_lines_on(
+    layout: &Layout,
+    base: &Resolved,
+    resolved: &Resolved,
+) -> Result<Mapping, LayoutError> {
+    let pos: BTreeMap<&ItemRef, usize> = base
+        .items
+        .iter()
+        .enumerate()
+        .map(|(i, it)| (&it.id, i))
+        .collect();
+    let mut starts = Vec::new();
+    let mut next = 0;
+    for (i, l) in layout.lines.iter().enumerate() {
+        let LineKind::Text { first, last } = &l.kind else {
+            continue;
+        };
+        let find = |r: &ItemRef| {
+            pos.get(r)
+                .copied()
+                .ok_or_else(|| LayoutError::UnknownAnchor {
+                    page: l.page,
+                    line: l.line,
+                    id: r.to_string(),
+                })
+        };
+        let (a, b) = (find(first)?, find(last)?);
+        if a != next || b < a {
+            return Err(LayoutError::NotContiguous {
+                page: l.page,
+                line: l.line,
+            });
+        }
+        starts.push((i, a));
+        next = b + 1;
+    }
+    if next != base.items.len() || starts.is_empty() {
+        return Err(LayoutError::NotCovered);
+    }
+    assign(layout, &starts, resolved, |it| {
+        let mut id = it.id.clone();
+        loop {
+            if let Some(&p) = pos.get(&id) {
+                return Ok(p);
+            }
+            if id.ins.pop().is_none() {
+                return Err(LayoutError::NotInStream {
+                    item: it.id.to_string(),
+                });
+            }
+        }
+    })
+}
+
+/// Assigns each resolved item to the text line holding its anchor (a position in the stream
+/// the layout's line starts index).
+fn assign(
+    layout: &Layout,
+    starts: &[(usize, usize)],
+    resolved: &Resolved,
+    anchor_of: impl Fn(&mushaf_resolve::RItem) -> Result<usize, LayoutError>,
+) -> Result<Mapping, LayoutError> {
     // the text line (index into `starts`) of each resolved item
     let mut text_line = Vec::with_capacity(resolved.items.len());
     for it in &resolved.items {
-        let (Origin::Spine { pos: anchor } | Origin::Inserted { anchor }) = it.origin;
+        let anchor = anchor_of(it)?;
         let t = starts.partition_point(|&(_, s)| s <= anchor) - 1;
         if text_line.last().is_some_and(|&prev| prev > t) {
             return Err(LayoutError::OutOfOrder {

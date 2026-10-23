@@ -178,6 +178,10 @@ fn ink(path: &[PathOp], x: i64, y: i64) -> Option<(i64, i64, i64)> {
     for op in path {
         match *op {
             PathOp::Move { x, y } | PathOp::Line { x, y } => add(x, y),
+            PathOp::Quad { x1, y1, x, y } => {
+                add(x1, y1);
+                add(x, y);
+            }
             PathOp::Cubic {
                 x1,
                 y1,

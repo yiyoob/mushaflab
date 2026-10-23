@@ -4,7 +4,8 @@
 
 The DB is a build artifact (rule 3) holding exactly the tracked data under a data root:
 spines (`spine/<name>/v<k>/`), layouts (`layouts/*.json`), patch files (`patches/**/*.yaml`),
-option groups (`options/*.yaml`) and ayah maps (`ayah_maps/*.yaml`). Rows are inserted in a
+option groups (`options/*.yaml`), ayah maps (`ayah_maps/*.yaml`) and riwayah profiles
+(`profiles/*.yaml`, T5.1). Rows are inserted in a
 fixed order into a fresh file, so the same inputs give a byte-identical DB. Spine text is
 stored as real codepoints (the app's form); patch files, option groups and ayah maps as
 canonical JSON, which the Rust core parses with the same types as the YAML files (D12).
@@ -28,13 +29,25 @@ import yaml
 from pipeline import spine
 from pipeline.codepoints import TABLE_PATH
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 DATA_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DB = DATA_ROOT.parent / "build" / "mushaf.db"
 SPINE_ID = f"hafs/v{spine.SPINE_VERSION}"
 
 # Keys whose values are not strings (every other scalar must be a string).
-INT_KEYS = frozenset({"seq", "at", "width_em_delta", "stretch", "surah", "ayah"})
+INT_KEYS = frozenset(
+    {
+        "seq",
+        "at",
+        "width_em_delta",
+        "stretch",
+        "surah",
+        "ayah",
+        "page",
+        "name_line",
+        "basmalah_line",
+    }
+)
 BOOL_KEYS = frozenset({"single_source"})
 NULL_KEYS = frozenset({"rule_id"})
 MERGE_TAG = "tag:yaml.org,2002:merge"
@@ -51,14 +64,16 @@ create table clusters (
     kind text not null, text text not null, primary key (spine_id, id));
 create table layouts (
     layout_id text primary key, script_id text not null, spine_id text not null,
-    pages integer not null, lines_per_page integer not null, sources text not null);
+    pages integer not null, lines_per_page integer not null, sources text not null,
+    riwayah text);
 create table lines (
     layout_id text not null, page integer not null, line integer not null, type text not null,
     surah integer, first_item text, last_item text, centered integer not null,
-    correction text, primary key (layout_id, page, line));
+    correction text, fit text, primary key (layout_id, page, line));
 create table patch_files (path text primary key, spine_id text not null, body text not null);
 create table option_groups (id text primary key, body text not null);
 create table ayah_maps (riwayah_id text primary key, spine_id text not null, body text not null);
+create table profiles (riwayah_id text primary key, spine_id text not null, body text not null);
 """
 
 
@@ -167,9 +182,10 @@ def build(db_path: Path = DEFAULT_DB, root: Path = DATA_ROOT) -> None:
     patch_files = [(p, load_yaml(p)) for p in yaml_files(root, "patches")]
     option_files = [(p, load_yaml(p, ascii_only=False)) for p in yaml_files(root, "options")]
     ayah_maps = [(p, load_yaml(p)) for p in yaml_files(root, "ayah_maps")]
+    profiles = [(p, load_yaml(p)) for p in yaml_files(root, "profiles")]
 
     inputs = [d / f for d in spine_dirs(root) for f in ("items.jsonl", "manifest.json")]
-    inputs += [p for p, _ in layouts + patch_files + option_files + ayah_maps]
+    inputs += [p for p, _ in layouts + patch_files + option_files + ayah_maps + profiles]
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
     tmp = db_path.with_name(db_path.name + ".tmp")
@@ -210,6 +226,15 @@ def build(db_path: Path = DEFAULT_DB, root: Path = DATA_ROOT) -> None:
             "insert into ayah_maps values (?, ?, ?)",
             (data["riwayah"], data["spine"], canonical_json(data)),
         )
+    seen = set()
+    for p, data in profiles:
+        if not isinstance(data, dict) or data.get("riwayah") in seen:
+            raise DataError(f"{p}: profile without a riwayah, or a duplicate riwayah")
+        seen.add(data["riwayah"])
+        con.execute(
+            "insert into profiles values (?, ?, ?)",
+            (data["riwayah"], data["spine"], canonical_json(data)),
+        )
     con.commit()
     con.execute("vacuum")
     con.close()
@@ -244,7 +269,7 @@ def _insert_spine(con: sqlite3.Connection, spine_id: str, manifest: dict, recs: 
 
 def _insert_layout(con: sqlite3.Connection, layout: dict) -> None:
     con.execute(
-        "insert into layouts values (?, ?, ?, ?, ?, ?)",
+        "insert into layouts values (?, ?, ?, ?, ?, ?, ?)",
         (
             layout["layout_id"],
             layout["script_id"],
@@ -252,10 +277,11 @@ def _insert_layout(con: sqlite3.Connection, layout: dict) -> None:
             layout["pages"],
             layout["lines_per_page"],
             json.dumps(layout["sources"], sort_keys=True),
+            layout.get("riwayah"),
         ),
     )
     con.executemany(
-        "insert into lines values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "insert into lines values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
             (
                 layout["layout_id"],
@@ -267,6 +293,7 @@ def _insert_layout(con: sqlite3.Connection, layout: dict) -> None:
                 ln.get("last"),
                 int(ln["centered"]),
                 ln.get("correction"),
+                ln.get("fit"),
             )
             for ln in layout["lines"]
         ],
@@ -298,14 +325,16 @@ def read_spine(db_path: Path) -> list[dict]:
     return recs
 
 
-def read_layout(db_path: Path) -> dict:
+def read_layout(db_path: Path, layout_id: str = "uthmani-1441h") -> dict:
     con = sqlite3.connect(db_path)
-    layout_id, script_id, spine_id, pages, per_page, srcs = con.execute(
-        "select layout_id, script_id, spine_id, pages, lines_per_page, sources from layouts"
+    layout_id, script_id, spine_id, pages, per_page, srcs, riwayah = con.execute(
+        "select layout_id, script_id, spine_id, pages, lines_per_page, sources, riwayah"
+        " from layouts where layout_id = ?",
+        (layout_id,),
     ).fetchone()
     lines = []
-    for page, line, kind, surah, first, last, centered, correction in con.execute(
-        "select page, line, type, surah, first_item, last_item, centered, correction"
+    for page, line, kind, surah, first, last, centered, correction, fit in con.execute(
+        "select page, line, type, surah, first_item, last_item, centered, correction, fit"
         " from lines where layout_id = ? order by page, line",
         (layout_id,),
     ):
@@ -317,17 +346,16 @@ def read_layout(db_path: Path) -> dict:
         rec["centered"] = bool(centered)
         if correction is not None:
             rec["correction"] = correction
+        if fit is not None:
+            rec["fit"] = fit
         lines.append(rec)
     con.close()
-    return {
-        "layout_id": layout_id,
-        "script_id": script_id,
-        "spine": spine_id,
-        "pages": pages,
-        "lines_per_page": per_page,
-        "sources": json.loads(srcs),
-        "lines": lines,
-    }
+    out: dict = {"layout_id": layout_id, "script_id": script_id, "spine": spine_id}
+    if riwayah is not None:
+        out["riwayah"] = riwayah
+    out |= {"pages": pages, "lines_per_page": per_page, "sources": json.loads(srcs)}
+    out["lines"] = lines
+    return out
 
 
 def main(argv: list[str]) -> int:

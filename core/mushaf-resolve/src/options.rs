@@ -5,7 +5,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use mushaf_model::{EditOverlay, OptionGroup, OwnerLevel, Patch, PatchFile, Spine};
+use mushaf_model::{DataSet, EditOverlay, OptionGroup, OwnerLevel, Patch, PatchFile, Spine};
 use serde::Serialize;
 
 use crate::{Mode, ResolveError, Resolved, resolve_patches};
@@ -128,4 +128,24 @@ pub fn resolve(
     r.choices = choices;
     r.lint = lint;
     Ok(r)
+}
+
+/// Resolves the riwāyah `sel.riwayah` through its profile (T5.1): its spine, its patch stack
+/// in order, the loaded option groups, and an optional edit overlay.
+pub fn resolve_profile(
+    ds: &DataSet,
+    sel: &Selection,
+    overlay: Option<&EditOverlay>,
+    mode: Mode,
+) -> Result<Resolved, ResolveError> {
+    let p = ds
+        .profiles
+        .get(&sel.riwayah)
+        .ok_or_else(|| ResolveError::UnknownRiwayah {
+            riwayah: sel.riwayah.clone(),
+        })?;
+    // `DataSet` validation guarantees the spine and every patch file exist.
+    let spine = &ds.spines[&p.spine];
+    let files: Vec<&PatchFile> = p.patch_stack.iter().map(|f| &ds.patch_files[f]).collect();
+    resolve(spine, &files, &ds.option_groups, sel, overlay, mode)
 }

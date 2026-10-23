@@ -17,14 +17,18 @@ from pathlib import Path
 
 from pipeline import (
     align,
+    ayah_lines,
     ayah_maps,
     codepoints,
     compile_db,
+    dk_riwayat,
     drift,
     emit_patches,
     ingest_layout,
     ingest_riwayah,
     phase4_report,
+    phase5_readme,
+    profiles,
     sources,
     spine,
 )
@@ -157,9 +161,23 @@ def check_db() -> list[str]:
     return out
 
 
+def check_phase5_files_current() -> list[str]:
+    out = []
+    if profiles.main(["", "check"]) != 0:
+        out.append("data/profiles differ from a rebuild")
+    if ayah_lines.main(["", "check"]) != 0:
+        out.append("data/layout_inputs differ from a rebuild")
+    if dk_riwayat.main(["", "check"]) != 0:
+        out.append("riwayat encoding candidates or rows differ from a rebuild")
+    if phase5_readme.main(["", "check"]) != 0:
+        out.append("docs/review/phase5/README.md differs from a rebuild")
+    return out
+
+
 CHECKS: dict[str, Callable[[], list[str]]] = {
     "sources": check_sources,
     "tracked files current": check_tracked_files_current,
+    "phase 5 files current": check_phase5_files_current,
     "lines per page": check_lines_per_page,
     "every item once, in order": check_every_item_once_in_order,
     "line types": check_line_types,

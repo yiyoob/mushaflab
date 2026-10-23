@@ -8,15 +8,22 @@ use serde::Deserialize;
 use serde::de::DeserializeOwned;
 
 use crate::{
-    AyahMap, Cluster, Cps, Error, Item, ItemKind, Layout, Line, OptionGroup, PatchFile, Spine,
-    from_json, from_yaml,
+    AyahMap, Cluster, Cps, Error, Item, ItemKind, Layout, Line, OptionGroup, PatchFile,
+    RiwayahProfile, Spine, from_json, from_yaml,
 };
 
 /// File contents by path relative to the data root, with `/` separators.
 pub type DataFiles = BTreeMap<String, String>;
 
 /// The top-level directories of a data root that hold loadable data.
-pub const DATA_DIRS: [&str; 5] = ["spine", "layouts", "patches", "options", "ayah_maps"];
+pub const DATA_DIRS: [&str; 6] = [
+    "spine",
+    "layouts",
+    "patches",
+    "options",
+    "ayah_maps",
+    "profiles",
+];
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct DataSet {
@@ -30,6 +37,8 @@ pub struct DataSet {
     pub option_groups: BTreeMap<String, OptionGroup>,
     /// By riwayah id.
     pub ayah_maps: BTreeMap<String, AyahMap>,
+    /// Riwāyah profiles (T5.1), by riwayah id.
+    pub profiles: BTreeMap<String, RiwayahProfile>,
 }
 
 /// What a file under the data root is, or `None` if the loader does not read it.
@@ -41,6 +50,7 @@ pub enum Input {
     PatchFile,
     OptionFile,
     AyahMap,
+    Profile,
 }
 
 /// Classifies a root-relative path. `.gitkeep` and layout correction inputs (read by the
@@ -59,6 +69,7 @@ pub fn classify(path: &str) -> Result<Option<Input>, Error> {
         ["patches", .., f] if f.ends_with(".yaml") => Some(Input::PatchFile),
         ["options", f] if f.ends_with(".yaml") => Some(Input::OptionFile),
         ["ayah_maps", f] if f.ends_with(".yaml") => Some(Input::AyahMap),
+        ["profiles", f] if f.ends_with(".yaml") => Some(Input::Profile),
         _ => None,
     };
     input
@@ -188,6 +199,14 @@ impl DataSet {
                     let m: AyahMap = from_yaml(text).map_err(at)?;
                     insert_unique(&mut ds.ayah_maps, m.riwayah.clone(), m, "ayah map")?;
                 }
+                Some(Input::Profile) => {
+                    ascii(path, text)?;
+                    let p: RiwayahProfile = from_yaml(text).map_err(at)?;
+                    if *path != format!("profiles/{}.yaml", p.riwayah) {
+                        return Err(Error::new(format!("{path}: file name is not its riwayah")));
+                    }
+                    insert_unique(&mut ds.profiles, p.riwayah.clone(), p, "profile")?;
+                }
             }
         }
         for (id, parts) in spine_parts {
@@ -264,6 +283,7 @@ impl DataSet {
                 l.last.as_deref(),
                 l.centered,
                 l.correction,
+                l.fit.as_deref(),
             )?;
             lines.entry(l.layout_id).or_default().push(line);
         }
@@ -274,6 +294,7 @@ impl DataSet {
                 layout_id: l.layout_id.clone(),
                 script_id: l.script_id,
                 spine: l.spine_id,
+                riwayah: l.riwayah,
                 pages: l.pages,
                 lines_per_page: l.lines_per_page,
                 sources: from_json(&l.sources)?,
@@ -315,12 +336,22 @@ impl DataSet {
             }
             ds.ayah_maps.insert(b.key, m);
         }
+        for b in rows.profiles {
+            let p: RiwayahProfile = from_json(&b.body)?;
+            if p.riwayah != b.key || p.spine != b.spine_id {
+                return Err(Error::new(format!(
+                    "DB profile {}: columns disagree with body",
+                    b.key
+                )));
+            }
+            ds.profiles.insert(b.key, p);
+        }
         ds.validate()?;
         Ok(ds)
     }
 
-    /// Cross-references: every layout, patch file and ayah map names a loaded spine, and
-    /// every layout is ordered.
+    /// Cross-references: every layout, patch file, ayah map and profile names a loaded spine,
+    /// every layout is ordered, and a profile's patch files and ayah map exist on its spine.
     fn validate(&self) -> Result<(), Error> {
         let known = |s: &str, what: &str| {
             if self.spines.contains_key(s) {
@@ -338,6 +369,25 @@ impl DataSet {
         }
         for m in self.ayah_maps.values() {
             known(&m.spine, &format!("ayah map {}", m.riwayah))?;
+        }
+        for p in self.profiles.values() {
+            let what = format!("profile {}", p.riwayah);
+            known(&p.spine, &what)?;
+            for path in &p.patch_stack {
+                match self.patch_files.get(path) {
+                    Some(f) if f.spine == p.spine => {}
+                    Some(_) => {
+                        return Err(Error::new(format!("{what}: {path} is on another spine")));
+                    }
+                    None => return Err(Error::new(format!("{what}: no patch file {path}"))),
+                }
+            }
+            if let Some(m) = &p.ayah_map {
+                match self.ayah_maps.get(m) {
+                    Some(a) if a.spine == p.spine && a.riwayah == p.riwayah => {}
+                    _ => return Err(Error::new(format!("{what}: no ayah map {m} for it"))),
+                }
+            }
         }
         Ok(())
     }
@@ -359,6 +409,7 @@ pub struct DbRows {
     pub patch_files: Vec<BodyRow>,
     pub option_groups: Vec<BodyRow>,
     pub ayah_maps: Vec<BodyRow>,
+    pub profiles: Vec<BodyRow>,
 }
 
 #[derive(Clone, Debug)]
@@ -396,6 +447,7 @@ pub struct LayoutRow {
     pub pages: u32,
     pub lines_per_page: u32,
     pub sources: String,
+    pub riwayah: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -409,6 +461,7 @@ pub struct LineRow {
     pub last: Option<String>,
     pub centered: bool,
     pub correction: Option<String>,
+    pub fit: Option<String>,
 }
 
 /// A row holding canonical JSON: `key` is the path (patch files), group id or riwayah id.
@@ -441,6 +494,7 @@ mod tests {
             fixture!("patches/curated/q1.yaml"),
             fixture!("options/test.yaml"),
             fixture!("ayah_maps/r1.yaml"),
+            fixture!("profiles/r1.yaml"),
         ]
         .into_iter()
         .collect()
@@ -457,12 +511,25 @@ mod tests {
             ["test.other", "test.toggle"]
         );
         assert_eq!(ds.ayah_maps["r1"].entries.len(), 4);
+        assert_eq!(ds.profiles["r1"].patch_stack.len(), 2);
     }
 
     #[test]
     fn rejects_bad_roots() {
         type Change = (&'static str, fn(&mut DataFiles));
-        let cases: [Change; 6] = [
+        let cases: [Change; 9] = [
+            ("profile names a missing patch file", |f| {
+                let p = f.get_mut("profiles/r1.yaml").unwrap();
+                *p = p.replace("patches/raw/r1.yaml", "patches/raw/r2.yaml");
+            }),
+            ("profile names a missing ayah map", |f| {
+                let p = f.get_mut("profiles/r1.yaml").unwrap();
+                *p = p.replace("ayah_map: \"r1\"", "ayah_map: \"r2\"");
+            }),
+            ("profile file name differs from its riwayah", |f| {
+                let p = f.remove("profiles/r1.yaml").unwrap();
+                f.insert("profiles/r2.yaml".into(), p);
+            }),
             ("unexpected file", |f| {
                 f.insert("patches/raw/notes.txt".into(), String::new());
             }),

@@ -14,7 +14,7 @@ use mushaf_model::{
 use rusqlite::{Connection, OpenFlags, Row};
 use sha2::{Digest, Sha256};
 
-pub const SCHEMA_VERSION: &str = "2";
+pub const SCHEMA_VERSION: &str = "3";
 
 fn io(path: &Path, e: impl std::fmt::Display) -> Error {
     Error::new(format!("{}: {e}", path.display()))
@@ -135,8 +135,8 @@ pub fn load_db(db: &Path) -> Result<DataSet, Error> {
         )?,
         layouts: query(
             &con,
-            "select layout_id, script_id, spine_id, pages, lines_per_page, sources from layouts \
-             order by layout_id",
+            "select layout_id, script_id, spine_id, pages, lines_per_page, sources, riwayah \
+             from layouts order by layout_id",
             |r| {
                 Ok(LayoutRow {
                     layout_id: r.get(0)?,
@@ -145,13 +145,14 @@ pub fn load_db(db: &Path) -> Result<DataSet, Error> {
                     pages: r.get(3)?,
                     lines_per_page: r.get(4)?,
                     sources: r.get(5)?,
+                    riwayah: r.get(6)?,
                 })
             },
         )?,
         lines: query(
             &con,
-            "select layout_id, page, line, type, surah, first_item, last_item, centered, correction \
-             from lines order by layout_id, page, line",
+            "select layout_id, page, line, type, surah, first_item, last_item, centered, correction, \
+             fit from lines order by layout_id, page, line",
             |r| {
                 Ok(LineRow {
                     layout_id: r.get(0)?,
@@ -163,6 +164,7 @@ pub fn load_db(db: &Path) -> Result<DataSet, Error> {
                     last: r.get(6)?,
                     centered: r.get::<_, i64>(7)? != 0,
                     correction: r.get(8)?,
+                    fit: r.get(9)?,
                 })
             },
         )?,
@@ -191,6 +193,17 @@ pub fn load_db(db: &Path) -> Result<DataSet, Error> {
         ayah_maps: query(
             &con,
             "select riwayah_id, spine_id, body from ayah_maps order by riwayah_id",
+            |r| {
+                Ok(BodyRow {
+                    key: r.get(0)?,
+                    spine_id: r.get(1)?,
+                    body: r.get(2)?,
+                })
+            },
+        )?,
+        profiles: query(
+            &con,
+            "select riwayah_id, spine_id, body from profiles order by riwayah_id",
             |r| {
                 Ok(BodyRow {
                     key: r.get(0)?,

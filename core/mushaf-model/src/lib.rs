@@ -16,6 +16,7 @@ mod layout;
 mod options;
 mod overlay;
 mod patch;
+mod profile;
 mod spine;
 
 pub use ayah_map::{AyahMap, AyahMapEntry};
@@ -25,13 +26,14 @@ pub use dataset::{
     SpineRow, classify,
 };
 pub use ids::{ClusterRef, ItemRef, MarkRef, Ref};
-pub use layout::{Layout, Line, LineKind};
+pub use layout::{FitTag, Layout, Line, LineKind};
 pub use options::{OptionDefault, OptionGroup};
 pub use overlay::EditOverlay;
 pub use patch::{
     AttrChange, AttrName, DifferenceKind, Layer, MarkAdd, MarkAt, NewCluster, NewItem, NewNode, Op,
     Owner, OwnerLevel, Patch, PatchFile, Side, Source, Status, When,
 };
+pub use profile::{RiwayahProfile, SurahHeader};
 pub use spine::{Attrs, Cluster, ClusterKind, Item, ItemKind, Spine};
 
 /// A model error: malformed data or a broken invariant, with a readable message.

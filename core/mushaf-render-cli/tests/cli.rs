@@ -25,7 +25,47 @@ fn pages_render_to_svg_that_parses_and_to_png() {
 }
 
 #[test]
-fn riwayat_without_a_profile_are_refused_with_a_reason() {
-    let err = Renderer::load(&repo(), "warsh").err().unwrap();
-    assert!(err.to_string().contains("Phase 5"));
+fn an_unknown_riwayah_is_refused_with_a_reason() {
+    let err = Renderer::load(&repo(), "nope").err().unwrap();
+    assert!(err.to_string().contains("unknown riwayah"));
+}
+
+/// T5.2: a riwāyah on its native layout, in its own KFGQPC font (D27, D29).
+#[test]
+fn warsh_renders_on_its_native_layout() {
+    let r = Renderer::load(&repo(), "warsh").unwrap();
+    let d = r.render(1, None).unwrap();
+    assert_eq!(d.layout_id, "uthmani-warsh-kfgqpc");
+    assert!(d.canonical);
+    assert_eq!(&png(&svg(&d), 300).unwrap()[1..4], b"PNG");
+}
+
+/// D36: render profiles are keyed by (riwāyah, style). Phase 5 renders each riwāyah's default
+/// style only (Maghribi for Warsh and Qālūn, Ḥijāzī for the rest); any other style is refused
+/// with a reason until Phase 6 builds it.
+#[test]
+fn render_profiles_are_keyed_by_riwayah_and_style() {
+    use mushaf_render::{default_style, profile_path};
+    for (r, style) in [
+        ("hafs", "hijazi"),
+        ("shuba", "hijazi"),
+        ("warsh", "maghribi"),
+        ("qalun", "maghribi"),
+        ("bazzi", "hijazi"),
+        ("qunbul", "hijazi"),
+        ("duri_abuamr", "hijazi"),
+        ("susi", "hijazi"),
+    ] {
+        assert_eq!(default_style(r).unwrap(), style);
+        let p = mushaf_layout::fit::Profile::from_json(
+            &std::fs::read_to_string(repo().join(profile_path(r, style).unwrap())).unwrap(),
+        )
+        .unwrap();
+        assert_eq!((p.riwayah.as_str(), p.style.as_str()), (r, style));
+    }
+    let err = Renderer::load_style(&repo(), "hafs", "maghribi")
+        .err()
+        .unwrap();
+    assert!(err.to_string().contains("D36"), "{err}");
+    assert!(Renderer::load_style(&repo(), "warsh", "hijazi").is_err());
 }

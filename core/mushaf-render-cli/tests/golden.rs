@@ -236,6 +236,9 @@ fn g015_pause_signs_after_small_meem_sit_over_their_letter() {
                     .flat_map(|op| match *op {
                         mushaf_draw::PathOp::Move { x, .. }
                         | mushaf_draw::PathOp::Line { x, .. } => vec![i64::from(x)],
+                        mushaf_draw::PathOp::Quad { x1, x, .. } => {
+                            vec![i64::from(x1), i64::from(x)]
+                        }
                         mushaf_draw::PathOp::Cubic { x1, x2, x, .. } => {
                             vec![i64::from(x1), i64::from(x2), i64::from(x)]
                         }
@@ -542,4 +545,448 @@ fn adjacent_lines_never_collide_at_the_profile_pitch() {
             .any(|p| p.upper == 14 && p.lower == 15 && p.collides),
         "the detector misses a known collision"
     );
+}
+
+/// Fonts of the riwāyāt that draw KFGQPC's encoding as stored (D2): the KFGQPC Warsh and Qālūn
+/// fonts, official v2.1. Their render profiles (T5.2) name the same files.
+const KFGQPC_FONTS: [(&str, &str); 2] = [
+    ("warsh", "fonts/kfgqpc/uthmanic_warsh_v21.ttf"),
+    ("qalun", "fonts/kfgqpc/uthmanic_qaloun_v21.ttf"),
+];
+const KFGQPC_PENDING: &str = "tests/golden/shape/kfgqpc-rule6-pending.json";
+
+/// T5.3, rule 6 for Warsh and Qālūn: every resolved item of the riwāyah, shaped alone in its
+/// KFGQPC font (as stored, identity encoding), has no `.notdef`, no inserted dotted circle, a
+/// valid cluster map and every mark attached. The font leaves a few marks unanchored; they are
+/// pinned in `KFGQPC_PENDING` until the owner decides on them (G-101), and any other
+/// violation fails.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn kfgqpc_riwayat_words_pass_rule_6() {
+    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let exceptions = mushaf_shape::Exceptions::from_json(
+        &fs::read_to_string(repo().join("data/render/kfgqpc-rule6-exceptions.json")).unwrap(),
+    )
+    .unwrap();
+    let mut found = Vec::new();
+    for (riwayah, font_path) in KFGQPC_FONTS {
+        let font = mushaf_shape::FontData::new(fs::read(repo().join(font_path)).unwrap()).unwrap();
+        let shaper = font.shaper();
+        let sel = mushaf_resolve::Selection {
+            riwayah: riwayah.into(),
+            ..Default::default()
+        };
+        let resolved =
+            mushaf_resolve::resolve_profile(&ds, &sel, None, mushaf_resolve::Mode::Data).unwrap();
+        let table = mushaf_shape::EncodingTable::identity(&ds.profiles[riwayah].spine);
+        for it in &resolved.items {
+            let cl: Vec<&[char]> = it.clusters.iter().map(|c| c.cps.0.as_slice()).collect();
+            let chars = table.convert(&cl).unwrap().chars;
+            let glyphs = shaper.shape(&chars, &[]).unwrap();
+            for v in check_word(&font, &shaper, &chars, &[], &glyphs).unwrap() {
+                if !exceptions.allows(font_path, &v) {
+                    found.push(format!("{riwayah} {}: {v:?}", it.id));
+                }
+            }
+        }
+    }
+    let path = repo().join(KFGQPC_PENDING);
+    if std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some() {
+        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        fs::write(&path, serde_json::to_string_pretty(&found).unwrap() + "\n").unwrap();
+        return;
+    }
+    let pending: Vec<String> = serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+    assert_eq!(
+        found, pending,
+        "rule-6 findings for the KFGQPC fonts differ from the pinned list awaiting the owner"
+    );
+    assert!(
+        found.iter().all(|f| f.contains("UnattachedMark")),
+        "only unattached marks may be pending"
+    );
+}
+
+/// Riwāyāt drawn with DigitalKhatt Madina besides Ḥafṣ (D2).
+const DK_RIWAYAT: [&str; 5] = ["shuba", "bazzi", "qunbul", "duri_abuamr", "susi"];
+const DK_PENDING: &str = "tests/golden/shape/dk-riwayat-rule6-pending.json";
+
+/// T5.3, rule 6 for Shuʿbah, Bazzi, Qunbul, al-Dūrī and al-Sūsī: every resolved item converts
+/// with the Ḥafṣ table plus the owner-approved rows (`hafs-v1.riwayat-rows.json`, D28) and,
+/// shaped in DigitalKhatt Madina, passes every check. Two kinds of item are pinned in
+/// `DK_PENDING` and listed as blocked: a cluster form whose group the owner has not decided yet
+/// cannot convert (G-102), and a few words leave a mark unattached in a context Ḥafṣ never has
+/// (G-103). Any other failure fails.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn dk_riwayat_words_pass_rule_6() {
+    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let r = Renderer::load(&repo(), "hafs").unwrap();
+    let mut table = r.table.clone();
+    table
+        .extend_from_json(
+            &fs::read_to_string(repo().join("data/encodings/hafs-v1.riwayat-rows.json")).unwrap(),
+        )
+        .unwrap();
+    let shaper = r.font.shaper();
+    let mut found = Vec::new();
+    for riwayah in DK_RIWAYAT {
+        let sel = mushaf_resolve::Selection {
+            riwayah: riwayah.into(),
+            ..Default::default()
+        };
+        let resolved =
+            mushaf_resolve::resolve_profile(&ds, &sel, None, mushaf_resolve::Mode::Data).unwrap();
+        for it in &resolved.items {
+            let cl: Vec<&[char]> = it.clusters.iter().map(|c| c.cps.0.as_slice()).collect();
+            let chars = match table.convert_item(&it.id.to_string(), &cl) {
+                Ok(c) => c.chars,
+                Err(u) => {
+                    found.push(format!("{riwayah} {}: no row for {}", it.id, u.cps));
+                    continue;
+                }
+            };
+            let glyphs = shaper.shape(&chars, &[]).unwrap();
+            for v in check_word(&r.font, &shaper, &chars, &[], &glyphs).unwrap() {
+                found.push(format!("{riwayah} {}: {v:?}", it.id));
+            }
+        }
+    }
+    let path = repo().join(DK_PENDING);
+    if std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some() {
+        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        fs::write(&path, serde_json::to_string_pretty(&found).unwrap() + "\n").unwrap();
+        return;
+    }
+    let pending: Vec<String> = serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+    assert_eq!(
+        found, pending,
+        "DigitalKhatt riwayat: rule-6 findings differ from the pinned list awaiting the owner"
+    );
+    assert!(
+        found
+            .iter()
+            .all(|f| f.contains("no row for") || f.contains("UnattachedMark")),
+        "only unconvertible forms and unattached marks may be pending"
+    );
+}
+
+/// The seven riwāyāt on their native layouts (T5.2).
+const NATIVE: [&str; 7] = [
+    "shuba",
+    "warsh",
+    "qalun",
+    "bazzi",
+    "qunbul",
+    "duri_abuamr",
+    "susi",
+];
+/// DigitalKhatt Madina's spacing upright alef that `rclt` puts after a non-joining letter
+/// (G-045): `glyph00103`.
+const G045_GLYPH: u32 = 103;
+
+/// Pinned rule-6 findings for one riwāyah: (item, is "no row") from both pending lists.
+fn pinned(riwayah: &str) -> Vec<(String, bool)> {
+    let mut out = Vec::new();
+    for f in [KFGQPC_PENDING, DK_PENDING] {
+        let list: Vec<String> =
+            serde_json::from_str(&fs::read_to_string(repo().join(f)).unwrap()).unwrap();
+        for e in list {
+            let (r, rest) = e.split_once(' ').unwrap();
+            if r == riwayah {
+                let (item, what) = rest.split_once(": ").unwrap();
+                out.push((item.to_string(), what.starts_with("no row for")));
+            }
+        }
+    }
+    out
+}
+
+fn pct(v: &[i64], p: usize) -> i64 {
+    v[(v.len() - 1) * p / 100]
+}
+
+/// T5.2 (D29, D31), every page of every riwāyah on its native layout: a page whose words cannot
+/// all be converted yet is blocked, exactly the pages holding a G-102 form; every other page
+/// passes rule 6 except the pinned words (G-101, G-103), its text lines close within 0.1%, and
+/// no ink of adjacent lines touches at the profile's pitch. The overflow report per riwāyah
+/// (`docs/review/phase5/overflow-<r>.md`) must equal what the pages give.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn native_layouts_pass_rule_6_close_and_never_collide() {
+    use mushaf_render::collide::line_pairs;
+    use mushaf_render::fit_checked;
+    for riwayah in NATIVE {
+        let r = Renderer::load(&repo(), riwayah).unwrap();
+        let resolved = r.resolve(None).unwrap();
+        let mapping = r.map(&resolved).unwrap();
+        let shaper = r.font.shaper();
+        let space = mushaf_justify::space_width(&shaper).unwrap();
+        let mut page_of = std::collections::BTreeMap::new();
+        for l in &mapping.lines {
+            for it in &resolved.items[l.items.clone()] {
+                page_of.insert(it.id.to_string(), l.page);
+            }
+        }
+        let pins = pinned(riwayah);
+        let want_blocked: BTreeSet<u32> = pins
+            .iter()
+            .filter(|(_, no_row)| *no_row)
+            .map(|(i, _)| page_of[i])
+            .collect();
+        let want_flagged: BTreeSet<String> = pins
+            .iter()
+            .filter(|(i, no_row)| !no_row && !want_blocked.contains(&page_of[i]))
+            .map(|(i, _)| i.clone())
+            .collect();
+        let (mut blocked, mut flagged) = (BTreeSet::new(), BTreeSet::new());
+        let (mut misfit, mut hits) = (Vec::new(), Vec::new());
+        let (mut scaled, mut floor, mut squeezed) = (Vec::new(), Vec::new(), Vec::new());
+        let (mut widest, mut g045, mut lines) = (Vec::new(), 0usize, 0usize);
+        let mut flag_pages = std::collections::BTreeMap::<u32, Vec<String>>::new();
+        for page in 1..=604 {
+            let cp = fit_checked(&r, &shaper, &resolved, &mapping, page).unwrap();
+            let Some(fit) = cp.fit else {
+                blocked.insert(page);
+                continue;
+            };
+            for (item, v) in &cp.violations {
+                assert!(
+                    matches!(v, mushaf_shape::Violation::UnattachedMark { .. }),
+                    "{riwayah} {item}: {v:?}"
+                );
+                flagged.insert(item.clone());
+                flag_pages.entry(page).or_default().push(item.clone());
+            }
+            for n in &fit.notes {
+                match n {
+                    FitNote::PageScaled { scale } => scaled.push((page, *scale)),
+                    FitNote::PageScaleAtFloor { .. } => floor.push(page),
+                    FitNote::Squeezed { line, x_scale } => squeezed.push((page, *line, *x_scale)),
+                    _ => {}
+                }
+            }
+            for l in &fit.lines {
+                if l.kind == FitKind::Text && l.width > 0 {
+                    lines += 1;
+                    if let Some(w) = l.spaces.iter().max() {
+                        widest.push(w * 1000 / space);
+                    }
+                }
+                for w in &l.words {
+                    g045 += w.glyphs.iter().filter(|g| g.glyph == G045_GLYPH).count();
+                }
+            }
+            let d = r.draw(&fit).unwrap();
+            for (line, drawn, want) in line_fit(&d) {
+                if (drawn - want).abs() * 1000 > want {
+                    misfit.push(format!("{page}:{line} drawn {drawn} vs {want}"));
+                }
+            }
+            hits.extend(
+                line_pairs(&d, r.profile.geometry.line_pitch)
+                    .into_iter()
+                    .filter(|p| p.collides)
+                    .map(|p| (page, p.upper, p.lower)),
+            );
+        }
+        assert_eq!(blocked, want_blocked, "{riwayah}: blocked pages (G-102)");
+        assert_eq!(
+            flagged, want_flagged,
+            "{riwayah}: rule-6 findings (G-101, G-103)"
+        );
+        assert!(
+            misfit.is_empty(),
+            "{riwayah}: lines outside 0.1%: {misfit:?}"
+        );
+        assert!(hits.is_empty(), "{riwayah}: colliding lines: {hits:?}");
+        widest.sort_unstable();
+        let mut md = format!(
+            "# Overflow report: {riwayah} (T5.2, D31)\n\nGenerated by `just golden` \
+             (`MUSHAF_UPDATE_GOLDEN=1` rewrites it) from every page of `{}` drawn with `{}`. \
+             Overflow policy (D15, extended per riwayah): one font scale per page (floor {}), \
+             then simple spaces tighten to {}%, then a horizontal squeeze; each step is \
+             listed. Justification: {}.\n\n",
+            r.profile.layout_id,
+            r.profile.font,
+            fmt_milli(r.profile.geometry.page_scale_floor),
+            r.profile.justify.min_space / 10,
+            if r.profile.justify.letters {
+                "letter stretching (DigitalKhatt features), then spaces"
+            } else {
+                "spaces only (D27)"
+            }
+        );
+        md += &format!(
+            "| | |\n|---|---|\n| Text lines drawn | {lines} |\n| Pages blocked (G-102) | {} |\n\
+             | Pages scaled below 1 | {} |\n| Pages at the scale floor | {} |\n| Squeezed lines | {} |\n\
+             | Widest space per line, median / p95 / max (x normal) | {} / {} / {} |\n\
+             | Spacing upright alef after a non-joining letter (G-045) | {} |\n\n",
+            blocked.len(),
+            scaled.len(),
+            floor.len(),
+            squeezed.len(),
+            fmt_milli(pct(&widest, 50)),
+            fmt_milli(pct(&widest, 95)),
+            fmt_milli(pct(&widest, 100)),
+            if r.profile.justify.letters {
+                g045.to_string()
+            } else {
+                "n/a (KFGQPC font)".into()
+            }
+        );
+        md += "## Blocked pages (G-102: a word has no DigitalKhatt row yet)\n\n";
+        md += &list_or_none(blocked.iter().map(u32::to_string));
+        md += "\n## Pages with pinned rule-6 findings (G-101, G-103)\n\n";
+        md += &list_or_none(
+            flag_pages
+                .iter()
+                .map(|(p, items)| format!("{p} ({})", items.join(", "))),
+        );
+        md += "\n## Pages at the scale floor\n\n";
+        md += &list_or_none(floor.iter().map(u32::to_string));
+        md += "\n## Squeezed lines\n\n";
+        md += &list_or_none(
+            squeezed
+                .iter()
+                .map(|(p, l, x)| format!("{p}:{l} ({})", fmt_ratio(*x))),
+        );
+        let path = repo().join(format!("docs/review/phase5/overflow-{riwayah}.md"));
+        if std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some() {
+            fs::write(&path, &md).unwrap();
+        } else {
+            let want = fs::read_to_string(&path).unwrap_or_default();
+            assert_eq!(md, want, "{riwayah}: overflow report differs from {path:?}");
+        }
+        eprintln!(
+            "{riwayah}: {lines} lines, {} blocked pages, {} squeezed, G-045 {g045}",
+            blocked.len(),
+            squeezed.len()
+        );
+    }
+}
+
+/// 16.16 as a decimal with three places.
+fn fmt_ratio(v: i64) -> String {
+    let m = v * 1000 / mushaf_justify::SCALE_ONE;
+    format!("{}.{:03}", m / 1000, m % 1000)
+}
+
+fn fmt_milli(v: i64) -> String {
+    format!("{}.{:02}", v / 1000, (v % 1000) / 10)
+}
+
+fn list_or_none(items: impl Iterator<Item = String>) -> String {
+    let v: Vec<String> = items.collect();
+    if v.is_empty() {
+        "None.\n".into()
+    } else {
+        v.join(", ") + "\n"
+    }
+}
+
+/// T5.4: where each riwāyah's golden pages come from. Cases named by the plan (3:133, 2:10,
+/// 2:184, the numbering of al-Fātiḥah) are located through the alignment with the Ḥafṣ spine: the
+/// page holding the first item of the riwāyah's text at or after that Ḥafṣ ayah's first word.
+/// What these pages show about the readings is a **hypothesis** (G-074): the goldens pin what the
+/// KFGQPC data render, never a claim about the qirāʾah.
+const NATIVE_CASES: [(&str, (u32, u32)); 4] = [
+    ("fatiha", (1, 1)),
+    ("2:10", (2, 10)),
+    ("2:184", (2, 184)),
+    ("3:133", (3, 133)),
+];
+/// A page-crossing ayah that every non-Ḥafṣ riwāyah has (4:44, ingest report T4.1): the page it
+/// starts on.
+const CROSSING: (u32, u32) = (4, 44);
+const NATIVE_PAGES: &str = "tests/golden/pages/native-pages.json";
+
+fn golden_page_choice(
+    r: &Renderer,
+    resolved: &mushaf_resolve::Resolved,
+    mapping: &mushaf_layout::Mapping,
+) -> Vec<(String, u32)> {
+    let spine = &r.data.spines[&r.profile.spine];
+    let page_of_spine_ayah = |(s, a): (u32, u32)| -> u32 {
+        let first = mushaf_model::ItemRef::spine(s, a, 1);
+        let pos = spine.position(&first).unwrap();
+        let k = resolved
+            .items
+            .iter()
+            .position(|it| {
+                let (mushaf_resolve::Origin::Spine { pos: p }
+                | mushaf_resolve::Origin::Inserted { anchor: p }) = it.origin;
+                p >= pos
+            })
+            .unwrap();
+        mapping
+            .lines
+            .iter()
+            .find(|l| l.items.contains(&k))
+            .unwrap()
+            .page
+    };
+    let mut out: Vec<(String, u32)> = NATIVE_CASES
+        .iter()
+        .map(|(name, key)| (name.to_string(), page_of_spine_ayah(*key)))
+        .collect();
+    out.push(("crossing 4:44".into(), page_of_spine_ayah(CROSSING)));
+    out
+}
+
+/// T5.4: golden pages per riwāyah. The page list itself is pinned in `NATIVE_PAGES` (so a change
+/// in layout or alignment shows), and every page in it is pinned like Ḥafṣ's goldens: the draw
+/// list's hash and its line fit, plus the PNG within a pixel tolerance. A page that cannot be
+/// drawn yet (G-102) is pinned as blocked.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn native_golden_pages() {
+    use mushaf_render::fit_checked;
+    let update = std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some();
+    let mut chosen = serde_json::Map::new();
+    for riwayah in NATIVE {
+        let r = Renderer::load(&repo(), riwayah).unwrap();
+        let resolved = r.resolve(None).unwrap();
+        let mapping = r.map(&resolved).unwrap();
+        let shaper = r.font.shaper();
+        let pages = golden_page_choice(&r, &resolved, &mapping);
+        chosen.insert(riwayah.into(), serde_json::json!(pages));
+        let mut done = BTreeSet::new();
+        for (_, page) in pages {
+            if !done.insert(page) {
+                continue;
+            }
+            let name = format!("{riwayah}-p{page:03}");
+            let cp = fit_checked(&r, &shaper, &resolved, &mapping, page).unwrap();
+            match cp.fit {
+                Some(fit) => check_golden(&name, &r.draw(&fit).unwrap()),
+                None => {
+                    let json = serde_json::to_string_pretty(&serde_json::json!({
+                        "page": page,
+                        "riwayah": riwayah,
+                        "blocked": cp.blocked,
+                    }))
+                    .unwrap()
+                        + "\n";
+                    let path = repo().join(format!("tests/golden/pages/{name}.json"));
+                    if update {
+                        fs::write(&path, json).unwrap();
+                    } else {
+                        assert_eq!(json, fs::read_to_string(&path).unwrap(), "{name}");
+                    }
+                }
+            }
+        }
+    }
+    let text = serde_json::to_string_pretty(&chosen).unwrap() + "\n";
+    let path = repo().join(NATIVE_PAGES);
+    if update {
+        fs::write(&path, text).unwrap();
+    } else {
+        assert_eq!(
+            text,
+            fs::read_to_string(&path).unwrap(),
+            "golden page list changed"
+        );
+    }
 }

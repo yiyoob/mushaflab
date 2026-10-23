@@ -29,11 +29,11 @@ fn font_bytes() -> Vec<u8> {
     fs::read(repo().join("fonts/digitalkhatt/hb-madina.otf")).unwrap()
 }
 
-#[test]
-fn outlines_match_an_independent_reader() {
-    let golden: Value =
-        serde_json::from_str(&read("tests/golden/draw/outline-sample.json")).unwrap();
-    let outlines = Outlines::new(&font_bytes()).unwrap();
+/// Compares the core's outlines with a fontTools fixture, point by point, within `tolerance`
+/// (in 1/64 unit).
+fn check_outlines(font: &str, fixture: &str, tolerance: i64) {
+    let golden: Value = serde_json::from_str(&read(fixture)).unwrap();
+    let outlines = Outlines::new(&fs::read(repo().join(font)).unwrap()).unwrap();
     assert_eq!(outlines.len() as u64, golden["glyphs"].as_u64().unwrap());
     let mut worst = 0i64;
     for case in golden["cases"].as_array().unwrap() {
@@ -45,6 +45,9 @@ fn outlines_match_an_independent_reader() {
             .map(|op| match *op {
                 PathOp::Move { x, y } => ("moveTo", vec![(x.into(), y.into())]),
                 PathOp::Line { x, y } => ("lineTo", vec![(x.into(), y.into())]),
+                PathOp::Quad { x1, y1, x, y } => {
+                    ("quadTo", vec![(x1.into(), y1.into()), (x.into(), y.into())])
+                }
                 PathOp::Cubic {
                     x1,
                     y1,
@@ -85,7 +88,30 @@ fn outlines_match_an_independent_reader() {
             }
         }
     }
-    assert!(worst <= 1, "outline points differ by {worst}/64 unit");
+    assert!(
+        worst <= tolerance,
+        "{font}: outline points differ by {worst}/64 unit"
+    );
+}
+
+#[test]
+fn outlines_match_an_independent_reader() {
+    check_outlines(
+        "fonts/digitalkhatt/hb-madina.otf",
+        "tests/golden/draw/outline-sample.json",
+        1,
+    );
+}
+
+/// T5.3: TrueType outlines (the KFGQPC Warsh font), composites flattened in integers. fontTools
+/// applies component transforms in floating point, hence two units.
+#[test]
+fn truetype_outlines_match_an_independent_reader() {
+    check_outlines(
+        "fonts/kfgqpc/uthmanic_warsh_v21.ttf",
+        "tests/golden/draw/outline-sample-warsh.json",
+        2,
+    );
 }
 
 struct Env {
@@ -102,7 +128,7 @@ fn env() -> Env {
     let profile = Profile::from_json(&read("data/render/hafs-uthmani-1441h.json")).unwrap();
     Env {
         ds: mushaf_db::load_dir(&repo().join("data")).unwrap(),
-        table: EncodingTable::from_json(&read(&profile.encoding)).unwrap(),
+        table: profile.encoding_table(|p| Ok(read(p))).unwrap(),
         widths: LineWidths::from_json(&read(&profile.line_widths)).unwrap(),
         names: SurahNames::from_json(&read(&profile.surah_names)).unwrap(),
         font: FontData::new(font_bytes()).unwrap(),
@@ -114,7 +140,8 @@ fn env() -> Env {
 fn draw(e: &Env, resolved: &Resolved, page: u32) -> DrawPage {
     let spine = &e.ds.spines[&e.profile.spine];
     let layout = &e.ds.layouts[&e.profile.layout_id];
-    let basmalah = basmalah_words(spine, &e.table).unwrap();
+    let base = resolve_patches(spine, &[], Mode::Data).unwrap();
+    let basmalah = basmalah_words(&base, &e.table).unwrap();
     let data = FitData {
         profile: &e.profile,
         table: &e.table,

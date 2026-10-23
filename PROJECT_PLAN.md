@@ -340,7 +340,7 @@ Runs after Phase 2 and before Phase 3 (see execution order). Order: `shuba` → 
 - **T5.4 Goldens per riwāyah.** Include 3:133, 2:10, 2:184 and the Fātiḥah numbering for Warsh.
 - **T5.5 Fidelity review.** Render all pages for each riwāyah as contact sheets in `docs/review/`.
 
-**GATE G3:** owner reviews contact sheets and the overflow report; D1 is finalized.
+**GATE G3:** owner reviews contact sheets and the overflow report; D1 is finalized. **Passed 2026-10-23 (owner); see the G3 record in `docs/decisions.md`. Open: the undecided encoding groups (G-102), the Warsh/Qālūn reference print (G-106).**
 
 ---
 

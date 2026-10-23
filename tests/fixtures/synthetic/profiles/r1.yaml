@@ -1,0 +1,11 @@
+# Synthetic riwayah profile: r1 on the synthetic spine test/v1.
+riwayah: "r1"
+spine: "test/v1"
+script_id: "synthetic"
+text_source: "synthetic"
+single_source: true
+patch_stack: ["patches/curated/q1.yaml", "patches/raw/r1.yaml"]
+ayah_map: "r1"
+surah_headers:
+  - {surah: 1, page: 1, name_line: 1}
+  - {surah: 2, page: 2, name_line: 1, basmalah_line: 2, basmalah_evidence: "synthetic"}

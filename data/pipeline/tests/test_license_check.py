@@ -1,6 +1,7 @@
 import hashlib
 import json
 import subprocess
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -29,7 +30,7 @@ def write_manifest(repo: Path, sources: list[dict]) -> None:
             "role": "font-candidate",
             "acquire": "http",
             "url": "https://example.org/f",
-            "file": f"{s['group']}/{s['id']}.otf",
+            "file": s.get("file", f"{s['group']}/{s['id']}.otf"),
             "sha256": s.get("sha256", hashlib.sha256(FONT).hexdigest()),
             "size": len(FONT),
             "pinned_on": "2026-10-22",
@@ -96,6 +97,54 @@ def test_font_that_differs_from_its_pinned_source_is_a_violation(repo: Path) -> 
     assert find_violations(repo) == [
         "fonts/open/f.otf: sha256 differs from pinned source 'open-font'"
     ]
+
+
+def _zip_source(repo: Path, member_bytes: bytes) -> None:
+    raw = repo / "data/sources/raw/open/fonts.zip"
+    raw.parent.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(raw, "w") as zf:
+        zf.writestr("pkg/font/f.ttf", member_bytes)
+        zf.writestr("pkg/data/read.me", b"x")
+    write_manifest(repo, [{"id": "open-zip", "group": "open", "file": "open/fonts.zip"}])
+
+
+def _member_entry(sha: bytes = FONT) -> dict:
+    return {
+        "path": "fonts/open/f.ttf",
+        "source": "open-zip",
+        "member": "pkg/font/f.ttf",
+        "sha256": hashlib.sha256(sha).hexdigest(),
+    }
+
+
+def test_font_from_a_zip_member_passes_when_bytes_match_entry_and_member(repo: Path) -> None:
+    _zip_source(repo, FONT)
+    stage(repo, "fonts/open/f.ttf", FONT)
+    write_fonts(repo, [_member_entry()])
+    assert find_violations(repo) == []
+
+
+def test_zip_member_font_is_checked_against_its_listed_sha256(repo: Path) -> None:
+    _zip_source(repo, FONT)
+    stage(repo, "fonts/open/f.ttf", b"changed bytes")
+    write_fonts(repo, [_member_entry()])
+    assert find_violations(repo) == ["fonts/open/f.ttf: sha256 differs from FONTS.json"]
+
+
+def test_zip_member_font_must_equal_the_member_of_the_pinned_zip(repo: Path) -> None:
+    _zip_source(repo, b"other bytes")
+    stage(repo, "fonts/open/f.ttf", FONT)
+    write_fonts(repo, [_member_entry()])
+    assert find_violations(repo) == [
+        "fonts/open/f.ttf: differs from member pkg/font/f.ttf of 'open-zip'"
+    ]
+
+
+def test_zip_member_font_without_the_raw_zip_checks_only_its_sha256(repo: Path) -> None:
+    write_manifest(repo, [{"id": "open-zip", "group": "open", "file": "open/fonts.zip"}])
+    stage(repo, "fonts/open/f.ttf", FONT)
+    write_fonts(repo, [_member_entry()])
+    assert find_violations(repo) == []
 
 
 def test_font_listed_with_an_unknown_source_is_a_violation(repo: Path) -> None:
