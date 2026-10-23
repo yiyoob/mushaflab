@@ -4,6 +4,14 @@ Generated at the end of Phase 3 (2026-10-22, branch `claude/phase-3-render-211d7
 pages with the **1441H digital layout** (KFGQPC's digital pages, QUL V4, qcf4), not with a
 1421H-style print: the two differ on 1,666 lines (D6 addendum, G-031).
 
+**Result: GATE G1 passed (owner, 2026-10-22)** on the pinned DigitalKhatt Madina font, line pitch
+1,900 and the committed goldens; surah headers plain for Stage 1 (record in `docs/decisions.md`).
+
+**Known deviation from the print (G-045, open):** after a non-joining letter (و, ذ, ر, د, ز, ء, ا),
+the superscript alef U+0670 is drawn as a spacing upright alef in a gap, where the print draws a
+small alef over the join, e.g. صِرَٰطَ on page 1. 1,377 places on 518 pages. Resolve before public
+release (Phase 10); options in G-045 and D17.
+
 ## 1. Pages to review
 
 All are tracked under `tests/golden/pages/` (PNG at 1000 px; the `.json` next to each pins the
