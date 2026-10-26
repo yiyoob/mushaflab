@@ -126,7 +126,13 @@ def build(riwayah: str) -> dict:
         p["patch_stack"] = ["patches/corrections/hafs.yaml"] if corrections.exists() else []
     else:
         p["single_source"] = True
-        p["patch_stack"] = [f"patches/raw/{riwayah}.yaml"]
+        # T6.4 (D42): data-derived rules plus the residual raw patches they leave, if mined.
+        residual = CORRECTIONS_DIR.parent / "curated" / f"{riwayah}.yaml"
+        p["patch_stack"] = (
+            [f"patches/curated/{riwayah}.yaml"]
+            if residual.exists()
+            else [f"patches/raw/{riwayah}.yaml"]
+        )
         p["ayah_map"] = riwayah
     if (RULES_DIR / f"{riwayah}.yaml").exists():  # T6.2: a riwayah's own rule file
         p["rule_stack"] = [f"rules/{riwayah}.yaml"]

@@ -39,6 +39,9 @@ pub enum Boundary {
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ClusterMatch {
+    /// The cluster's codepoints exactly (T6.4: data-derived rules match whole cluster forms).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cps: Option<crate::Cps>,
     /// Allowed base codepoints (the cluster's first codepoint).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub base: Vec<Cp>,

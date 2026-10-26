@@ -79,7 +79,8 @@ def test_profile_names_its_sources(riwayah: str) -> None:
         assert p["rule_stack"] == ["rules/hafs.yaml"]  # T6.2
         assert "ayah_map" not in p
     else:
-        assert p["patch_stack"] == [f"patches/raw/{riwayah}.yaml"]
+        assert p["patch_stack"] == [f"patches/curated/{riwayah}.yaml"]  # T6.4 residual
+        assert p["rule_stack"] == [f"rules/{riwayah}.yaml"]
         assert p["ayah_map"] == riwayah
         assert p["single_source"] is True
 

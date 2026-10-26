@@ -37,9 +37,27 @@ fn all_eight_profiles_load_and_resolve_in_data_mode() {
     for (id, p) in &ds.profiles {
         let r = resolve_profile(&ds, &sel(id), None, Mode::Data).unwrap();
         let spine = &ds.spines[&p.spine];
-        let files: Vec<_> = p.patch_stack.iter().map(|f| &ds.patch_files[f]).collect();
-        let direct = resolve(spine, &files, &BTreeMap::new(), &sel(id), None, Mode::Data).unwrap();
+        let expanded: Vec<_> = p
+            .rule_stack
+            .iter()
+            .map(|f| mushaf_rules::expand(&ds.rule_files[f], spine).unwrap().file)
+            .collect();
+        let files: Vec<_> = expanded
+            .iter()
+            .chain(p.patch_stack.iter().map(|f| &ds.patch_files[f]))
+            .collect();
+        let direct = resolve(spine, &files, &ds.option_groups, &sel(id), None, Mode::Data).unwrap();
         assert!(r.items == direct.items, "{id}: profile resolution differs");
+        // T6.4 (D42): rules + residual give exactly the raw file's text.
+        if let Some(raw) = ds.patch_files.get(&format!("patches/raw/{id}.yaml")) {
+            let by_raw =
+                resolve(spine, &[raw], &BTreeMap::new(), &sel(id), None, Mode::Data).unwrap();
+            assert_eq!(
+                r.text(),
+                by_raw.text(),
+                "{id}: rules + residual differ from raw"
+            );
+        }
         if id == "hafs" {
             // The spine, except the owner's corrections (D39): G-142 at 52:37:7:4 only.
             let got = as_spine_items(&r);

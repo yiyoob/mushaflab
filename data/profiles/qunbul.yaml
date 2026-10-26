@@ -5,8 +5,9 @@ spine: "hafs/v1"
 script_id: "uthmani"
 text_source: "kfgqpc-official-qunbul"
 single_source: true
-patch_stack: ["patches/raw/qunbul.yaml"]
+patch_stack: ["patches/curated/qunbul.yaml"]
 ayah_map: "qunbul"
+rule_stack: ["rules/qunbul.yaml"]
 surah_headers:
   - {surah: 1, page: 1, name_line: 1}
   - {surah: 2, page: 2, name_line: 1, basmalah_line: 2}

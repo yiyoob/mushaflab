@@ -5,8 +5,9 @@ spine: "hafs/v1"
 script_id: "uthmani"
 text_source: "kfgqpc-official-warsh"
 single_source: true
-patch_stack: ["patches/raw/warsh.yaml"]
+patch_stack: ["patches/curated/warsh.yaml"]
 ayah_map: "warsh"
+rule_stack: ["rules/warsh.yaml"]
 surah_headers:
   - {surah: 1, page: 1, name_line: 1, basmalah_line: 2, basmalah_evidence: "hypothesis (G-023): the KFGQPC file leaves this line without an ayah where Hafs has its numbered basmalah; drawn as an unnumbered basmalah line until the owner checks the print"}
   - {surah: 2, page: 2, name_line: 1, basmalah_line: 2}

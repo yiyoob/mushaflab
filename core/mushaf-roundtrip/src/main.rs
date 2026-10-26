@@ -1,17 +1,17 @@
-//! T4.6 round-trip (D22): resolves each riwāyah's raw patch file on the Ḥafṣ spine in
+//! T4.6 round-trip (D22): resolves each riwāyah through its profile (T6.4: its rule files and
+//! its patch stack; before T6.4 the raw patch file) on the Ḥafṣ spine in
 //! `Mode::Data` (any orphan, unresolved, collision or other report entry is an error) and
 //! writes the resolved items as JSON lines for `pipeline.roundtrip`, which compares them with
 //! the pinned KFGQPC text codepoint for codepoint. Host only: reads the data root from disk.
 //!
 //!     mushaf-roundtrip <data root> <out dir> <riwayah>...
 
-use std::collections::BTreeMap;
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use mushaf_model::{Cps, DataSet, ItemKind, ItemRef, to_json};
-use mushaf_resolve::{Mode, ResolveError, Selection, resolve};
+use mushaf_resolve::{Mode, ResolveError, Selection, resolve_profile};
 use serde::Serialize;
 
 /// Report entries shown when a resolution fails; the count is always shown.
@@ -39,21 +39,12 @@ fn describe(e: &ResolveError) -> String {
 }
 
 fn run(ds: &DataSet, riwayah: &str, out: &Path) -> Result<usize, String> {
-    let path = format!("patches/raw/{riwayah}.yaml");
-    let file = ds
-        .patch_files
-        .get(&path)
-        .ok_or_else(|| format!("no patch file {path}"))?;
-    let spine = ds
-        .spines
-        .get(&file.spine)
-        .ok_or_else(|| format!("{path}: spine {} is not loaded", file.spine))?;
     let sel = Selection {
         riwayah: riwayah.into(),
         ..Selection::default()
     };
-    let r = resolve(spine, &[file], &BTreeMap::new(), &sel, None, Mode::Data)
-        .map_err(|e| format!("{path}: {}", describe(&e)))?;
+    let r = resolve_profile(ds, &sel, None, Mode::Data)
+        .map_err(|e| format!("profile {riwayah}: {}", describe(&e)))?;
     let mut text = String::new();
     for item in &r.items {
         let line = Line {

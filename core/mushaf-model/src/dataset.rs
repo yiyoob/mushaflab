@@ -60,7 +60,8 @@ pub enum Input {
     RuleRegister,
 }
 
-/// The register's path under the data root.
+/// The hand-written register's path under the data root; generated rule files have their
+/// own `rules/<name>.register.yaml`.
 pub const REGISTER_PATH: &str = "rules/register.yaml";
 
 /// Classifies a root-relative path. `.gitkeep` and layout correction inputs (read by the
@@ -81,7 +82,9 @@ pub fn classify(path: &str) -> Result<Option<Input>, Error> {
         ["ayah_maps", f] if f.ends_with(".yaml") => Some(Input::AyahMap),
         ["profiles", f] if f.ends_with(".yaml") => Some(Input::Profile),
         ["rules", "README.md"] => return Ok(None),
-        ["rules", "register.yaml"] => Some(Input::RuleRegister),
+        ["rules", f] if *f == "register.yaml" || f.ends_with(".register.yaml") => {
+            Some(Input::RuleRegister)
+        }
         ["rules", f] if f.ends_with(".yaml") => Some(Input::RuleFile),
         _ => None,
     };
@@ -226,7 +229,9 @@ impl DataSet {
                         .insert(path.clone(), from_yaml(text).map_err(at)?);
                 }
                 Some(Input::RuleRegister) => {
-                    ds.register = from_yaml(text).map_err(at)?;
+                    // Several register files (hand-written and generated) form one register.
+                    let r: Register = from_yaml(text).map_err(at)?;
+                    ds.register.rules.extend(r.rules);
                 }
             }
         }
@@ -379,10 +384,11 @@ impl DataSet {
             ds.rule_files.insert(b.key, f);
         }
         for b in rows.rule_register {
-            if b.key != REGISTER_PATH {
+            if classify(&b.key)? != Some(Input::RuleRegister) {
                 return Err(Error::new(format!("DB: unexpected register row {}", b.key)));
             }
-            ds.register = from_json(&b.body)?;
+            let r: Register = from_json(&b.body)?;
+            ds.register.rules.extend(r.rules);
         }
         ds.validate()?;
         Ok(ds)
@@ -470,7 +476,7 @@ pub struct DbRows {
     pub ayah_maps: Vec<BodyRow>,
     pub profiles: Vec<BodyRow>,
     pub rule_files: Vec<BodyRow>,
-    /// At most one row, keyed by `REGISTER_PATH`.
+    /// One row per register file (`rules/register.yaml`, `rules/<name>.register.yaml`).
     pub rule_register: Vec<BodyRow>,
 }
 

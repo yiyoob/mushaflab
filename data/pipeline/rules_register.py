@@ -11,7 +11,7 @@ a cited source is a `hypothesis`; descriptions are not empty.
 import sys
 from pathlib import Path
 
-from pipeline.compile_db import DATA_ROOT, REGISTER, load_yaml, yaml_files
+from pipeline.compile_db import DATA_ROOT, is_register, load_yaml, yaml_files
 
 STATUSES = ("rule-derived", "hypothesis")
 
@@ -32,10 +32,9 @@ def _compare(rid: str, rule: dict, e: dict) -> list[str]:
 
 def check(root: Path = DATA_ROOT) -> list[str]:
     problems: list[str] = []
-    reg_path = root / REGISTER
-    register = load_yaml(reg_path, ascii_only=False) if reg_path.exists() else {"rules": []}
+    registers = [p for p in yaml_files(root, "rules") if is_register(p)]
     entries: dict[str, dict] = {}
-    for e in register["rules"]:
+    for e in [e for p in registers for e in load_yaml(p, ascii_only=False)["rules"]]:
         if e["id"] in entries:
             problems.append(f"register: {e['id']} is listed twice")
         entries[e["id"]] = e
@@ -47,7 +46,7 @@ def check(root: Path = DATA_ROOT) -> list[str]:
             problems.append(f"register: {e['id']} is rule-derived without a source")
     found: set[str] = set()
     for path in yaml_files(root, "rules"):
-        if path == reg_path:
+        if is_register(path):
             continue
         for rule in load_yaml(path)["rules"]:
             rid = rule["id"]

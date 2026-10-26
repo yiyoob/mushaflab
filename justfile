@@ -34,6 +34,7 @@ data-build:
     {{uv}} run python -m pipeline.ingest_riwayah write
     {{uv}} run python -m pipeline.align write
     {{uv}} run python -m pipeline.emit_patches write
+    {{uv}} run python -m pipeline.rule_mining write
     {{uv}} run python -m pipeline.ayah_maps write
     {{uv}} run python -m pipeline.profiles write
     {{uv}} run python -m pipeline.ayah_lines write

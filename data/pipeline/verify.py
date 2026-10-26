@@ -30,6 +30,7 @@ from pipeline import (
     phase4_report,
     phase5_readme,
     profiles,
+    rule_mining,
     rules_register,
     sources,
     spine,
@@ -165,8 +166,6 @@ def check_db() -> list[str]:
 
 def check_phase5_files_current() -> list[str]:
     out = []
-    if corrections.main(["", "check"]) != 0:
-        out.append("data/encodings/hafs-v1.correction-rows.json differs from a rebuild")
     if profiles.main(["", "check"]) != 0:
         out.append("data/profiles differ from a rebuild")
     if ayah_lines.main(["", "check"]) != 0:
@@ -178,10 +177,20 @@ def check_phase5_files_current() -> list[str]:
     return out
 
 
+def check_phase6_files_current() -> list[str]:
+    out = []
+    if corrections.main(["", "check"]) != 0:
+        out.append("data/encodings/hafs-v1.correction-rows.json differs from a rebuild")
+    if rule_mining.main(["", "check"]) != 0:
+        out.append("data-derived rules, registers or residual patches differ from a rebuild")
+    return out
+
+
 CHECKS: dict[str, Callable[[], list[str]]] = {
     "sources": check_sources,
     "tracked files current": check_tracked_files_current,
     "phase 5 files current": check_phase5_files_current,
+    "phase 6 files current": check_phase6_files_current,
     "lines per page": check_lines_per_page,
     "every item once, in order": check_every_item_once_in_order,
     "line types": check_line_types,

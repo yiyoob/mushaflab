@@ -252,18 +252,22 @@ def build(db_path: Path = DEFAULT_DB, root: Path = DATA_ROOT) -> None:
 
 
 def _load_rules(root: Path) -> list[tuple[Path, object]]:
-    """Rule files (ASCII), then the register (descriptions may be Arabic), if present."""
-    paths = [p for p in yaml_files(root, "rules") if _rel(p, root) != REGISTER]
-    out = [(p, load_yaml(p)) for p in paths]
-    if (root / REGISTER).exists():
-        out.append((root / REGISTER, load_yaml(root / REGISTER, ascii_only=False)))
+    """Rule files (ASCII) and register files (descriptions may be Arabic), in path order."""
+    out = []
+    for p in yaml_files(root, "rules"):
+        out.append((p, load_yaml(p, ascii_only=not is_register(p))))
     return out
+
+
+def is_register(path: Path) -> bool:
+    """`rules/register.yaml` (hand-written) or `rules/<name>.register.yaml` (generated)."""
+    return path.name == "register.yaml" or path.name.endswith(".register.yaml")
 
 
 def _insert_rules(con: sqlite3.Connection, root: Path, rules: list[tuple[Path, object]]) -> None:
     for p, data in rules:
         rel = _rel(p, root)
-        if rel == REGISTER:
+        if is_register(p):
             if not isinstance(data, dict) or not isinstance(data.get("rules"), list):
                 raise DataError(f"{p}: the register is a mapping with a `rules` list")
             con.execute("insert into rule_register values (?, ?)", (rel, canonical_json(data)))

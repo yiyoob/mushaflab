@@ -53,6 +53,7 @@ Consequences: what follows, what it rules out
 | D39 | Owner corrections to the Ḥafṣ spine text as patches; G-142 (52:37 sīn below the ṣād) | accepted (owner decision, 2026-10-26) |
 | D40 | Annotation channel: pronunciation-only features as `pron.<feature>` cluster annotations | accepted (T6.3, 2026-10-26) |
 | D41 | مَالِيَهْ idghām wajh changes no glyph (owner decision, departs from p. ح) | accepted (owner decision, 2026-10-26) |
+| D42 | T6.4: data-derived rules (hypotheses) plus residual patches per riwāyah | accepted (T6.4, 2026-10-26); every rule awaits a citation |
 
 ---
 
@@ -1245,3 +1246,49 @@ The golden test requires the two draw lists to be byte-identical. This departs f
 written form on p. ح; it is an owner decision, and the register entry says so.
 Consequences: G-143 is closed. A reader who wants the idghām shown in writing has no
 option for it; that would need a new owner decision.
+
+## D42: Rule sets per riwāyah from the data (T6.4)
+Status: accepted (T6.4, 2026-10-26). Every rule is a hypothesis until the owner or a muqriʾ
+cites or rejects it.
+Context: T6.4 asks for rules that explain the raw patches, qirāʾah by qirāʾah, with the
+remainder kept as curated farsh, while `just roundtrip` stays at 100%. Rule 1 forbids
+writing uṣūl from memory. The only sources in the repository are the KFGQPC texts (already
+encoded as the raw patches) and the pinned book, whose text cannot be extracted reliably
+(T6.0 deferred).
+Options:
+- (a) Write named uṣūl rules from knowledge. Rejected: rule 1.
+- (b) Wait for cited sources for each rule. This would block T6.4 entirely.
+- (c) Induce rules from the raw patches, accept only those the data supports exactly, and
+  mark every one a hypothesis.
+Decision: (c), in `pipeline/rule_mining.py`.
+- A candidate is one cluster change, either a codepoint change (`replace`/`set_marks`) or a
+  single-cluster insert with seq 1, plus at most one context feature:
+  - the cluster's place in its word (first, last or only);
+  - the letter before it or after it in the word;
+  - the first letter of the next word, for a word-final cluster (boundary `any`).
+- It becomes a rule when at least 3 places carry exactly that change and the other places its
+  pattern matches are at most max(2, 5%) of the matches. Those other places are listed as
+  exceptions, each with its reason from the data.
+- The matcher is a port of `mushaf_rules::matches` (leftmost, non-overlapping), so each rule's
+  exceptions are exactly what the core sees.
+- Rules are written to `data/rules/<r>.yaml` and their register to
+  `data/rules/<r>.register.yaml`. Every entry is `hypothesis`, `single_source`, with no source.
+- The raw patches no rule explains are kept unchanged, with their ids, in
+  `data/patches/curated/<r>.yaml`.
+- Each riwāyah's profile now resolves `rule_stack: [rules/<r>.yaml]` and
+  `patch_stack: [patches/curated/<r>.yaml]`. The raw files stay as evidence.
+- `just roundtrip` resolves through the profiles. It, and a Rust test comparing with the raw
+  file, require the same text codepoint for codepoint.
+- Order: the plan's order of qirāʾāt (ʿĀṣim → Nāfiʿ → Ibn Kathīr → Abū ʿAmr) is kept for
+  review. The mining itself is independent per riwāyah.
+- Several register files make up one register: `rules/register.yaml` for hand-written rules
+  and `rules/*.register.yaml` for generated ones.
+Consequences:
+- These rules are patterns in the KFGQPC data, not named uṣūl. Many are encoding or spelling
+  conventions; some are coincidences of a few places. The review sheets (T6.5) show each one
+  with its places and exceptions.
+- At G4 the owner or a muqriʾ cites, renames, merges or rejects them. A rejected rule's
+  places return to the residual by rerunning the miner with that rule excluded (to be built
+  when the first rejection comes).
+- Pronunciation-only uṣūl (madd, taqlīl …) are not in the KFGQPC codepoints, so no rule
+  writes annotations yet (D40). They need cited sources.

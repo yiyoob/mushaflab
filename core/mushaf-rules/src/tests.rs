@@ -239,3 +239,13 @@ fn annotation_actions_become_set_attr_patches_that_change_no_codepoint() {
         other => panic!("{other:?}"),
     }
 }
+
+#[test]
+fn exact_cluster_form() {
+    // BA+FATHA exactly: 1:1:1:1 and 1:2:1:2, not the bare BA of 1:1:2:1.
+    assert_eq!(
+        hits("[{cps: \"U+0628 U+064E\", capture: \"a\"}]", ""),
+        ["1:1:1:1", "1:2:1:2"]
+    );
+    assert!(hits("[{cps: \"U+0628 U+0650\", capture: \"a\"}]", "").is_empty());
+}

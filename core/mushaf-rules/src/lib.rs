@@ -120,8 +120,8 @@ fn patch(rule: &Rule, a: &mushaf_model::Action, caps: &Captures) -> Result<Patch
 }
 
 /// All matches of a rule in spine order, and the places skipped by its exceptions (each
-/// identified by the cluster an exception names). One cursor walks the spine's clusters; after
-/// a match it resumes at the cluster after the match's last one.
+/// identified by the cluster an exception names). Starts are tried in spine order; after a
+/// match, matching resumes at the cluster after the match's last one.
 pub fn matches(rule: &Rule, spine: &Spine) -> (Vec<Captures>, BTreeSet<ClusterRef>) {
     let except: BTreeSet<&ClusterRef> = rule.except.iter().map(|e| &e.cluster).collect();
     let in_scope = |item: &Item| {
@@ -133,15 +133,40 @@ pub fn matches(rule: &Rule, spine: &Spine) -> (Vec<Captures>, BTreeSet<ClusterRe
     };
     let mut found = Vec::new();
     let mut skipped = BTreeSet::new();
-    let (mut i, mut k) = (0, 0);
-    while i < spine.items.len() {
-        if k >= spine.items[i].clusters.len() {
-            (i, k) = (i + 1, 0);
+    // Candidate starts in spine order: every cluster, or only those whose first codepoint the
+    // first matcher allows (same result, far fewer tries).
+    let starts: Vec<(usize, usize)> = match rule.pattern.first() {
+        Some(Step::Cluster(m)) if m.cps.is_some() || !m.base.is_empty() => {
+            let firsts: BTreeSet<char> = match &m.cps {
+                Some(c) => c.0.first().copied().into_iter().collect(),
+                None => m.base.iter().map(|b| b.0).collect(),
+            };
+            spine
+                .items
+                .iter()
+                .enumerate()
+                .flat_map(|(i, it)| {
+                    it.clusters
+                        .iter()
+                        .enumerate()
+                        .filter(|(_, c)| firsts.contains(&c.cps.0[0]))
+                        .map(move |(k, _)| (i, k))
+                })
+                .collect()
+        }
+        _ => spine
+            .items
+            .iter()
+            .enumerate()
+            .flat_map(|(i, it)| (0..it.clusters.len()).map(move |k| (i, k)))
+            .collect(),
+    };
+    let mut resume = (0, 0);
+    for (i, k) in starts {
+        if (i, k) < resume || !in_scope(&spine.items[i]) {
             continue;
         }
-        if in_scope(&spine.items[i])
-            && let Some((caps, end)) = match_at(rule, spine, i, k)
-        {
+        if let Some((caps, end)) = match_at(rule, spine, i, k) {
             let hit: Vec<&ClusterRef> = caps
                 .iter()
                 .map(|(_, c)| c)
@@ -152,10 +177,8 @@ pub fn matches(rule: &Rule, spine: &Spine) -> (Vec<Captures>, BTreeSet<ClusterRe
             } else {
                 skipped.extend(hit.into_iter().cloned());
             }
-            (i, k) = (end.0, end.1 + 1);
-            continue;
+            resume = (end.0, end.1 + 1);
         }
-        k += 1;
     }
     (found, skipped)
 }
@@ -169,7 +192,8 @@ fn cluster_ok(m: &ClusterMatch, item: &Item, k: usize) -> bool {
     let ms = marks(c);
     let has = |cp: &mushaf_model::Cp| ms.contains(&cp.0);
     let last = item.clusters.len() - 1;
-    (m.base.is_empty() || m.base.iter().any(|b| b.0 == c.cps.0[0]))
+    m.cps.as_ref().is_none_or(|x| *x == c.cps)
+        && (m.base.is_empty() || m.base.iter().any(|b| b.0 == c.cps.0[0]))
         && m.kind.is_none_or(|kind| kind == c.kind)
         && m.marks_all.iter().all(has)
         && (m.marks_any.is_empty() || m.marks_any.iter().any(has))
