@@ -21,6 +21,7 @@ from pipeline import (
     ayah_maps,
     codepoints,
     compile_db,
+    corrections,
     dk_riwayat,
     drift,
     emit_patches,
@@ -164,6 +165,8 @@ def check_db() -> list[str]:
 
 def check_phase5_files_current() -> list[str]:
     out = []
+    if corrections.main(["", "check"]) != 0:
+        out.append("data/encodings/hafs-v1.correction-rows.json differs from a rebuild")
     if profiles.main(["", "check"]) != 0:
         out.append("data/profiles differ from a rebuild")
     if ayah_lines.main(["", "check"]) != 0:

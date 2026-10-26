@@ -109,6 +109,7 @@ def hafs_kinds() -> dict[Pos, str]:
 
 
 RULES_DIR = Path(__file__).resolve().parents[1] / "rules"
+CORRECTIONS_DIR = Path(__file__).resolve().parents[1] / "patches" / "corrections"
 
 
 def build(riwayah: str) -> dict:
@@ -120,7 +121,9 @@ def build(riwayah: str) -> dict:
         "text_source": kfgqpc.source_id(riwayah),
     }
     if riwayah == "hafs":
-        p["patch_stack"] = []
+        # D39: owner corrections to the spine text, when there are any.
+        corrections = CORRECTIONS_DIR / "hafs.yaml"
+        p["patch_stack"] = ["patches/corrections/hafs.yaml"] if corrections.exists() else []
     else:
         p["single_source"] = True
         p["patch_stack"] = [f"patches/raw/{riwayah}.yaml"]

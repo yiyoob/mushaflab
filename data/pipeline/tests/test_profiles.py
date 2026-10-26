@@ -75,7 +75,8 @@ def test_profile_names_its_sources(riwayah: str) -> None:
     assert p["text_source"] == kfgqpc.source_id(riwayah)
     assert len(p["surah_headers"]) == 114
     if riwayah == "hafs":
-        assert p["patch_stack"] == []
+        assert p["patch_stack"] == ["patches/corrections/hafs.yaml"]  # D39
+        assert p["rule_stack"] == ["rules/hafs.yaml"]  # T6.2
         assert "ayah_map" not in p
     else:
         assert p["patch_stack"] == [f"patches/raw/{riwayah}.yaml"]

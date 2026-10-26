@@ -1,0 +1,17 @@
+# Owner corrections to the Hafs spine text (ADR D39). The spine (KFGQPC v2.0) stays as
+# published (rule 2); each correction is a patch with its source and the owner's decision.
+spine: "hafs/v1"
+patches:
+  # G-142: 52:37 al-musaytirun. KFGQPC Hafs mushaf, explanation of signs, p. waw: the sin is
+  # placed *under* the sad in this word. The spine has U+06DC (small high seen). Evidence for
+  # U+06E3 (ARABIC SMALL LOW SEEN): the pinned DigitalKhatt Madina and Old Madina texts write
+  # this word with U+0635 U+06E3 U+064E, their only U+06E3; the Hafs encoding table already
+  # maps this cluster to that form. Owner decision 2026-10-26 (data/approvals/hafs.yaml).
+  - id: "hafs.g142.52.37.7.4.rep"
+    owner: {level: "riwayah", id: "hafs"}
+    op: "replace"
+    target: "52:37:7:4"
+    payload: {kind: "letter", cps: "U+0635 U+06E3 U+064E"}
+    source: {kind: "owner-correction", ref: "KFGQPC Hafs mushaf, explanation of signs, p. waw; owner decision 2026-10-26 (G-142)"}
+    status: "raw-derived"
+    single_source: true

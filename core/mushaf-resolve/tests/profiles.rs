@@ -1,6 +1,7 @@
 //! T5.1: every riwāyah profile loads and resolves in data mode. The resolved text of each
 //! riwāyah is checked against KFGQPC by `just roundtrip`; here the profile path must give the
-//! same result as resolving its patch files directly, and Ḥafṣ (no patches) is the spine.
+//! same result as resolving its patch files directly, and Ḥafṣ is the spine apart from the
+//! owner's corrections (D39).
 
 mod common;
 
@@ -40,7 +41,22 @@ fn all_eight_profiles_load_and_resolve_in_data_mode() {
         let direct = resolve(spine, &files, &BTreeMap::new(), &sel(id), None, Mode::Data).unwrap();
         assert!(r.items == direct.items, "{id}: profile resolution differs");
         if id == "hafs" {
-            assert!(as_spine_items(&r) == spine.items, "hafs is not the spine");
+            // The spine, except the owner's corrections (D39): G-142 at 52:37:7:4 only.
+            let got = as_spine_items(&r);
+            let differ: Vec<String> = got
+                .iter()
+                .zip(&spine.items)
+                .filter(|(a, b)| a != b)
+                .map(|(a, _)| a.id.to_string())
+                .collect();
+            assert_eq!(got.len(), spine.items.len());
+            assert_eq!(differ, ["52:37:7"], "hafs differs from the spine elsewhere");
+            let c = &got
+                .iter()
+                .find(|i| i.id.to_string() == "52:37:7")
+                .unwrap()
+                .clusters[3];
+            assert_eq!(c.cps.0, ['\u{0635}', '\u{06E3}', '\u{064E}']);
         } else {
             assert_ne!(r.text(), direct_spine_text(spine), "{id} resolved to Hafs");
         }

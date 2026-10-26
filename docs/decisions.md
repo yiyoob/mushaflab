@@ -50,6 +50,7 @@ Consequences: what follows, what it rules out
 | D36 | Display styles: Ḥijāzī and Maghribi for every riwāyah | accepted (scope); built in Phase 6 |
 | D37 | Highlighting differences from Ḥafṣ | accepted (scope); built in Phase 6, UI in Phase 8 |
 | D38 | Rule DSL: declarative patterns expanded into ordinary patches in the core | accepted with the T6.1 plan (2026-10-26) |
+| D39 | Owner corrections to the Ḥafṣ spine text as patches; G-142 (52:37 sīn below the ṣād) | accepted (owner decision, 2026-10-26) |
 
 ---
 
@@ -1169,3 +1170,43 @@ Decision: (c).
 Consequences: T6.2 and T6.4 add real, cited rules to `data/rules/`. T6.4 compares each
 rule's expansion with the raw patches it explains. If a rule ever needs to see another
 rule's output, G-141 is revisited with a new ADR.
+
+## D39: Owner corrections to the Ḥafṣ spine text (G-142)
+Status: accepted (owner decision, 2026-10-26)
+Context: at 52:37:7:4 (المصيطرون) the spine, which is KFGQPC Ḥafṣ v2.0, stores
+`U+0635 U+06DC U+064E`, a small sīn *above* the ṣād. The KFGQPC Ḥafṣ muṣḥaf's explanation of
+signs, p. و, says that in this word the sīn is placed *under* the ṣād, meaning that ṣād is
+the more common reading. The owner decided: "sīn should be below the ṣāḍ on 52:37."
+Rule 2 forbids editing the pinned source, and rule 3 makes the spine text in git
+the source of truth.
+Evidence for the codepoint, all from pinned data:
+- U+06E3 ARABIC SMALL LOW SEEN appears nowhere in the eight KFGQPC texts.
+- The pinned DigitalKhatt Madina and Old Madina texts (`quran_text_madina.ts`,
+  `quran_text_old_madinah.ts`, line 8901) write this word with `U+0635 U+06E3 U+064E`. It is
+  the only U+06E3 in each text.
+- The data-derived Ḥafṣ encoding table (D14) already maps this exact cluster to that
+  DigitalKhatt form, so the renderer drew the sīn below even before this correction
+  (`docs/font-coverage.md`, S2 counts).
+- DigitalKhatt Madina has a glyph for U+06E3 and anchors it on this ṣād. The rule-6 check
+  passes in `just golden`.
+Options:
+- (a) Edit the spine. Rejected: rule 2 and rule 3.
+- (b) Leave the text and rely on the renderer. Rejected: the stored text would still say
+  "sīn above".
+- (c) An owner correction patch on the Ḥafṣ profile.
+Decision: (c).
+- `data/patches/corrections/hafs.yaml` holds patch `hafs.g142.52.37.7.4.rep`. It replaces
+  the cluster with `U+0635 U+06E3 U+064E`, with source = p. و plus the owner decision, and
+  `single_source`.
+- The Ḥafṣ profile's patch stack lists this file (`pipeline/profiles.py`, generated).
+- The decision is recorded in `data/approvals/hafs.yaml` (`cross-checked`, owner's words
+  quoted), written on the owner's explicit instruction.
+- `pipeline/corrections.py` derives the encoding row for the corrected form: the DigitalKhatt
+  image of the spine cluster it replaces, accepted only when that image equals the corrected
+  form. The row is written to `data/encodings/hafs-v1.correction-rows.json` and loaded as
+  the Ḥafṣ render profile's `encoding_extra`.
+Effect on the other riwāyāt: none. All seven remove U+06DC at 52:37:7:4 in their own raw
+patches, because their KFGQPC texts have a plain ṣād there. The correction applies only to
+the Ḥafṣ profile, so their resolved text and `just roundtrip` are unchanged.
+Consequences: the spine and KFGQPC still differ here; the difference is listed (G-142,
+resolved). `data/approvals/` is still not joined into `mushaf.db` (G-033).
