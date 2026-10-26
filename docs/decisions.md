@@ -55,6 +55,7 @@ Consequences: what follows, what it rules out
 | D41 | مَالِيَهْ idghām wajh changes no glyph (owner decision, departs from p. ح) | accepted (owner decision, 2026-10-26) |
 | D42 | T6.4: data-derived rules (hypotheses) plus residual patches per riwāyah | accepted (T6.4, 2026-10-26); every rule awaits a citation |
 | D43 | Ṭarīq as the option group `<riwāyah>.tariq`; ṭarīq-level patches apply under their ṭarīq only | accepted (T6.6, 2026-10-26) |
+| D44 | Display styles: render-time conversion from owner-confirmed rows; per-(riwāyah, style) audit decides availability | accepted (T6.7–T6.10, 2026-10-26) |
 
 ---
 
@@ -1315,3 +1316,39 @@ Decision:
   modelled (G-145). The synthetic fixture tests two ṭuruq (`r3.tariq`).
 Consequences: adding a ṭarīq means one more choice plus its cited rules or patches. The
 "no sakt" wajh (G-143) waits for a cited second ṭarīq.
+
+## D44: Display styles, conversion and availability (T6.7–T6.10)
+Status: accepted (T6.7–T6.10, 2026-10-26)
+Context: D36 wants every riwāyah shown in Ḥijāzī or Maghribi style. The KFGQPC texts encode
+style-specific mark conventions in their codepoints (G-006). A conversion is allowed only
+from owner-confirmed rows (the D21 pattern) and is applied only at render time. A combination
+the fonts cannot render correctly is reported as unavailable (rule 6), never drawn wrongly.
+Decision:
+- T6.7, the conversion layer:
+  - `pipeline/style_conversion.py` writes `data/encodings/style-conversion.json`. Each row maps
+    one codepoint of one style to one codepoint of the other, and comes from an
+    owner-confirmed `encoding` row in `data/approvals/difference_kinds.yaml` that holds for
+    every riwāyah of the target style.
+  - Today that is exactly one row, Ḥijāzī → Maghribi `U+06E1 → U+0652` (Warsh and Qālūn,
+    D21).
+  - Maghribi → Ḥijāzī has no row: Maghribi U+0652 stands for both Ḥijāzī U+06E1 and U+0652,
+    so the data does not determine the inverse.
+  - The core applies the rows as a codepoint pre-map in `EncodingTable` before the font's
+    table (`with_style_conversion`). A render profile names them with `style_conversion` and
+    `text_style`. The spine and patches are unchanged.
+- T6.8, conventions: `docs/review/phase6/style-conventions.md` (generated) lists every
+  codepoint whose use differs between the two families of KFGQPC texts by at least ten times,
+  with its counts and conversion status. 22 differences have no confirmed row (e.g. U+0671
+  alef waṣla, U+06DA, U+06ED) and stay unconverted.
+- T6.9, coverage: an audit shapes every resolved word of each riwāyah in each non-default
+  style with that style's font. Maghribi uses the KFGQPC Warsh font with the conversion rows.
+  Ḥijāzī uses DigitalKhatt Madina through the Ḥafṣ table and the approved riwāyah rows.
+  The audit counts words that cannot convert and words that fail rule 6. The result is
+  pinned in `data/render/style-availability.json`, and `just golden` recomputes it.
+  A combination is available only when both counts are zero.
+- T6.10, the style switch: `Renderer::load_style` gives a non-default style only when the
+  audit marks it available and a render profile for it exists. Otherwise the error states the
+  audit's counts. Golden pages exist for every available combination.
+Consequences: with one confirmed row, no non-default combination is available today (see
+the audit). Each further owner-confirmed row, or a font, reduces the counts. The owner
+reviews the convention report at G4.

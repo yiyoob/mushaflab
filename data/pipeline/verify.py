@@ -34,6 +34,7 @@ from pipeline import (
     rules_register,
     sources,
     spine,
+    style_conversion,
 )
 
 GOLDEN = Path(__file__).resolve().parents[2] / "tests" / "golden" / "page_boundaries.json"
@@ -183,6 +184,8 @@ def check_phase6_files_current() -> list[str]:
         out.append("data/encodings/hafs-v1.correction-rows.json differs from a rebuild")
     if rule_mining.main(["", "check"]) != 0:
         out.append("data-derived rules, registers or residual patches differ from a rebuild")
+    if style_conversion.main(["", "check"]) != 0:
+        out.append("style conversion rows or docs/review/phase6/style-conventions.md are stale")
     return out
 
 

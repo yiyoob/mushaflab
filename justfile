@@ -28,6 +28,7 @@ data-build:
     {{uv}} run python -m pipeline.ingest_layout build
     {{uv}} run python -m pipeline.dk_encoding build
     {{uv}} run python -m pipeline.corrections write
+    {{uv}} run python -m pipeline.style_conversion write
     {{uv}} run python -m pipeline.dk_riwayat write
     {{uv}} run python -m pipeline.line_widths build
     {{uv}} run python -m pipeline.surah_names build

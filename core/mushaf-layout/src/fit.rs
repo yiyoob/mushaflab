@@ -46,6 +46,12 @@ pub struct Profile {
     /// Owner-approved rows for cluster forms outside Ḥafṣ (D28), loaded next to `encoding`.
     #[serde(default)]
     pub encoding_extra: Option<String>,
+    /// Style conversion rows (T6.7, D44) and the style of the riwāyah's text: the rows from
+    /// `text_style` to this profile's `style` are applied before the encoding table.
+    #[serde(default)]
+    pub style_conversion: Option<String>,
+    #[serde(default)]
+    pub text_style: Option<String>,
     pub line_widths: String,
     pub surah_names: String,
     pub note: String,
@@ -167,6 +173,20 @@ impl SurahNames {
 impl Profile {
     /// The profile's encoding table: the identity table without `encoding`, else the table
     /// plus any `encoding_extra` rows. `read` returns a repository file's text.
+    fn with_style(
+        &self,
+        table: EncodingTable,
+        read: &impl Fn(&str) -> Result<String, Error>,
+    ) -> Result<EncodingTable, Error> {
+        match (&self.style_conversion, &self.text_style) {
+            (None, None) => Ok(table),
+            (Some(path), Some(from)) => {
+                table.with_style_conversion(&read(path)?, from, &self.style)
+            }
+            _ => Err(Error::new("style_conversion and text_style go together")),
+        }
+    }
+
     pub fn encoding_table(
         &self,
         read: impl Fn(&str) -> Result<String, Error>,
@@ -175,13 +195,13 @@ impl Profile {
             if self.encoding_extra.is_some() {
                 return Err(Error::new("encoding_extra without an encoding table"));
             }
-            return Ok(EncodingTable::identity(&self.spine));
+            return self.with_style(EncodingTable::identity(&self.spine), &read);
         };
         let mut table = EncodingTable::from_json(&read(path)?)?;
         if let Some(extra) = &self.encoding_extra {
             table.extend_from_json(&read(extra)?)?;
         }
-        Ok(table)
+        self.with_style(table, &read)
     }
 }
 
