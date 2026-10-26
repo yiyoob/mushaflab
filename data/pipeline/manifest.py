@@ -34,6 +34,8 @@ class Source:
     note: str
     # Archive.org CDX content digest (base32 SHA-1), when the source is an archived copy.
     expected_sha1_b32: str | None = None
+    # Optional sources (e.g. owner-supplied books) may be absent; if present they must verify.
+    optional: bool = False
 
 
 @dataclass
@@ -45,7 +47,7 @@ class Manifest:
 
 
 SOURCE_FIELDS = {f.name for f in fields(Source)}
-REQUIRED_FIELDS = SOURCE_FIELDS - {"expected_sha1_b32"}
+REQUIRED_FIELDS = SOURCE_FIELDS - {"expected_sha1_b32", "optional"}
 
 
 def _check_file_path(sid: str, file: str) -> None:
@@ -79,7 +81,9 @@ def _parse_source(raw: dict, allowed: list[str]) -> Source:
     src = Source(**raw)
     if src.acquire not in ACQUIRE_KINDS:
         raise ManifestError(f"{sid}: acquire must be one of {ACQUIRE_KINDS}")
-    _check_url(sid, src.url, allowed)
+    # A manual source with no public URL (e.g. a book the owner supplies) has url "".
+    if not (src.acquire == "manual" and src.url == ""):
+        _check_url(sid, src.url, allowed)
     _check_file_path(sid, src.file)
     if src.sha256 is not None and not SHA256_RE.match(src.sha256):
         raise ManifestError(f"{sid}: malformed sha256")
@@ -110,6 +114,8 @@ def dump_manifest(manifest: Manifest, path: Path) -> None:
         d = asdict(s)
         if d["expected_sha1_b32"] is None:
             del d["expected_sha1_b32"]
+        if not d["optional"]:
+            del d["optional"]
         sources.append(d)
     data = {
         "schema": manifest.schema,

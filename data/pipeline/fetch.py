@@ -103,10 +103,14 @@ def verify(manifest: Manifest, raw_root: Path) -> list[Problem]:
     for src in manifest.sources:
         target = raw_root / src.file
         if not target.exists():
-            how = "download it manually from" if src.acquire == "manual" else "run fetch for"
-            problems.append(
-                Problem(src.id, "missing", f"{src.id}: missing; {how} {src.url} into {target}")
-            )
+            if src.optional:
+                continue
+            if src.acquire == "manual" and not src.url:
+                message = f"{src.id}: missing; place it at {target}"
+            else:
+                how = "download it manually from" if src.acquire == "manual" else "run fetch for"
+                message = f"{src.id}: missing; {how} {src.url} into {target}"
+            problems.append(Problem(src.id, "missing", message))
             continue
         if src.sha256 is None:
             problems.append(Problem(src.id, "unpinned", f"{src.id}: present but not pinned"))

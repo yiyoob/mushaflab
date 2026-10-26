@@ -92,3 +92,13 @@ def test_round_trip_is_stable(tmp_path: Path) -> None:
     dump_manifest(load_manifest(path), path)
     assert path.read_bytes() == first
     assert first.endswith(b"\n")
+
+
+def test_manual_source_may_have_no_url(tmp_path: Path) -> None:
+    m = load_manifest(write(tmp_path, [source(acquire="manual", url="")]))
+    assert m.sources[0].url == ""
+
+
+def test_http_source_needs_a_url(tmp_path: Path) -> None:
+    with pytest.raises(ManifestError, match="https"):
+        load_manifest(write(tmp_path, [source(url="")]))

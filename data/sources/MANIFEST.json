@@ -495,6 +495,84 @@
       "sha256": "7b268021f51518bdf1c9d020f2ceb21e081de10166ca5faf2e51540510a19e3f",
       "size": 10593,
       "url": "https://raw.githubusercontent.com/DigitalKhatt/digitalkhatt-js/78372d7a1e211bbab677cc0304384f278f508657/apps/site-angular/src/app/services/qurantext.service.ts"
+    },
+    {
+      "acquire": "manual",
+      "file": "books/al-futuh-al-bahira/vol1.pdf",
+      "group": "books",
+      "id": "book-al-futuh-al-bahira-vol1",
+      "note": "al-Futuh al-Bahira fi Jam' al-Qira'at al-'Ashr al-Mutawatira, volume 1 (PDF supplied by the owner, 2026-10-26). Rules reference for Phase 6 citations (book, page, row). Its text layer scrambles Quranic text: use only for labels and locations, never as Quranic text (rule 1).",
+      "optional": true,
+      "pinned_on": "2026-10-26",
+      "role": "rules-reference",
+      "sha256": "4967fa8cdf648e5255029398783a77b979b55b0b81feba447f0521932e86bcc2",
+      "size": 18703921,
+      "url": ""
+    },
+    {
+      "acquire": "manual",
+      "file": "books/al-futuh-al-bahira/vol2.pdf",
+      "group": "books",
+      "id": "book-al-futuh-al-bahira-vol2",
+      "note": "al-Futuh al-Bahira fi Jam' al-Qira'at al-'Ashr al-Mutawatira, volume 2 (PDF supplied by the owner, 2026-10-26). Rules reference for Phase 6 citations (book, page, row). Its text layer scrambles Quranic text: use only for labels and locations, never as Quranic text (rule 1).",
+      "optional": true,
+      "pinned_on": "2026-10-26",
+      "role": "rules-reference",
+      "sha256": "928001df00d3cc3d795319448da416725551efae77b092e4ba69b9da343f5105",
+      "size": 9521197,
+      "url": ""
+    },
+    {
+      "acquire": "manual",
+      "file": "books/al-futuh-al-bahira/vol3.pdf",
+      "group": "books",
+      "id": "book-al-futuh-al-bahira-vol3",
+      "note": "al-Futuh al-Bahira fi Jam' al-Qira'at al-'Ashr al-Mutawatira, volume 3 (PDF supplied by the owner, 2026-10-26). Rules reference for Phase 6 citations (book, page, row). Its text layer scrambles Quranic text: use only for labels and locations, never as Quranic text (rule 1).",
+      "optional": true,
+      "pinned_on": "2026-10-26",
+      "role": "rules-reference",
+      "sha256": "1f5aff6c7f684b76fcf5ef2ed6f2cad9efafc4304d4b8fba06d5803ef3ce33eb",
+      "size": 10672704,
+      "url": ""
+    },
+    {
+      "acquire": "manual",
+      "file": "books/al-futuh-al-bahira/vol4.pdf",
+      "group": "books",
+      "id": "book-al-futuh-al-bahira-vol4",
+      "note": "al-Futuh al-Bahira fi Jam' al-Qira'at al-'Ashr al-Mutawatira, volume 4 (PDF supplied by the owner, 2026-10-26). Rules reference for Phase 6 citations (book, page, row). Its text layer scrambles Quranic text: use only for labels and locations, never as Quranic text (rule 1).",
+      "optional": true,
+      "pinned_on": "2026-10-26",
+      "role": "rules-reference",
+      "sha256": "0c2b8ac732ce308eb79d73907b9bdc1b7eb8816e0eba2242a1b7c09fe4f222ff",
+      "size": 11577202,
+      "url": ""
+    },
+    {
+      "acquire": "manual",
+      "file": "books/al-futuh-al-bahira/vol5.pdf",
+      "group": "books",
+      "id": "book-al-futuh-al-bahira-vol5",
+      "note": "al-Futuh al-Bahira fi Jam' al-Qira'at al-'Ashr al-Mutawatira, volume 5 (PDF supplied by the owner, 2026-10-26). Rules reference for Phase 6 citations (book, page, row). Its text layer scrambles Quranic text: use only for labels and locations, never as Quranic text (rule 1).",
+      "optional": true,
+      "pinned_on": "2026-10-26",
+      "role": "rules-reference",
+      "sha256": "f96d05c2ee5871bd3be91e7b32214e8ff8f024507418cb1b2546e5786d2bbacc",
+      "size": 11082192,
+      "url": ""
+    },
+    {
+      "acquire": "manual",
+      "file": "books/al-futuh-al-bahira/vol6.pdf",
+      "group": "books",
+      "id": "book-al-futuh-al-bahira-vol6",
+      "note": "al-Futuh al-Bahira fi Jam' al-Qira'at al-'Ashr al-Mutawatira, volume 6 (PDF supplied by the owner, 2026-10-26). Rules reference for Phase 6 citations (book, page, row). Its text layer scrambles Quranic text: use only for labels and locations, never as Quranic text (rule 1).",
+      "optional": true,
+      "pinned_on": "2026-10-26",
+      "role": "rules-reference",
+      "sha256": "511307401597355afa71cf2044f213b368ab20399d25600da9b10598f5cf6f84",
+      "size": 13231677,
+      "url": ""
     }
   ]
 }

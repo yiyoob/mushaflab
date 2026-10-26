@@ -158,3 +158,23 @@ def test_pin_skips_missing_files(tmp_path: Path, raw: Path) -> None:
     m = make_manifest(tmp_path)
     assert pin(m, raw, today="2026-10-21") == []
     assert m.sources[0].sha256 is None
+
+
+def test_verify_missing_manual_without_url_names_the_path(tmp_path: Path, raw: Path) -> None:
+    m = make_manifest(tmp_path, acquire="manual", url="")
+    problems = verify(m, raw)
+    assert [p.kind for p in problems] == ["missing"]
+    assert "place it at" in problems[0].message
+    assert str(raw / "g/f.txt") in problems[0].message
+
+
+def test_missing_optional_source_is_not_a_problem(tmp_path: Path, raw: Path) -> None:
+    m = make_manifest(tmp_path, acquire="manual", url="", optional=True)
+    assert verify(m, raw) == []
+
+
+def test_present_optional_source_must_still_match(tmp_path: Path, raw: Path) -> None:
+    m = make_manifest(tmp_path, acquire="manual", url="", optional=True, sha256=SHA256, size=16)
+    (raw / "g").mkdir()
+    (raw / "g/f.txt").write_bytes(b"different bytes!")
+    assert [p.kind for p in verify(m, raw)] == ["sha256"]
