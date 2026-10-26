@@ -56,6 +56,7 @@ Consequences: what follows, what it rules out
 | D42 | T6.4: data-derived rules (hypotheses) plus residual patches per riwāyah | accepted (T6.4, 2026-10-26); every rule awaits a citation |
 | D43 | Ṭarīq as the option group `<riwāyah>.tariq`; ṭarīq-level patches apply under their ṭarīq only | accepted (T6.6, 2026-10-26) |
 | D44 | Display styles: render-time conversion from owner-confirmed rows; per-(riwāyah, style) audit decides availability | accepted (T6.7–T6.10, 2026-10-26) |
+| D45 | Difference highlighting from rule provenance; cited rules by default, hypotheses opt-in and flagged | accepted (T6.11–T6.12, 2026-10-26); default for hypotheses is the owner's choice at G4 |
 
 ---
 
@@ -1352,3 +1353,43 @@ Decision:
 Consequences: with one confirmed row, no non-default combination is available today (see
 the audit). Each further owner-confirmed row, or a font, reduces the counts. The owner
 reviews the convention report at G4.
+
+## D45: Difference highlighting (T6.11–T6.12)
+Status: accepted (T6.11–T6.12, 2026-10-26). Whether hypotheses show by default is the owner's
+choice at G4.
+Context: D37. A highlight must come from a rule application or a curated farsh entry,
+never from a raw patch. It must never mark an encoding or spelling difference, and it must
+carry a label, the Ḥafṣ form and a citation. Plain and highlighted modes draw identically.
+Decision:
+- Source: the resolver already records, for every cluster, the ids of the patches that
+  changed it (`provenance`). A rule's patches are `<rule>@…`, so the rule and its register
+  entry are known.
+  - A cluster highlights if a rule changed it, and that rule's register `difference_kind` is
+    neither `encoding` nor `spelling`, and the rule is cited (`rule-derived` with a source) or
+    the policy shows hypotheses.
+  - A curated farsh patch (`source.kind: farsh`) also highlights; none exists yet.
+  - Raw and residual patches never highlight. Nothing highlights on Ḥafṣ.
+- `difference_kind` for data-derived rules: `pipeline/rule_mining.py` gives each rule the D21
+  kind of its change when every codepoint component is an owner-confirmed row of one kind,
+  else `unclassified`. Today that is 60 Warsh and 38 Qālūn rules classed `encoding`, the
+  confirmed sukūn row.
+- Output: `DrawPage::highlights` holds, per highlighted cluster:
+  - its line;
+  - the label (rule or farsh id);
+  - the Ḥafṣ form (`U+` codepoints; empty for an inserted cluster);
+  - the citation and a `cited` flag (false means shown in a distinct style);
+  - `annotation`, true for pronunciation-only differences (D40).
+  `Renderer::render_highlighted(page, choices, HighlightPolicy)` fills it. The list is
+  serialized only when non-empty, so plain pages and their goldens are unchanged.
+- Policy: `HighlightPolicy::default()` shows only cited rules. Since no data-derived rule is
+  cited yet, the default highlights nothing. `hypotheses: true` shows them, flagged uncited.
+- Tests (`highlight_pairs_per_riwayah`, in `just golden`), per non-Ḥafṣ riwāyah on its first
+  page with a highlight:
+  - the highlighted page minus its highlights equals the plain page byte for byte;
+  - the default policy equals plain;
+  - no highlight comes from an encoding or spelling rule (for Warsh, encoding rules are
+    applied on the page and none highlights);
+  - the highlights are pinned in `tests/golden/pages/<r>-p<NNN>-highlights.json`.
+Consequences: highlighting becomes useful by default once the owner cites rules (G4).
+Pronunciation-only uṣūl highlight through annotations once cited rules write them (D40).
+The UI toggle is Phase 8.

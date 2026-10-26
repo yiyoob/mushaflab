@@ -311,3 +311,116 @@ pub fn png(svg: &str, width_px: u32) -> Result<Vec<u8>, Error> {
 pub fn svg(page: &DrawPage) -> String {
     to_svg(page)
 }
+
+/// Which differences from Ḥafṣ to highlight (T6.11, D37, D45).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct HighlightPolicy {
+    /// Also highlight uncited rules (hypotheses), flagged `cited: false` for a distinct style.
+    /// The owner chooses the default at G4; off here, so only cited rules highlight.
+    pub hypotheses: bool,
+}
+
+/// The highlights of a drawn page (T6.11–T6.12, D45). A highlight is an application of a
+/// rule, or of a curated farsh patch (`source.kind: farsh`), on a cluster drawn on the page;
+/// never a raw or residual patch, never an `encoding` or `spelling` rule, and nothing on
+/// Ḥafṣ itself (highlights compare with Ḥafṣ).
+pub fn highlights(
+    data: &mushaf_model::DataSet,
+    spine: &mushaf_model::Spine,
+    resolved: &Resolved,
+    page: &DrawPage,
+    policy: HighlightPolicy,
+) -> Vec<mushaf_draw::Highlight> {
+    use mushaf_model::{DifferenceKind, RuleStatus};
+    if page.riwayah == "hafs" {
+        return Vec::new();
+    }
+    let mut line_of: BTreeMap<&mushaf_model::ClusterRef, u32> = BTreeMap::new();
+    for it in &page.items {
+        if let mushaf_draw::DrawItem::Glyph {
+            line,
+            cluster: Some(c),
+            ..
+        } = it
+        {
+            line_of.entry(c).or_insert(*line);
+        }
+    }
+    let farsh: BTreeMap<&str, &mushaf_model::Patch> = data
+        .patch_files
+        .values()
+        .flat_map(|f| &f.patches)
+        .filter(|p| p.source.kind == "farsh")
+        .map(|p| (p.id.as_str(), p))
+        .collect();
+    let mut out = Vec::new();
+    for item in &resolved.items {
+        for c in &item.clusters {
+            let Some(line) = line_of.get(&c.id) else {
+                continue;
+            };
+            let hafs_cps = spine.cluster(&c.id).map(|h| h.cps.clone());
+            let hafs = hafs_cps
+                .as_ref()
+                .map(ToString::to_string)
+                .unwrap_or_default();
+            let annotation = hafs_cps.as_ref() == Some(&c.cps);
+            for pid in &c.provenance {
+                let found = match pid.split_once('@') {
+                    Some((rule, _)) => data.register.entry(rule).and_then(|e| {
+                        let kind_ok = !matches!(
+                            e.difference_kind,
+                            Some(DifferenceKind::Encoding | DifferenceKind::Spelling)
+                        );
+                        let cited = e.status == RuleStatus::RuleDerived && e.source.is_some();
+                        let cite = e.source.as_ref().map(|s| match s.volume {
+                            Some(v) => format!("{}, vol {v}, p. {}", s.book, s.page),
+                            None => format!("{}, p. {}", s.book, s.page),
+                        });
+                        (kind_ok && (cited || policy.hypotheses))
+                            .then(|| (rule.to_string(), cite, cited))
+                    }),
+                    None => farsh
+                        .get(pid.as_str())
+                        .map(|p| (p.id.clone(), Some(p.source.reference.clone()), true)),
+                };
+                if let Some((label, cite, cited)) = found {
+                    out.push(mushaf_draw::Highlight {
+                        line: *line,
+                        cluster: c.id.clone(),
+                        label,
+                        hafs: hafs.clone(),
+                        cite,
+                        cited,
+                        annotation,
+                    });
+                    break;
+                }
+            }
+        }
+    }
+    out
+}
+
+impl Renderer {
+    /// Resolve, fit and draw one page, then attach its highlights (T6.12). Everything drawn is
+    /// the same as `render` with the same choices: only `DrawPage::highlights` is added.
+    pub fn render_highlighted(
+        &self,
+        page: u32,
+        choices: &BTreeMap<String, String>,
+        policy: HighlightPolicy,
+    ) -> Result<DrawPage, Error> {
+        let resolved = self.resolve_with(choices, None)?;
+        let mapping = self.map(&resolved)?;
+        let mut d = self.draw(&self.fit(&resolved, &mapping, page)?)?;
+        d.highlights = highlights(
+            &self.data,
+            &self.data.spines[&self.profile.spine],
+            &resolved,
+            &d,
+            policy,
+        );
+        Ok(d)
+    }
+}

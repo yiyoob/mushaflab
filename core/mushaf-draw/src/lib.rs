@@ -106,6 +106,27 @@ pub struct DrawPage {
     pub items: Vec<DrawItem>,
     pub lines: Vec<LineSummary>,
     pub notes: Vec<FitNote>,
+    /// "Differs from Ḥafṣ" flags (T6.12, D37, D45), set only in highlight mode. They never
+    /// change `items`, `lines` or anything drawn: plain and highlighted pages differ only here.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub highlights: Vec<Highlight>,
+}
+
+/// One highlighted cluster: what makes it differ from Ḥafṣ, and where that comes from.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct Highlight {
+    pub line: u32,
+    pub cluster: ClusterRef,
+    /// The rule (or curated farsh entry) that changed this cluster.
+    pub label: String,
+    /// The cluster's Ḥafṣ form as `U+XXXX` codepoints; empty for an inserted cluster.
+    pub hafs: String,
+    /// Book and page, when cited.
+    pub cite: Option<String>,
+    /// False for an uncited hypothesis (shown in a distinct style, owner's choice at G4).
+    pub cited: bool,
+    /// True when the difference is pronunciation only (annotation channel, D40).
+    pub annotation: bool,
 }
 
 /// Names that go into the page's metadata.
@@ -371,6 +392,7 @@ pub fn draw_page(
         items,
         lines,
         notes: fit.notes.clone(),
+        highlights: Vec::new(),
     })
 }
 

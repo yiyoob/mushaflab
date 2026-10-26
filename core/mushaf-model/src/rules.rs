@@ -356,6 +356,10 @@ pub struct RegisterEntry {
     pub status: RuleStatus,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub single_source: bool,
+    /// D21 kind of the rule's change (T6.11): an `encoding` or `spelling` rule never
+    /// highlights. Absent means unclassified.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub difference_kind: Option<crate::DifferenceKind>,
 }
 
 /// `rules/register.yaml`.

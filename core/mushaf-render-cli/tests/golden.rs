@@ -1165,3 +1165,94 @@ fn style_availability_audit() {
         "style availability changed"
     );
 }
+
+/// T6.11–T6.12 (D37, D45): difference highlighting per riwāyah, on the first page from 3 that
+/// draws and has a highlight. Highlighting changes nothing drawn: the highlighted page's draw list without its
+/// highlights equals the plain page byte for byte. With the default policy (cited rules only)
+/// nothing highlights today, as every data-derived rule is a hypothesis. With hypotheses
+/// shown, every highlight comes from a rule that is neither `encoding` nor `spelling`, and an
+/// encoding rule applied on the page never highlights. The highlights are pinned per riwāyah
+/// in `tests/golden/pages/<r>-p<NNN>-highlights.json`.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn highlight_pairs_per_riwayah() {
+    use mushaf_model::DifferenceKind;
+    use mushaf_render::HighlightPolicy;
+    use std::collections::BTreeMap;
+    let update = std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some();
+    let none = BTreeMap::new();
+    for riwayah in [
+        "shuba",
+        "warsh",
+        "qalun",
+        "bazzi",
+        "qunbul",
+        "duri_abuamr",
+        "susi",
+    ] {
+        let r = Renderer::load(&repo(), riwayah).unwrap();
+        let shown = HighlightPolicy { hypotheses: true };
+        let (page, mut hl) = (3..=604)
+            .find_map(|p| {
+                r.render_highlighted(p, &none, shown)
+                    .ok()
+                    .filter(|d| !d.highlights.is_empty())
+                    .map(|d| (p, d))
+            })
+            .unwrap();
+        let plain = r.render(page, None).unwrap();
+        let cited = r
+            .render_highlighted(page, &none, HighlightPolicy::default())
+            .unwrap();
+        assert_eq!(
+            cited, plain,
+            "{riwayah}: no rule is cited yet, so nothing highlights"
+        );
+        let highlights = std::mem::take(&mut hl.highlights);
+        assert_eq!(
+            serde_json::to_string(&hl).unwrap(),
+            serde_json::to_string(&plain).unwrap(),
+            "{riwayah}: highlighting changed the drawing"
+        );
+        for h in &highlights {
+            let e = r.data.register.entry(&h.label).unwrap();
+            assert!(
+                !matches!(
+                    e.difference_kind,
+                    Some(DifferenceKind::Encoding | DifferenceKind::Spelling)
+                ),
+                "{riwayah}: {} is an encoding/spelling rule",
+                h.label
+            );
+            assert!(!h.cited, "{riwayah}: {} is shown as cited", h.label);
+        }
+        if riwayah == "warsh" {
+            let resolved = r.resolve(None).unwrap();
+            let encoding_rules: Vec<&str> = resolved
+                .items
+                .iter()
+                .flat_map(|i| &i.clusters)
+                .flat_map(|c| &c.provenance)
+                .filter_map(|p| p.split_once('@').map(|x| x.0))
+                .filter(|rule| {
+                    r.data.register.entry(rule).and_then(|e| e.difference_kind)
+                        == Some(DifferenceKind::Encoding)
+                })
+                .collect();
+            assert!(!encoding_rules.is_empty(), "warsh applies encoding rules");
+            assert!(
+                highlights
+                    .iter()
+                    .all(|h| !encoding_rules.contains(&h.label.as_str()))
+            );
+        }
+        let name = format!("{riwayah}-p{page:03}-highlights");
+        let path = repo().join(format!("tests/golden/pages/{name}.json"));
+        let text = serde_json::to_string_pretty(&highlights).unwrap() + "\n";
+        if update {
+            fs::write(&path, &text).unwrap();
+        } else {
+            assert_eq!(text, fs::read_to_string(&path).unwrap(), "{name} changed");
+        }
+    }
+}

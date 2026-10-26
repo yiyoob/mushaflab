@@ -30,7 +30,7 @@ from pathlib import Path
 
 import yaml
 
-from pipeline import emit_patches, spine
+from pipeline import classify, emit_patches, spine
 from pipeline.differ import simulate_set_marks
 from pipeline.spine import from_cps, to_cps
 
@@ -369,6 +369,17 @@ def rule_file(riwayah: str, rules: list[Mined]) -> str:
     return "\n".join(out) + "\n"
 
 
+def difference_kind(riwayah: str, m: Mined) -> str:
+    """The D21 kind of a rule's change (T6.11): a codepoint change whose every component is an
+    owner-confirmed row of one kind takes that kind; anything else is unclassified."""
+    if m.change.kind != "mod":
+        return "unclassified"
+    confirmed = classify.load_confirmed().get(riwayah, {})
+    comps = classify.components(m.change.old, m.change.new)
+    kinds = {confirmed.get((x, y)) if t == "sub" else None for t, x, y in comps}
+    return kinds.pop() if len(kinds) == 1 and None not in kinds else "unclassified"
+
+
 def register_file(riwayah: str, rules: list[Mined]) -> str:
     out = [
         f"# Register for rules/{riwayah}.yaml (T6.4, ADR D42). Every entry is a hypothesis: no",
@@ -384,6 +395,7 @@ def register_file(riwayah: str, rules: list[Mined]) -> str:
             "source": None,
             "status": "hypothesis",
             "single_source": True,
+            "difference_kind": difference_kind(riwayah, m),
         }
         out.append("  - " + emit_patches.flow(entry))
     return "\n".join(out) + "\n"

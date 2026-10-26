@@ -1,0 +1,65 @@
+[
+  {
+    "line": 1,
+    "cluster": "2:6:6:1",
+    "label": "duri_abuamr.d0032",
+    "hafs": "U+0621 U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 1,
+    "cluster": "2:6:6:2",
+    "label": "duri_abuamr.d0029",
+    "hafs": "U+0623 U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 4,
+    "cluster": "2:8:6:2",
+    "label": "duri_abuamr.d0005",
+    "hafs": "U+0671",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 4,
+    "cluster": "2:8:7:3",
+    "label": "duri_abuamr.d0005",
+    "hafs": "U+0671",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 5,
+    "cluster": "2:9:3:2",
+    "label": "duri_abuamr.d0001",
+    "hafs": "U+0671",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 13,
+    "cluster": "2:15:2:6",
+    "label": "duri_abuamr.d0044",
+    "hafs": "U+0626 U+064F",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 15,
+    "cluster": "2:16:5:2",
+    "label": "duri_abuamr.d0005",
+    "hafs": "U+0671",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  }
+]
