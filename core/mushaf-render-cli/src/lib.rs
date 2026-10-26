@@ -29,18 +29,50 @@ pub fn default_style(riwayah: &str) -> Result<&'static str, Error> {
 }
 
 /// Render profiles by (riwāyah, style) (D36): Ḥafṣ on the 1441H layout, the others on their
-/// native KFGQPC layouts (T5.2). Only each riwāyah's default style exists in Phase 5.
+/// native KFGQPC layouts (T5.2); a non-default style has `data/render/<riwāyah>-<style>.json`
+/// (T6.10, D44), used only when the T6.9 audit marks the combination available.
 pub fn profile_path(riwayah: &str, style: &str) -> Result<String, Error> {
+    if !matches!(style, "hijazi" | "maghribi") {
+        return Err(Error::new(format!("unknown style {style:?}")));
+    }
     if style != default_style(riwayah)? {
-        return Err(Error::new(format!(
-            "style {style:?} of riwayah {riwayah:?} is not available yet (D36: other styles are \
-             built in Phase 6, T6.7-T6.10)"
-        )));
+        return Ok(format!("data/render/{riwayah}-{style}.json"));
     }
     Ok(match riwayah {
         "hafs" => "data/render/hafs-uthmani-1441h.json".into(),
         _ => format!("data/render/{riwayah}-uthmani-kfgqpc.json"),
     })
+}
+
+/// The T6.9 audit of every (riwāyah, non-default style) (D44).
+pub const STYLE_AVAILABILITY: &str = "data/render/style-availability.json";
+
+/// Refuses a non-default style the T6.9 audit does not mark available, with the audit's counts.
+pub fn check_style_available(repo: &Path, riwayah: &str, style: &str) -> Result<(), Error> {
+    if style == default_style(riwayah)? {
+        return Ok(());
+    }
+    let doc: serde_json::Value = serde_json::from_str(&read(repo, STYLE_AVAILABILITY)?)
+        .map_err(|e| Error::new(format!("{STYLE_AVAILABILITY}: {e}")))?;
+    let entry = doc["entries"]
+        .as_array()
+        .and_then(|es| {
+            es.iter()
+                .find(|e| e["riwayah"] == riwayah && e["style"] == style)
+        })
+        .ok_or_else(|| {
+            Error::new(format!(
+                "{STYLE_AVAILABILITY}: no entry for {riwayah} {style}"
+            ))
+        })?;
+    if entry["available"] == true {
+        return Ok(());
+    }
+    Err(Error::new(format!(
+        "style {style:?} of riwayah {riwayah:?} is not available (D44, T6.9 audit in \
+         {STYLE_AVAILABILITY}): {} of {} words cannot convert, {} fail rule 6",
+        entry["unconvertible_words"], entry["words"], entry["rule6_failing_words"]
+    )))
 }
 
 /// Owner-approved per-glyph rule-6 exceptions (D27, G-100).
@@ -83,6 +115,7 @@ impl Renderer {
     }
 
     pub fn load_style(repo: &Path, riwayah: &str, style: &str) -> Result<Self, Error> {
+        check_style_available(repo, riwayah, style)?;
         let profile = Profile::from_json(&read(repo, &profile_path(riwayah, style)?)?)?;
         if profile.riwayah != riwayah || profile.style != style {
             return Err(Error::new(format!(
