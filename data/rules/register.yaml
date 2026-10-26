@@ -1,0 +1,5 @@
+# Rule register (T6.1, ADR D38): one entry per rule in data/rules/*.yaml. Tests fail if the
+# register and the rule files disagree (owner, option, missing or extra entries), and a rule
+# without a cited source can only be a `hypothesis`. `cross-checked` and `muqri-verified`
+# never appear here: they live in data/approvals/ (CLAUDE.md rule 4).
+rules: []

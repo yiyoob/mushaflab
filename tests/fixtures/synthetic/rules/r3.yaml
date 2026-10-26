@@ -1,0 +1,26 @@
+# Synthetic rules over the synthetic spine test/v1 (T6.1): a cross-cluster rule, a cross-word
+# rule and an option-dependent rule.
+spine: "test/v1"
+rules:
+  - id: "r3.mark"
+    owner: {level: "riwayah", id: "r3"}
+    pattern:
+      - {base: ["U+0063"], capture: "c"}
+      - {base: ["U+0064"], at: "last"}
+    actions:
+      - {op: "set_marks", target: "c", payload: {add: ["U+0301"]}}
+  - id: "r3.cross"
+    owner: {level: "riwayah", id: "r3"}
+    pattern:
+      - {base: ["U+0064"], at: "last", capture: "d"}
+      - {boundary: "ayah_end"}
+      - {at: "first", capture: "next"}
+    actions:
+      - {op: "replace", target: "d.item", payload: {sep_after: "U+0020"}}
+  - id: "r3.toggle"
+    owner: {level: "riwayah", id: "r3"}
+    when: {option: "test.toggle", choice: "on"}
+    pattern:
+      - {base: ["U+0061"], bare: true, capture: "a"}
+    actions:
+      - {op: "set_marks", target: "a", payload: {add: ["U+0302"]}}

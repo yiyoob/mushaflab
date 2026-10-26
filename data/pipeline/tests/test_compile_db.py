@@ -33,7 +33,7 @@ def test_schema_version_and_keys(tmp_path: Path) -> None:
     compile_db.build(db)
     con = sqlite3.connect(db)
     meta = dict(con.execute("select key, value from meta"))
-    assert meta["schema_version"] == "3"
+    assert meta["schema_version"] == "4"
     assert (
         meta["sha256:spine/hafs/v1/items.jsonl"]
         == hashlib.sha256(spine.ITEMS.read_bytes()).hexdigest()
@@ -72,7 +72,13 @@ def test_synthetic_root_compiles(tmp_path: Path) -> None:
     ]
     assert _rows(db, "select id from option_groups") == [("test.other",), ("test.toggle",)]
     assert _rows(db, "select riwayah_id, spine_id from ayah_maps") == [("r1", "test/v1")]
-    assert _rows(db, "select riwayah_id, spine_id from profiles") == [("r1", "test/v1")]
+    assert _rows(db, "select riwayah_id, spine_id from profiles") == [
+        ("r1", "test/v1"),
+        ("r3", "test/v1"),
+    ]
+    assert _rows(db, "select path, spine_id from rule_files") == [("rules/r3.yaml", "test/v1")]
+    register = json.loads(_rows(db, "select body from rule_register")[0][0])
+    assert [r["id"] for r in register["rules"]] == ["r3.mark", "r3.cross", "r3.toggle"]
     body = json.loads(_rows(db, "select body from patch_files where path like '%r1%'")[0][0])
     assert body["patches"][0]["target"] == "1:1:2:1"
     meta = dict(_rows(db, "select key, value from meta"))
@@ -84,6 +90,9 @@ def test_synthetic_root_compiles(tmp_path: Path) -> None:
         "patches/curated/q1.yaml",
         "patches/raw/r1.yaml",
         "profiles/r1.yaml",
+        "profiles/r3.yaml",
+        "rules/r3.yaml",
+        "rules/register.yaml",
         "spine/test/v1/items.jsonl",
         "spine/test/v1/manifest.json",
     ]

@@ -1,5 +1,5 @@
 //! T2.2: everything under a data root, loaded either from the tracked files or from the rows of
-//! `mushaf.db` (schema v2). Both paths build the same `DataSet`, and the parity tests in
+//! `mushaf.db` (schema v4). Both paths build the same `DataSet`, and the parity tests in
 //! `mushaf-db` check that they are equal. Pure: callers supply file contents or rows.
 
 use std::collections::BTreeMap;
@@ -8,21 +8,22 @@ use serde::Deserialize;
 use serde::de::DeserializeOwned;
 
 use crate::{
-    AyahMap, Cluster, Cps, Error, Item, ItemKind, Layout, Line, OptionGroup, PatchFile,
-    RiwayahProfile, Spine, from_json, from_yaml,
+    AyahMap, Cluster, Cps, Error, Item, ItemKind, Layout, Line, OptionGroup, PatchFile, Register,
+    RiwayahProfile, RuleFile, Spine, from_json, from_yaml,
 };
 
 /// File contents by path relative to the data root, with `/` separators.
 pub type DataFiles = BTreeMap<String, String>;
 
 /// The top-level directories of a data root that hold loadable data.
-pub const DATA_DIRS: [&str; 6] = [
+pub const DATA_DIRS: [&str; 7] = [
     "spine",
     "layouts",
     "patches",
     "options",
     "ayah_maps",
     "profiles",
+    "rules",
 ];
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -39,6 +40,10 @@ pub struct DataSet {
     pub ayah_maps: BTreeMap<String, AyahMap>,
     /// Riwāyah profiles (T5.1), by riwayah id.
     pub profiles: BTreeMap<String, RiwayahProfile>,
+    /// Rule files (T6.1), by path relative to the data root (`rules/hafs.yaml`).
+    pub rule_files: BTreeMap<String, RuleFile>,
+    /// The rule register (`rules/register.yaml`); it must agree with the rule files.
+    pub register: Register,
 }
 
 /// What a file under the data root is, or `None` if the loader does not read it.
@@ -51,7 +56,12 @@ pub enum Input {
     OptionFile,
     AyahMap,
     Profile,
+    RuleFile,
+    RuleRegister,
 }
+
+/// The register's path under the data root.
+pub const REGISTER_PATH: &str = "rules/register.yaml";
 
 /// Classifies a root-relative path. `.gitkeep` and layout correction inputs (read by the
 /// pipeline, not the core) are not inputs; any other unexpected file is an error.
@@ -70,6 +80,9 @@ pub fn classify(path: &str) -> Result<Option<Input>, Error> {
         ["options", f] if f.ends_with(".yaml") => Some(Input::OptionFile),
         ["ayah_maps", f] if f.ends_with(".yaml") => Some(Input::AyahMap),
         ["profiles", f] if f.ends_with(".yaml") => Some(Input::Profile),
+        ["rules", "README.md"] => return Ok(None),
+        ["rules", "register.yaml"] => Some(Input::RuleRegister),
+        ["rules", f] if f.ends_with(".yaml") => Some(Input::RuleFile),
         _ => None,
     };
     input
@@ -206,6 +219,14 @@ impl DataSet {
                         return Err(Error::new(format!("{path}: file name is not its riwayah")));
                     }
                     insert_unique(&mut ds.profiles, p.riwayah.clone(), p, "profile")?;
+                }
+                Some(Input::RuleFile) => {
+                    ascii(path, text)?;
+                    ds.rule_files
+                        .insert(path.clone(), from_yaml(text).map_err(at)?);
+                }
+                Some(Input::RuleRegister) => {
+                    ds.register = from_yaml(text).map_err(at)?;
                 }
             }
         }
@@ -346,6 +367,23 @@ impl DataSet {
             }
             ds.profiles.insert(b.key, p);
         }
+        for b in rows.rule_files {
+            let f: RuleFile =
+                from_json(&b.body).map_err(|e| Error::new(format!("DB {}: {e}", b.key)))?;
+            if f.spine != b.spine_id {
+                return Err(Error::new(format!(
+                    "DB {}: spine column disagrees with body",
+                    b.key
+                )));
+            }
+            ds.rule_files.insert(b.key, f);
+        }
+        for b in rows.rule_register {
+            if b.key != REGISTER_PATH {
+                return Err(Error::new(format!("DB: unexpected register row {}", b.key)));
+            }
+            ds.register = from_json(&b.body)?;
+        }
         ds.validate()?;
         Ok(ds)
     }
@@ -370,6 +408,18 @@ impl DataSet {
         for m in self.ayah_maps.values() {
             known(&m.spine, &format!("ayah map {}", m.riwayah))?;
         }
+        for (path, f) in &self.rule_files {
+            known(&f.spine, path)?;
+        }
+        let problems = self
+            .register
+            .check(self.rule_files.iter().map(|(p, f)| (p.as_str(), f)));
+        if !problems.is_empty() {
+            return Err(Error::new(format!(
+                "rules and register disagree: {}",
+                problems.join("; ")
+            )));
+        }
         for p in self.profiles.values() {
             let what = format!("profile {}", p.riwayah);
             known(&p.spine, &what)?;
@@ -380,6 +430,15 @@ impl DataSet {
                         return Err(Error::new(format!("{what}: {path} is on another spine")));
                     }
                     None => return Err(Error::new(format!("{what}: no patch file {path}"))),
+                }
+            }
+            for path in &p.rule_stack {
+                match self.rule_files.get(path) {
+                    Some(f) if f.spine == p.spine => {}
+                    Some(_) => {
+                        return Err(Error::new(format!("{what}: {path} is on another spine")));
+                    }
+                    None => return Err(Error::new(format!("{what}: no rule file {path}"))),
                 }
             }
             if let Some(m) = &p.ayah_map {
@@ -398,7 +457,7 @@ fn enum_from<T: DeserializeOwned>(s: &str) -> Result<T, Error> {
         .map_err(|e| Error::new(format!("{s:?}: {e}")))
 }
 
-/// Rows of `mushaf.db` (schema v2), as read by `mushaf-db`. Text columns hold real codepoints.
+/// Rows of `mushaf.db` (schema v4), as read by `mushaf-db`. Text columns hold real codepoints.
 #[derive(Clone, Debug, Default)]
 pub struct DbRows {
     pub spines: Vec<SpineRow>,
@@ -410,6 +469,9 @@ pub struct DbRows {
     pub option_groups: Vec<BodyRow>,
     pub ayah_maps: Vec<BodyRow>,
     pub profiles: Vec<BodyRow>,
+    pub rule_files: Vec<BodyRow>,
+    /// At most one row, keyed by `REGISTER_PATH`.
+    pub rule_register: Vec<BodyRow>,
 }
 
 #[derive(Clone, Debug)]

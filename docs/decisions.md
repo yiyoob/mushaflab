@@ -49,6 +49,7 @@ Consequences: what follows, what it rules out
 | D33 | Display style as a render key: (riwāyah, style), default style only in Phase 5 | accepted (owner requirement, relayed 2026-10-23; confirmed at GATE G3); implements D36's Phase 5 part |
 | D36 | Display styles: Ḥijāzī and Maghribi for every riwāyah | accepted (scope); built in Phase 6 |
 | D37 | Highlighting differences from Ḥafṣ | accepted (scope); built in Phase 6, UI in Phase 8 |
+| D38 | Rule DSL: declarative patterns expanded into ordinary patches in the core | accepted with the T6.1 plan (2026-10-26) |
 
 ---
 
@@ -1129,3 +1130,41 @@ Phase 6 rules and curated farsh (T6.11–T6.12), including pronunciation-only ru
 the annotation channel; each carries a label, the Ḥafṣ form and a citation. Text and layout
 are identical in both modes. The toggle is in the Phase 8 UI.
 
+
+## D38: Rule DSL (T6.1)
+Status: accepted with the T6.1 plan (2026-10-26)
+Context: Phase 6 replaces raw diffs with rules, so that choosing an option changes the text
+through rules instead of a lookup table. Rules must be data in git (rule 3), must be
+evaluated in the core (rule 7), and must be deterministic (rule 8). Each rule needs a source
+and a status (rule 4), and each one must be checkable against a register.
+Options:
+- (a) Expand rules into patch files in the Python pipeline at build time. Simple, but the
+  logic would live outside `core/`, and a free-mode edit could not re-run the rules.
+- (b) A separate rule engine in the resolver with its own way of applying changes. This
+  duplicates the patch semantics: layers, conflicts and orphans.
+- (c) Rules as patterns whose actions are patch templates, expanded in the core into ordinary
+  `Patch` values that the existing resolver applies.
+Decision: (c).
+- `mushaf-model::rules` holds the data types and their checks: `RuleFile`, `Rule`, `Step`,
+  `ClusterMatch`, `Boundary`, `Scope`, `Exception`, `Action` and `Register`.
+- `mushaf-rules::expand` matches on the spine and returns a `PatchFile`. Each patch gets the
+  id `<rule>@<target>.<op>`, the source `{kind: rule, ref: <rule>}`, `rule_id`,
+  `status: rule-derived`, and the rule's `when`. An action's payload is checked by the same
+  parser as patch files.
+- A profile lists its rule files in `rule_stack`. `resolve_profile` expands them before the
+  patch stack. An option group's `affects` may name a rule id (§3.3).
+- In data mode, a rule that matches nowhere and an exception that is never met are errors.
+  In free mode they are lint notes.
+- The register (`data/rules/register.yaml`) is checked in Rust (`DataSet` validation) and in
+  Python (`pipeline/rules_register.py`, run by `just data-verify`). Its rules are:
+  - every rule has exactly one entry, and every entry a rule;
+  - owner and option agree with the rule file;
+  - an uncited rule is a `hypothesis`;
+  - `cross-checked` and `muqri-verified` are never allowed (rule 4).
+- `mushaf.db` schema v4 adds the `rule_files` and `rule_register` tables. The parity tests
+  cover them.
+- Rules match the spine's own text, not the output of other rules or of farsh (G-141).
+  Matches are leftmost and non-overlapping, in spine order. Codepoints are compared exactly.
+Consequences: T6.2 and T6.4 add real, cited rules to `data/rules/`. T6.4 compares each
+rule's expansion with the raw patches it explains. If a rule ever needs to see another
+rule's output, G-141 is revisited with a new ADR.

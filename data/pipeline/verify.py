@@ -29,6 +29,7 @@ from pipeline import (
     phase4_report,
     phase5_readme,
     profiles,
+    rules_register,
     sources,
     spine,
 )
@@ -185,6 +186,7 @@ CHECKS: dict[str, Callable[[], list[str]]] = {
     "qcf4 line data": check_qcf4_lines,
     "word texts": check_text_differences,
     "database": check_db,
+    "rule register": rules_register.check,
 }
 
 

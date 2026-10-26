@@ -5,7 +5,8 @@
   defaults:
     - {riwayah: "r1", choice: "off"}
     - {riwayah: "r1", tariq: "t2", choice: "on"}
-  affects: ["r1.opt.on"]
+    - {riwayah: "r3", choice: "off"}
+  affects: ["r1.opt.on", "r3.toggle"]
   allowed_for: ["r1"]
 - id: "test.other"
   title_ar: "test other"

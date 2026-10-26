@@ -1,0 +1,20 @@
+# Synthetic rule register (T6.1).
+rules:
+  - id: "r3.mark"
+    owner: {level: "riwayah", id: "r3"}
+    description: "synthetic: c before word-final d takes U+0301"
+    option: null
+    source: {book: "synthetic", page: "1"}
+    status: "rule-derived"
+  - id: "r3.cross"
+    owner: {level: "riwayah", id: "r3"}
+    description: "synthetic: a word-final d before an ayah end gets a plain space"
+    option: null
+    source: null
+    status: "hypothesis"
+  - id: "r3.toggle"
+    owner: {level: "riwayah", id: "r3"}
+    description: "synthetic: bare a takes U+0302 when test.toggle is on"
+    option: "test.toggle"
+    source: {book: "synthetic", volume: 2, page: "3"}
+    status: "rule-derived"

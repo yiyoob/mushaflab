@@ -170,6 +170,9 @@ pub enum ResolveError {
     Strict(Vec<Diagnostic>),
     /// The selection names a riwāyah with no profile (T5.1).
     UnknownRiwayah { riwayah: String },
+    /// A rule file could not be expanded (T6.1), or in `Mode::Data` a rule matched nowhere
+    /// or has an exception it never meets.
+    Rule(String),
 }
 
 impl fmt::Display for ResolveError {
@@ -230,6 +233,7 @@ impl fmt::Display for ResolveError {
             ResolveError::UnknownRiwayah { riwayah } => {
                 write!(f, "no profile for riwayah {riwayah:?}")
             }
+            ResolveError::Rule(e) => write!(f, "rules: {e}"),
         }
     }
 }

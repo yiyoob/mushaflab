@@ -31,6 +31,8 @@ pub struct RiwayahProfile {
     pub single_source: bool,
     /// Patch file paths relative to the data root, in layer order.
     pub patch_stack: Vec<String>,
+    /// Rule file paths (T6.1); their expansions are resolved with the patch stack.
+    pub rule_stack: Vec<String>,
     /// The riwāyah's own ayah numbering; `None` where the spine's numbering is its own (Ḥafṣ).
     pub ayah_map: Option<String>,
     pub surah_headers: Vec<SurahHeader>,
@@ -46,6 +48,8 @@ struct ProfileWire {
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     single_source: bool,
     patch_stack: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    rule_stack: Vec<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     ayah_map: Option<String>,
     surah_headers: Vec<SurahHeader>,
@@ -66,11 +70,13 @@ impl TryFrom<ProfileWire> for RiwayahProfile {
                 return Err(at(format!("surah {}: evidence without a line", h.surah)));
             }
         }
-        let mut stack = w.patch_stack.clone();
-        stack.sort();
-        stack.dedup();
-        if stack.len() != w.patch_stack.len() {
-            return Err(at("a patch file is listed twice".into()));
+        for (list, what) in [(&w.patch_stack, "patch"), (&w.rule_stack, "rule")] {
+            let mut stack = list.clone();
+            stack.sort();
+            stack.dedup();
+            if stack.len() != list.len() {
+                return Err(at(format!("a {what} file is listed twice")));
+            }
         }
         Ok(RiwayahProfile {
             riwayah: w.riwayah,
@@ -79,6 +85,7 @@ impl TryFrom<ProfileWire> for RiwayahProfile {
             text_source: w.text_source,
             single_source: w.single_source,
             patch_stack: w.patch_stack,
+            rule_stack: w.rule_stack,
             ayah_map: w.ayah_map,
             surah_headers: w.surah_headers,
         })
@@ -94,6 +101,7 @@ impl From<RiwayahProfile> for ProfileWire {
             text_source: p.text_source,
             single_source: p.single_source,
             patch_stack: p.patch_stack,
+            rule_stack: p.rule_stack,
             ayah_map: p.ayah_map,
             surah_headers: p.surah_headers,
         }

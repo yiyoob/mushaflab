@@ -1,0 +1,8 @@
+# Synthetic riwayah profile: r3 uses only rules (T6.1).
+riwayah: "r3"
+spine: "test/v1"
+script_id: "synthetic"
+text_source: "synthetic"
+patch_stack: []
+rule_stack: ["rules/r3.yaml"]
+surah_headers: []
