@@ -1,8 +1,8 @@
-//! T6.2: the Ḥafṣ option `hafs.maliyah` on the real data. Expected values cite KFGQPC Ḥafṣ
-//! muṣḥaf, explanation of signs, p. ح: for 69:28 مَالِيَهْ, iẓhār with sakt (what the muṣḥaf
-//! prints, so the default leaves the spine unchanged), or idghām into the hāʾ of هَلَكَ (69:29):
-//! no sukūn on the first hāʾ, shadda on the second. Dropping U+06DC with the sakt is our
-//! reading (G-143). Spine codepoints: `data/spine/hafs/v1` 69:28:4:5 and 69:29:1:1.
+//! T6.2/T6.3: the Ḥafṣ option `hafs.maliyah` on the real data. Source: KFGQPC Ḥafṣ muṣḥaf,
+//! explanation of signs, p. ح: for 69:28 مَالِيَهْ, iẓhār with sakt (as printed, the default) or
+//! idghām into the hāʾ of هَلَكَ (69:29). Owner decision (D41): the idghām wajh changes no
+//! codepoint; it is written to the annotation channel (D40). Spine codepoints:
+//! `data/spine/hafs/v1` 69:28:4:5 and 69:29:1:1.
 
 mod common;
 
@@ -46,17 +46,30 @@ fn default_is_the_printed_izhar_with_sakt() {
 }
 
 #[test]
-fn idgham_changes_exactly_the_two_ha() {
+fn idgham_changes_no_codepoint_only_annotations() {
     let base = run(None);
     let r = run(Some("idgham"));
-    assert_eq!(cluster(&r, "69:28:4", 4), "U+0647");
-    assert_eq!(cluster(&r, "69:29:1", 0), "U+0647 U+0651 U+064E");
-    let changed: Vec<String> = base
+    let text = |r: &Resolved| r.items.iter().map(|i| i.text()).collect::<String>();
+    assert_eq!(text(&r), text(&base));
+    assert_eq!(cluster(&r, "69:28:4", 4), "U+0647 U+06E1 U+06DC");
+    assert_eq!(cluster(&r, "69:29:1", 0), "U+0647 U+064E");
+    let ann = |item: &str, n: usize| {
+        let it = r.items.iter().find(|i| i.id.to_string() == item).unwrap();
+        it.clusters[n].attrs.annotations.clone()
+    };
+    assert_eq!(ann("69:28:4", 4)["pron.idgham"], "into_next");
+    assert_eq!(ann("69:29:1", 0)["pron.idgham"], "from_previous");
+    let annotated: usize = r
         .items
         .iter()
-        .zip(&r.items)
-        .filter(|(a, b)| a.clusters != b.clusters || a.text() != b.text())
-        .map(|(a, _)| a.id.to_string())
-        .collect();
-    assert_eq!(changed, ["69:28:4", "69:29:1"]);
+        .flat_map(|i| &i.clusters)
+        .filter(|c| !c.attrs.annotations.is_empty())
+        .count();
+    assert_eq!(annotated, 2);
+    assert!(
+        base.items
+            .iter()
+            .flat_map(|i| &i.clusters)
+            .all(|c| c.attrs.annotations.is_empty())
+    );
 }

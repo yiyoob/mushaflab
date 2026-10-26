@@ -224,3 +224,18 @@ fn expansion_is_deterministic() {
     let b = mushaf_model::to_json(&expand(&f, &spine()).unwrap().file).unwrap();
     assert_eq!(a, b);
 }
+
+#[test]
+fn annotation_actions_become_set_attr_patches_that_change_no_codepoint() {
+    let f = file(
+        "  - id: \"t.ann\"\n    owner: {level: \"riwayah\", id: \"x\"}\n    pattern: [{base: [\"U+062B\"], capture: \"a\"}]\n    actions: [{op: \"set_attr\", target: \"a\", payload: {annotations: {\"pron.madd\": \"4\"}}}]\n",
+    );
+    let e = expand(&f, &spine()).unwrap();
+    let [p] = e.file.patches.as_slice() else {
+        panic!()
+    };
+    match &p.op {
+        Op::SetAttr(c) => assert_eq!(c.annotations["pron.madd"], "4"),
+        other => panic!("{other:?}"),
+    }
+}

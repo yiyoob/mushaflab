@@ -58,6 +58,14 @@ Each match's patches get the id `<rule id>@<target>.<op>`. They also get
 `source: {kind: rule, ref: <rule id>}`, `rule_id` and `status: rule-derived`, and the rule's
 `when` is copied onto them.
 
+## Pronunciation-only rules (annotation channel, D40)
+
+A feature that changes no glyph, such as madd lengths, taqlīl or tarqīq, is written with
+`set_attr` to the cluster's annotations:
+`{op: "set_attr", target: "x", payload: {annotations: {"pron.madd": "4"}}}`. Keys are
+`pron.<feature>`, with the feature taken from the closed list in D40. Values are short ASCII
+tokens. Annotations never change the text or the drawing.
+
 ## Limits (known gaps)
 
 Rules match the spine's own text. They do not match the output of other rules or of farsh

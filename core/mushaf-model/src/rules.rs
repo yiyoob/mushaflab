@@ -228,6 +228,7 @@ impl TryFrom<RuleWire> for Rule {
             return Err(err("no actions".into()));
         }
         for a in &w.actions {
+            check_annotations(a).map_err(err)?;
             if !captures.contains(a.capture().0) {
                 return Err(err(format!(
                     "action target {:?} is not a capture",
@@ -274,6 +275,42 @@ impl From<Rule> for RuleWire {
             single_source: r.single_source,
         }
     }
+}
+
+/// The annotation channel (T6.3, ADR D40): pronunciation features that change no glyph are
+/// written to a cluster's `annotations` through `set_attr`, never to its codepoints. Keys are
+/// `pron.<feature>` from this closed list of technical terms; values are short ASCII tokens.
+pub const PRONUNCIATION_FEATURES: [&str; 17] = [
+    "ibdal", "idgham", "ikhfa", "imala", "iqlab", "ishmam", "izhar", "madd", "naql", "rawm",
+    "sakt", "silah", "taghliz", "tahqiq", "taqlil", "tarqiq", "tashil",
+];
+
+/// The `pron.` key prefix of the annotation channel.
+pub const PRONUNCIATION_PREFIX: &str = "pron.";
+
+/// Checks that a `set_attr` action writes only annotation-channel keys with token values.
+fn check_annotations(a: &Action) -> Result<(), String> {
+    let Some(ann) = a.payload.as_ref().and_then(|p| p.get("annotations")) else {
+        return Ok(());
+    };
+    let map = ann.as_object().ok_or("annotations must be a mapping")?;
+    for (k, v) in map {
+        let feature = k
+            .strip_prefix(PRONUNCIATION_PREFIX)
+            .filter(|f| PRONUNCIATION_FEATURES.contains(f))
+            .ok_or_else(|| format!("annotation key {k:?} is not pron.<feature> (D40)"))?;
+        let token = v.as_str().filter(|t| {
+            !t.is_empty()
+                && t.bytes()
+                    .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b"_-".contains(&b))
+        });
+        if token.is_none() {
+            return Err(format!(
+                "annotation {feature}: value {v} is not a short ASCII token"
+            ));
+        }
+    }
+    Ok(())
 }
 
 /// `rules/<name>.yaml`: rules on one spine.
@@ -460,6 +497,24 @@ rules:
             "      - {base: [\"U+062A\"], capture: \"b\"}\n      - {boundary: \"word\"}\n",
         );
         assert!(file(&edge).is_err(), "pattern ending with a boundary");
+    }
+
+    #[test]
+    fn annotation_actions_use_the_channel() {
+        let ok = FILE.replace(
+            "{op: \"set_marks\", target: \"a\", payload: {remove: [\"U+064E\"]}}",
+            "{op: \"set_attr\", target: \"a\", payload: {annotations: {\"pron.taqlil\": \"on\"}}}",
+        );
+        assert_ne!(ok, FILE);
+        file(&ok).unwrap();
+        for (bad, why) in [
+            ("\"pron.taqlil\": \"on\"", "\"colour\": \"on\""),
+            ("\"pron.taqlil\": \"on\"", "\"pron.unknown\": \"on\""),
+            ("\"pron.taqlil\": \"on\"", "\"pron.taqlil\": \"Two Words\""),
+        ] {
+            let text = ok.replace(bad, why);
+            assert!(file(&text).is_err(), "accepted {why}");
+        }
     }
 
     #[test]

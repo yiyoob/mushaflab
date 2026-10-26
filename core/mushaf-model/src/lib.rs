@@ -36,8 +36,8 @@ pub use patch::{
 };
 pub use profile::{RiwayahProfile, SurahHeader};
 pub use rules::{
-    Action, At, Boundary, Citation, ClusterMatch, Exception, Register, RegisterEntry, Rule,
-    RuleFile, RuleStatus, Scope, Step,
+    Action, At, Boundary, Citation, ClusterMatch, Exception, PRONUNCIATION_FEATURES,
+    PRONUNCIATION_PREFIX, Register, RegisterEntry, Rule, RuleFile, RuleStatus, Scope, Step,
 };
 pub use spine::{Attrs, Cluster, ClusterKind, Item, ItemKind, Spine};
 

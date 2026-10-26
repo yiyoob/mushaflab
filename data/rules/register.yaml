@@ -5,7 +5,7 @@
 rules:
   - id: "hafs.maliyah.idgham"
     owner: {level: "riwayah", id: "hafs"}
-    description: "69:28 مَالِيَهْ, wajh of idgham into هَلَكَ (69:29): no sukun on the first ha, shadda on the second. Also removes the sakt sign U+06DC (our reading of the exclusive wujuh; G-143)."
+    description: "69:28 مَالِيَهْ, wajh of idgham into هَلَكَ (69:29). Pronunciation only (annotation channel, D40): by the owner's decision (D41) the text keeps the sukun and the sakt sin and gets no shadda, unlike the written form p. ح describes."
     option: "hafs.maliyah"
     source: {book: "KFGQPC Hafs mushaf, explanation of signs", page: "ح"}
     status: "rule-derived"

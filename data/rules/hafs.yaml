@@ -1,10 +1,10 @@
 # Rules for Hafs on the Hafs spine (T6.2). Every rule is cited in rules/register.yaml.
 spine: "hafs/v1"
 rules:
-  # 69:28-29, the idgham wajh (KFGQPC Hafs mushaf, explanation of signs, p. ha): strip the
-  # first ha of its sukun and put a shadda on the second ha. Removing U+06DC (the sakt sign)
-  # as well is our reading of the two exclusive wujuh (G-143), for the owner to confirm.
-  # Shadda goes first among the marks, as in every spine cluster that has shadda and fatha.
+  # 69:28-29, the idgham wajh (KFGQPC Hafs mushaf, explanation of signs, p. ha). Owner
+  # decision 2026-10-26 (D41, G-143): the text keeps the sukun and the sakt sin on the ha of
+  # 69:28:4 and gets no shadda on 69:29:1, so both wujuh draw identically. The difference is
+  # pronunciation only and goes to the annotation channel (D40): idgham into the next word.
   - id: "hafs.maliyah.idgham"
     owner: {level: "riwayah", id: "hafs"}
     when: {option: "hafs.maliyah", choice: "idgham"}
@@ -15,5 +15,5 @@ rules:
       - {base: ["U+0647"], at: "first", capture: "second_ha"}
     scope: [{surah: 69, from: 28, to: 28}]
     actions:
-      - {op: "set_marks", target: "first_ha", payload: {remove: ["U+06E1", "U+06DC"]}}
-      - {op: "set_marks", target: "second_ha", payload: {add: [{cp: "U+0651", at: 0}]}}
+      - {op: "set_attr", target: "first_ha", payload: {annotations: {"pron.idgham": "into_next"}}}
+      - {op: "set_attr", target: "second_ha", payload: {annotations: {"pron.idgham": "from_previous"}}}

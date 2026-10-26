@@ -51,6 +51,8 @@ Consequences: what follows, what it rules out
 | D37 | Highlighting differences from Ḥafṣ | accepted (scope); built in Phase 6, UI in Phase 8 |
 | D38 | Rule DSL: declarative patterns expanded into ordinary patches in the core | accepted with the T6.1 plan (2026-10-26) |
 | D39 | Owner corrections to the Ḥafṣ spine text as patches; G-142 (52:37 sīn below the ṣād) | accepted (owner decision, 2026-10-26) |
+| D40 | Annotation channel: pronunciation-only features as `pron.<feature>` cluster annotations | accepted (T6.3, 2026-10-26) |
+| D41 | مَالِيَهْ idghām wajh changes no glyph (owner decision, departs from p. ح) | accepted (owner decision, 2026-10-26) |
 
 ---
 
@@ -1210,3 +1212,36 @@ patches, because their KFGQPC texts have a plain ṣād there. The correction ap
 the Ḥafṣ profile, so their resolved text and `just roundtrip` are unchanged.
 Consequences: the spine and KFGQPC still differ here; the difference is listed (G-142,
 resolved). `data/approvals/` is still not joined into `mushaf.db` (G-033).
+
+## D40: Annotation channel (T6.3)
+Status: accepted (T6.3, 2026-10-26)
+Context: some features change pronunciation but no glyph: madd lengths, taqlīl, tarqīq, and
+(by D41) the idghām wajh of 69:28. Writing them into clusters would change the text and the
+rendering. Leaving them out would lose them, and they are needed for highlighting (T6.11)
+and for review.
+Decision:
+- A cluster's `attrs.annotations` (§3.1) is the channel. It is written by `set_attr` patches
+  and by rule actions (D38), and the resolver already carries it to `Resolved`.
+- Keys are `pron.<feature>`. The feature comes from a closed list of technical terms in
+  `mushaf_model::PRONUNCIATION_FEATURES` (ibdāl, idghām, ikhfāʾ, imālah, iqlāb, ishmām, iẓhār,
+  madd, naql, rawm, sakt, ṣilah, taghlīẓ, taḥqīq, taqlīl, tarqīq, tashīl).
+- Values are short ASCII tokens (`[a-z0-9_-]+`).
+- Rule validation rejects any other key or value. A new feature needs an ADR amendment.
+- Annotations never change codepoints, shaping, line fit or the draw list. A test checks
+  this: the 69:28 option pair must draw byte-identically.
+Consequences: T6.4 writes pronunciation-only rules to this channel. T6.12 exposes
+annotations in the draw output as highlight flags, without changing glyphs.
+
+## D41: The idghām wajh of مَالِيَهْ changes no glyph (G-143)
+Status: accepted (owner decision, 2026-10-26)
+Context: the KFGQPC Ḥafṣ muṣḥaf's explanation of signs (p. ح) describes the idghām wajh at 69:28
+in writing: the sukūn is removed from the first hāʾ and a shadda is placed on the hāʾ of
+هَلَكَ. T6.2 implemented that, and also removed the sakt sign. The owner said: "No, keep the
+sukun and sīn and dont have the shaddah."
+Decision: the text is the same under both choices of `hafs.maliyah`. It keeps
+`U+0647 U+06E1 U+06DC` and `U+0647 U+064E`. The rule `hafs.maliyah.idgham` writes only
+`pron.idgham` annotations: `into_next` on 69:28:4:5 and `from_previous` on 69:29:1:1 (D40).
+The golden test requires the two draw lists to be byte-identical. This departs from the
+written form on p. ح; it is an owner decision, and the register entry says so.
+Consequences: G-143 is closed. A reader who wants the idghām shown in writing has no
+option for it; that would need a new owner decision.
