@@ -48,6 +48,7 @@ Consequences: what follows, what it rules out
 | D32 | Rule-5 edition notes per riwāyah | accepted at GATE G3 (2026-10-23) |
 | D33 | Display style as a render key: (riwāyah, style), default style only in Phase 5 | accepted (owner requirement, relayed 2026-10-23; confirmed at GATE G3); implements D36's Phase 5 part |
 | D36 | Display styles: Ḥijāzī and Maghribi for every riwāyah | accepted (scope); built in Phase 6 |
+| D37 | Highlighting differences from Ḥafṣ | accepted (scope); built in Phase 6, UI in Phase 8 |
 
 ---
 
@@ -1117,4 +1118,14 @@ answered "do whatever you recommend" (2026-10-23, in the Phase 5 session). Recor
   through them the same day (D28, walkthrough), which leaves 169 places blocked; the Warsh/Qālūn reference print (G-106) and page 1 line 2 (G-023) wait for a print
   of KFGQPC's own edition.
 - PR #3 is merged by the owner.
+
+## D37: Highlighting differences from Ḥafṣ
+Status: accepted (scope and phase)
+Date: 2026-10-26
+Decision (owner): every non-Ḥafṣ muṣḥaf can be shown plain or with its differences from Ḥafṣ
+highlighted. A difference is a farsh difference or an uṣūl application (e.g. taghlīẓ al-lām,
+ṣilah, ibdāl), never an encoding or spelling-convention difference. Highlights come from
+Phase 6 rules and curated farsh (T6.11–T6.12), including pronunciation-only rules through
+the annotation channel; each carries a label, the Ḥafṣ form and a citation. Text and layout
+are identical in both modes. The toggle is in the Phase 8 UI.
 

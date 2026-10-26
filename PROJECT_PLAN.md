@@ -364,6 +364,10 @@ Goal: replace raw diffs with rules so toggling works. This is where "complete ch
 - **T6.9 Font coverage per (riwāyah, style)**, an S2-style audit. Every combination must pass rule 6 (no `.notdef`, dotted circle, unattached or spacing mark). Fill gaps with the escape-hatch mapping, a documented derived font, or by marking the combination unavailable. Justification is calligraphic where a font supports it (Ḥijāzī: DigitalKhatt) and spacing-only otherwise (Maghribi, until a calligraphic Maghribi font exists). Line breaks always stay the riwāyah's own layout (D1); overflow follows T5.2.
 - **T6.10 Style switch and goldens.** A runtime style option per muṣḥaf, plus golden pages for every riwāyah in its non-default style. *Accept:* rule-6 integrity and line fit on all pages of every available (riwāyah, style); the owner reviews samples at GATE G4.
 
+**Difference highlighting (owner, 2026-10-26, D37).** A non-Ḥafṣ muṣḥaf can be shown plain, or with the places where its *reading* differs from Ḥafṣ highlighted. "Difference" means farsh (different words or letters) and uṣūl applications (e.g. taghlīẓ al-lām, ṣilah, ibdāl). Encoding and spelling-convention differences are never highlighted.
+- **T6.11 Highlight source.** A highlight is an application of a rule (T6.4) or a curated farsh entry, never a raw patch. Pronunciation-only rules (e.g. taghlīẓ) highlight through the annotation channel (T6.3). Each highlight carries its label (rule or farsh name), the Ḥafṣ form, and its citation. Only cited, owner-confirmed rules highlight by default; uncited candidates are hidden or shown in a distinct style (owner's choice at G4).
+- **T6.12 Draw output.** The core attaches a "differs from Ḥafṣ" flag (with label and reference) to the affected words and clusters in the draw commands. Text, line breaks and justification are identical in plain and highlighted mode. *Accept:* golden page pairs (plain/highlighted) per riwāyah; no encoding-only patch ever produces a highlight (test).
+
 **GATE G4:** the owner reviews rule registers and sheets, sets `cross-checked` or `muqri-verified` where warranted, and reviews the display-style samples.
 
 ---
@@ -383,7 +387,7 @@ Platform per D5: **a website first** (owner, 2026-10-21), because it is the fast
 
 - **T8.1 WASM bindings.** `mushaf-wasm` crate (wasm-bindgen) next to `mushaf-ffi`; build script producing a JS/WASM package. *Accept:* the same golden page resolves byte-identically in the CLI and in WASM.
 - **T8.2 Data.** Serve `mushaf.db` (or a derived static format) and fonts; same content as the CLI uses. Cache for offline use.
-- **T8.3 UI.** RTL pager, drawing of core draw commands (SVG or Canvas), riwāyah picker, option sheet, free-edit editor, provenance/verification-status screen, and an engine-inspector view (patch stack, applied rules, per-cluster provenance) for testing qirāʾāt.
+- **T8.3 UI.** RTL pager, plain/highlighted toggle per muṣḥaf with tap-for-detail (D37), drawing of core draw commands (SVG or Canvas), riwāyah picker, option sheet, free-edit editor, provenance/verification-status screen, and an engine-inspector view (patch stack, applied rules, per-cluster provenance) for testing qirāʾāt.
 - **T8.4 Performance.** Verify the 16 ms/page budget in a mid-range phone browser; tune caching.
 - **T8.5 Tests.** Browser screenshot tests (Playwright) against core goldens.
 
