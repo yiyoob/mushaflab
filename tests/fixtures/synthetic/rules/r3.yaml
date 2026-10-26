@@ -24,3 +24,9 @@ rules:
       - {base: ["U+0061"], bare: true, capture: "a"}
     actions:
       - {op: "set_marks", target: "a", payload: {add: ["U+0302"]}}
+  - id: "r3.t2.grave"
+    owner: {level: "tariq", id: "t2"}
+    pattern:
+      - {base: ["U+0067"], capture: "g"}
+    actions:
+      - {op: "set_marks", target: "g", payload: {add: ["U+0300"]}}

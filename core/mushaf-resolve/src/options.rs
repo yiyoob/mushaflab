@@ -91,6 +91,28 @@ pub fn resolve(
             patch: p.id.clone(),
         });
     }
+    // T6.6 (D43): a riwāyah's ṭarīq is the option group `<riwāyah>.tariq`, when loaded. The
+    // selection's `tariq` and a choice for that group must agree; without either, the
+    // group's default for the riwāyah is the ṭarīq.
+    let mut owned = sel.clone();
+    let tariq_group = groups.get(&format!("{}.tariq", sel.riwayah));
+    if let Some(g) = tariq_group {
+        let chosen = match (sel.choices.get(&g.id), &sel.tariq) {
+            (Some(c), Some(t)) if c != t => {
+                return Err(ResolveError::TariqMismatch {
+                    choice: c.clone(),
+                    tariq: t.clone(),
+                });
+            }
+            (Some(c), _) => c.clone(),
+            (None, Some(t)) => t.clone(),
+            (None, None) => choice_for(g, sel)?,
+        };
+        known_choice(g, &chosen)?;
+        owned.tariq = Some(chosen.clone());
+        owned.choices.insert(g.id.clone(), chosen);
+    }
+    let sel = &owned;
     for (id, c) in &sel.choices {
         known_choice(group(id)?, c)?;
     }
@@ -130,6 +152,12 @@ pub fn resolve(
             p.when
                 .as_ref()
                 .is_none_or(|w| choices[&w.option] == w.choice)
+        })
+        // A ṭarīq-level patch applies only under its own ṭarīq (when the riwāyah has a group).
+        .filter(|p| {
+            p.owner.level != OwnerLevel::Tariq
+                || tariq_group.is_none()
+                || sel.tariq.as_deref() == Some(p.owner.id.as_str())
         })
         .collect();
     let mut r = resolve_patches(spine, &active, mode)?;

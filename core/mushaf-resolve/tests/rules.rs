@@ -119,3 +119,29 @@ fn an_option_rule_must_be_in_the_groups_affects() {
     let e = resolve_profile(&ds, &sel(&[]), None, Mode::Data).unwrap_err();
     assert!(matches!(e, ResolveError::NotInAffects { .. }), "{e}");
 }
+
+/// T6.6 (D43): `r3.tariq` (t1 default, t2) decides which ṭarīq-level rules apply.
+#[test]
+fn tariq_group_selects_tariq_level_rules() {
+    let ds = synthetic();
+    let mut s = sel(&[]);
+    let r = resolve_profile(&ds, &s, None, Mode::Data).unwrap();
+    assert_eq!(r.choices["r3.tariq"], "t1");
+    assert_eq!(item_text(&r, "1:2:2").unwrap(), "gh\u{a0}");
+    s.tariq = Some("t2".into());
+    let t2 = resolve_profile(&ds, &s, None, Mode::Data).unwrap();
+    assert_eq!(item_text(&t2, "1:2:2").unwrap(), "g\u{300}h\u{a0}");
+    let by_choice = resolve_profile(&ds, &sel(&[("r3.tariq", "t2")]), None, Mode::Data).unwrap();
+    assert_eq!(by_choice.items, t2.items);
+    s.tariq = Some("t9".into());
+    assert!(matches!(
+        resolve_profile(&ds, &s, None, Mode::Data),
+        Err(ResolveError::UnknownChoice { .. })
+    ));
+    let mut both = sel(&[("r3.tariq", "t1")]);
+    both.tariq = Some("t2".into());
+    assert!(matches!(
+        resolve_profile(&ds, &both, None, Mode::Data),
+        Err(ResolveError::TariqMismatch { .. })
+    ));
+}

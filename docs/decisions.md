@@ -54,6 +54,7 @@ Consequences: what follows, what it rules out
 | D40 | Annotation channel: pronunciation-only features as `pron.<feature>` cluster annotations | accepted (T6.3, 2026-10-26) |
 | D41 | مَالِيَهْ idghām wajh changes no glyph (owner decision, departs from p. ح) | accepted (owner decision, 2026-10-26) |
 | D42 | T6.4: data-derived rules (hypotheses) plus residual patches per riwāyah | accepted (T6.4, 2026-10-26); every rule awaits a citation |
+| D43 | Ṭarīq as the option group `<riwāyah>.tariq`; ṭarīq-level patches apply under their ṭarīq only | accepted (T6.6, 2026-10-26) |
 
 ---
 
@@ -1292,3 +1293,25 @@ Consequences:
   when the first rejection comes).
 - Pronunciation-only uṣūl (madd, taqlīl …) are not in the KFGQPC codepoints, so no rule
   writes annotations yet (D40). They need cited sources.
+
+## D43: The ṭarīq layer (T6.6)
+Status: accepted (T6.6, 2026-10-26)
+Context: §3.2 has a ṭarīq layer, and `Selection` has a `tariq`, but nothing chose between
+ṭuruq. Every ṭarīq-level patch applied, whatever ṭarīq was selected. The plan asks to model
+ṭuruq as an option group where the sources distinguish them.
+Decision:
+- A riwāyah's ṭuruq form the option group `<riwāyah>.tariq`. When it is loaded:
+  - the selection's `tariq`, or a choice for the group, selects the ṭarīq; they must agree
+    (`TariqMismatch`) and must be one of the group's choices (`UnknownChoice`);
+  - without either, the group's default for the riwāyah applies;
+  - the resolved ṭarīq is also the `tariq` used for other groups' per-ṭarīq defaults;
+  - a patch (or a rule's patches) at owner level `tariq` applies only when its `owner.id` is
+    the resolved ṭarīq;
+  - patches that depend on a ṭarīq through `when {option: <r>.tariq, choice: …}` work as any
+    other option.
+- Without such a group, behaviour is unchanged.
+- Ḥafṣ: the group `hafs.tariq` has the single choice `shatibiyyah`, cited to KFGQPC Ḥafṣ muṣḥaf,
+  explanation of signs, p. ح. No second ṭarīq has a source in the repository, so none is
+  modelled (G-145). The synthetic fixture tests two ṭuruq (`r3.tariq`).
+Consequences: adding a ṭarīq means one more choice plus its cited rules or patches. The
+"no sakt" wajh (G-143) waits for a cited second ṭarīq.

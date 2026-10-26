@@ -18,3 +18,9 @@ rules:
     option: "test.toggle"
     source: {book: "synthetic", volume: 2, page: "3"}
     status: "rule-derived"
+  - id: "r3.t2.grave"
+    owner: {level: "tariq", id: "t2"}
+    description: "synthetic: under tariq t2, g takes U+0300"
+    option: null
+    source: {book: "synthetic", page: "4"}
+    status: "rule-derived"

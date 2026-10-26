@@ -576,7 +576,7 @@ mod tests {
         assert_eq!(ds.patch_files["patches/raw/r1.yaml"].patches.len(), 10);
         assert_eq!(
             ds.option_groups.keys().collect::<Vec<_>>(),
-            ["test.other", "test.toggle"]
+            ["r3.tariq", "test.other", "test.toggle"]
         );
         assert_eq!(ds.ayah_maps["r1"].entries.len(), 4);
         assert_eq!(ds.profiles["r1"].patch_stack.len(), 2);

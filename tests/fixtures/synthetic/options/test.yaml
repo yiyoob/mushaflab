@@ -11,3 +11,8 @@
 - id: "test.other"
   title_ar: "test other"
   choices: ["a", "b", "c"]
+- id: "r3.tariq"
+  title_ar: "test tariq"
+  choices: ["t1", "t2"]
+  defaults:
+    - {riwayah: "r3", choice: "t1"}

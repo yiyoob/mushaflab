@@ -10,3 +10,12 @@
     - {riwayah: "hafs", choice: "izhar_sakt"}
   affects: ["hafs.maliyah.idgham"]
   allowed_for: ["hafs"]
+# T6.6 (D43): the tariq of Hafs. KFGQPC Hafs mushaf, explanation of signs, p. ح, gives the
+# mushaf's readings "from the tariq of al-Shatibiyyah". No other tariq is cited yet (G-145),
+# so it is the only choice; another tariq is added only with a source.
+- id: "hafs.tariq"
+  title_ar: "الطريق"
+  choices: ["shatibiyyah"]
+  defaults:
+    - {riwayah: "hafs", choice: "shatibiyyah"}
+  allowed_for: ["hafs"]

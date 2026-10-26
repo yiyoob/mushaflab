@@ -39,6 +39,7 @@ fn cluster(r: &Resolved, item: &str, n: usize) -> String {
 fn default_is_the_printed_izhar_with_sakt() {
     let r = run(None);
     assert_eq!(r.choices["hafs.maliyah"], "izhar_sakt");
+    assert_eq!(r.choices["hafs.tariq"], "shatibiyyah"); // T6.6, p. ح
     assert_eq!(cluster(&r, "69:28:4", 4), "U+0647 U+06E1 U+06DC");
     assert_eq!(cluster(&r, "69:29:1", 0), "U+0647 U+064E");
     let explicit = run(Some("izhar_sakt"));

@@ -170,6 +170,8 @@ pub enum ResolveError {
     Strict(Vec<Diagnostic>),
     /// The selection names a riwāyah with no profile (T5.1).
     UnknownRiwayah { riwayah: String },
+    /// The selection's `tariq` and its choice for the `<riwāyah>.tariq` group disagree (T6.6).
+    TariqMismatch { choice: String, tariq: String },
     /// A rule file could not be expanded (T6.1), or in `Mode::Data` a rule matched nowhere
     /// or has an exception it never meets.
     Rule(String),
@@ -234,6 +236,12 @@ impl fmt::Display for ResolveError {
                 write!(f, "no profile for riwayah {riwayah:?}")
             }
             ResolveError::Rule(e) => write!(f, "rules: {e}"),
+            ResolveError::TariqMismatch { choice, tariq } => {
+                write!(
+                    f,
+                    "tariq {tariq:?} disagrees with the tariq choice {choice:?}"
+                )
+            }
         }
     }
 }

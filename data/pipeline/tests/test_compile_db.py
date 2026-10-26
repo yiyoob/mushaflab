@@ -70,7 +70,11 @@ def test_synthetic_root_compiles(tmp_path: Path) -> None:
         ("patches/curated/q1.yaml", "test/v1"),
         ("patches/raw/r1.yaml", "test/v1"),
     ]
-    assert _rows(db, "select id from option_groups") == [("test.other",), ("test.toggle",)]
+    assert _rows(db, "select id from option_groups order by id") == [
+        ("r3.tariq",),
+        ("test.other",),
+        ("test.toggle",),
+    ]
     assert _rows(db, "select riwayah_id, spine_id from ayah_maps") == [("r1", "test/v1")]
     assert _rows(db, "select riwayah_id, spine_id from profiles") == [
         ("r1", "test/v1"),
@@ -78,7 +82,12 @@ def test_synthetic_root_compiles(tmp_path: Path) -> None:
     ]
     assert _rows(db, "select path, spine_id from rule_files") == [("rules/r3.yaml", "test/v1")]
     register = json.loads(_rows(db, "select body from rule_register")[0][0])
-    assert [r["id"] for r in register["rules"]] == ["r3.mark", "r3.cross", "r3.toggle"]
+    assert [r["id"] for r in register["rules"]] == [
+        "r3.mark",
+        "r3.cross",
+        "r3.toggle",
+        "r3.t2.grave",
+    ]
     body = json.loads(_rows(db, "select body from patch_files where path like '%r1%'")[0][0])
     assert body["patches"][0]["target"] == "1:1:2:1"
     meta = dict(_rows(db, "select key, value from meta"))
