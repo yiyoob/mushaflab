@@ -92,6 +92,11 @@ contact-sheets *RIWAYAT:
     cargo run --release -q {{manifest}} -p mushaf-render-cli --bin mushaf-contact -- {{RIWAYAT}}
     {{uv}} run python -m pipeline.phase5_readme write
 
+# T6.5: rule review sheets, build/review/phase6/rules-<name>.html (not tracked), and the
+# tracked summary docs/review/phase6/rules.md
+review-rules *NAMES:
+    {{uv}} run python -m pipeline.rule_sheets {{NAMES}}
+
 # SVG + PNG via reference renderer, e.g. just render PAGE=1 RIWAYAH=hafs
 render *ARGS:
     #!/usr/bin/env bash
