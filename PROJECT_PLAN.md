@@ -348,6 +348,14 @@ Runs after Phase 2 and before Phase 3 (see execution order). Order: `shuba` → 
 
 Goal: replace raw diffs with rules so toggling works. This is where "complete changeability" becomes a rule engine instead of a lookup table.
 
+- **T6.0 Full verification against al-Futūḥ al-Bāhira** (source `book-al-futuh-al-bahira-vol1..6`). Done before T6.1, so rules are built on checked data. The book's Qurʾānic text is never read as Qurʾān: the PDF text layer (KFGQPC Uthmanic font) is used only to align against the spine, and the page image is the reference.
+  1. Rebuild each reading row from span positions (y-band, then right-to-left x), rejoining colour-split spans. Anchor surah and ayah from the page header and ayah markers.
+  2. Align each row to the spine ayah letter by letter. A row that does not align cleanly is flagged, never guessed.
+  3. Resolve each row label to its readers using the book's own key (introduction, cited by volume and page). Record **every** reader the book names, so Stage 2 is a rerun with a wider filter; Stage 1 reports only the 8 riwāyāt. Grouped rows (e.g. "واندرج") are handled explicitly.
+  4. Take the meaning of each colour from the book's introduction, cited; an undocumented colour is reported, not assumed.
+  5. Compare in both directions for every ayah and riwāyah: each book difference must exist as a patch, rule or annotation, and each patch must appear in the book.
+  6. Output: a coverage report listing every ayah × riwāyah as matched (with vol/page/row), flagged, or not found, with page-image crops beside our rendering for every flag. All gaps go to `known-gaps.md`; the owner adjudicates.
+  Pilot first: about 20 pages spread across all six volumes; the full run starts only after the owner reviews the pilot. *Accept:* `just book-verify` produces the report, every ayah of all 114 surahs appears for each of the 8 riwāyāt, and no ayah is silently missing (test).
 - **T6.1 Rule DSL.** Declarative rules over cluster sequences, including cross-word context, parameterized by option choices. Rules live in `data/rules/`. Every rule has a register entry: description, source book and page, status. Design the register so tests fail if a rule and its register entry disagree.
 - **T6.2 First option group: Ḥafṣ sakt.** Toggle the sakt places on/off; the small sīn (U+06DC) appears or disappears and the line re-justifies. Take the places and default from the source data, not memory. *Accept:* golden image pair (on/off) plus line-fit.
 - **T6.3 Annotation channel.** Rules that change pronunciation but not glyphs (madd lengths, taqlīl, tarqīq) write to `annotations`, not to clusters.
@@ -368,7 +376,7 @@ Goal: replace raw diffs with rules so toggling works. This is where "complete ch
 - **T6.11 Highlight source.** A highlight is an application of a rule (T6.4) or a curated farsh entry, never a raw patch. Pronunciation-only rules (e.g. taghlīẓ) highlight through the annotation channel (T6.3). Each highlight carries its label (rule or farsh name), the Ḥafṣ form, and its citation. Only cited, owner-confirmed rules highlight by default; uncited candidates are hidden or shown in a distinct style (owner's choice at G4).
 - **T6.12 Draw output.** The core attaches a "differs from Ḥafṣ" flag (with label and reference) to the affected words and clusters in the draw commands. Text, line breaks and justification are identical in plain and highlighted mode. *Accept:* golden page pairs (plain/highlighted) per riwāyah; no encoding-only patch ever produces a highlight (test).
 
-**GATE G4:** the owner reviews rule registers and sheets, sets `cross-checked` or `muqri-verified` where warranted, and reviews the display-style samples.
+**GATE G4:** the owner reviews the T6.0 verification report and adjudicates every flag, reviews rule registers and sheets, sets `cross-checked` or `muqri-verified` where warranted, and reviews the display-style samples.
 
 ---
 
