@@ -5,6 +5,7 @@
 
 pub mod collide;
 
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -126,9 +127,19 @@ impl Renderer {
     /// Resolves through the riwāyah's profile (T5.1). An overlay (free edits) resolves in free
     /// mode.
     pub fn resolve(&self, overlay: Option<&EditOverlay>) -> Result<Resolved, Error> {
+        self.resolve_with(&BTreeMap::new(), overlay)
+    }
+
+    /// Resolves with option choices (T6.2) by group id; groups not named take their defaults.
+    pub fn resolve_with(
+        &self,
+        choices: &BTreeMap<String, String>,
+        overlay: Option<&EditOverlay>,
+    ) -> Result<Resolved, Error> {
         let sel = Selection {
             riwayah: self.profile.riwayah.clone(),
-            ..Selection::default()
+            tariq: None,
+            choices: choices.clone(),
         };
         let mode = if overlay.is_some() {
             Mode::Free

@@ -1165,6 +1165,7 @@ Decision: (c).
   cover them.
 - Rules match the spine's own text, not the output of other rules or of farsh (G-141).
   Matches are leftmost and non-overlapping, in spine order. Codepoints are compared exactly.
+- T6.2 addition: a rule and its register entry carry `single_source` (it must agree in both). The rule's patches inherit it (§3.5).
 Consequences: T6.2 and T6.4 add real, cited rules to `data/rules/`. T6.4 compares each
 rule's expansion with the raw patches it explains. If a rule ever needs to see another
 rule's output, G-141 is revisited with a new ADR.

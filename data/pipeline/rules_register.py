@@ -21,6 +21,15 @@ def _option(rule: dict) -> str | None:
     return when["option"] if isinstance(when, dict) else None
 
 
+def _compare(rid: str, rule: dict, e: dict) -> list[str]:
+    fields = {
+        "owner": (e["owner"], rule["owner"]),
+        "option": (e.get("option"), _option(rule)),
+        "single_source": (bool(e.get("single_source")), bool(rule.get("single_source"))),
+    }
+    return [f"rule {rid}: {k} differs from the register" for k, (a, b) in fields.items() if a != b]
+
+
 def check(root: Path = DATA_ROOT) -> list[str]:
     problems: list[str] = []
     reg_path = root / REGISTER
@@ -50,10 +59,7 @@ def check(root: Path = DATA_ROOT) -> list[str]:
             if e is None:
                 problems.append(f"{path.name}: rule {rid} has no register entry")
                 continue
-            if e["owner"] != rule["owner"]:
-                problems.append(f"rule {rid}: owner differs from the register")
-            if e.get("option") != _option(rule):
-                problems.append(f"rule {rid}: option differs from the register")
+            problems += _compare(rid, rule, e)
     problems += [f"register: {rid} has no rule" for rid in sorted(set(entries) - found)]
     return problems
 

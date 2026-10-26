@@ -1,5 +1,12 @@
 # Rule register (T6.1, ADR D38): one entry per rule in data/rules/*.yaml. Tests fail if the
-# register and the rule files disagree (owner, option, missing or extra entries), and a rule
-# without a cited source can only be a `hypothesis`. `cross-checked` and `muqri-verified`
-# never appear here: they live in data/approvals/ (CLAUDE.md rule 4).
-rules: []
+# register and the rule files disagree (owner, option, single_source, missing or extra
+# entries), and a rule without a cited source can only be a `hypothesis`. `cross-checked`
+# and `muqri-verified` never appear here: they live in data/approvals/ (CLAUDE.md rule 4).
+rules:
+  - id: "hafs.maliyah.idgham"
+    owner: {level: "riwayah", id: "hafs"}
+    description: "69:28 مَالِيَهْ, wajh of idgham into هَلَكَ (69:29): no sukun on the first ha, shadda on the second. Also removes the sakt sign U+06DC (our reading of the exclusive wujuh; G-143)."
+    option: "hafs.maliyah"
+    source: {book: "KFGQPC Hafs mushaf, explanation of signs", page: "ح"}
+    status: "rule-derived"
+    single_source: true

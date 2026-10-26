@@ -160,6 +160,8 @@ pub struct Rule {
     pub scope: Vec<Scope>,
     pub except: Vec<Exception>,
     pub actions: Vec<Action>,
+    /// No second independent source supports the rule (§3.5); copied to its patches.
+    pub single_source: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -175,6 +177,8 @@ struct RuleWire {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     except: Vec<Exception>,
     actions: Vec<Action>,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    single_source: bool,
 }
 
 fn valid_id(id: &str) -> bool {
@@ -252,6 +256,7 @@ impl TryFrom<RuleWire> for Rule {
             scope: w.scope,
             except: w.except,
             actions: w.actions,
+            single_source: w.single_source,
         })
     }
 }
@@ -266,6 +271,7 @@ impl From<Rule> for RuleWire {
             scope: r.scope,
             except: r.except,
             actions: r.actions,
+            single_source: r.single_source,
         }
     }
 }
@@ -308,6 +314,8 @@ pub struct RegisterEntry {
     pub option: Option<String>,
     pub source: Option<Citation>,
     pub status: RuleStatus,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub single_source: bool,
 }
 
 /// `rules/register.yaml`.
@@ -359,6 +367,12 @@ impl Register {
                 }
                 if e.option.as_deref() != r.when.as_ref().map(|w| w.option.as_str()) {
                     problems.push(format!("rule {}: option differs from the register", r.id));
+                }
+                if e.single_source != r.single_source {
+                    problems.push(format!(
+                        "rule {}: single_source differs from the register",
+                        r.id
+                    ));
                 }
             }
         }
@@ -481,6 +495,13 @@ rules:
             (
                 REGISTER.replace("description: \"test rule\"", "description: \"\""),
                 "no description",
+            ),
+            (
+                REGISTER.replace(
+                    "status: \"rule-derived\"",
+                    "status: \"rule-derived\"\n    single_source: true",
+                ),
+                "single_source differs",
             ),
         ];
         for (text, want) in cases {

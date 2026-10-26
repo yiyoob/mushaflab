@@ -112,6 +112,9 @@ fn patch(rule: &Rule, a: &mushaf_model::Action, caps: &Captures) -> Result<Patch
     if let Some(w) = &rule.when {
         wire["when"] = json!(w);
     }
+    if rule.single_source {
+        wire["single_source"] = json!(true);
+    }
     serde_json::from_value(wire)
         .map_err(|e| Error::new(format!("rule {}: action {}: {e}", rule.id, a.op)))
 }

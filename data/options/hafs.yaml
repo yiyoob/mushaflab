@@ -1,0 +1,12 @@
+# Option groups for Hafs (T6.2). Source: KFGQPC Hafs mushaf, explanation of signs, p. ح
+# (owner-supplied page, 2026-10-26): for مَالِيَهْ in al-Haqqah (69:28) two wujuh are allowed,
+# izhar with sakt, or idgham into the ha of هَلَكَ (69:29). The mushaf prints izhar with sakt
+# "because most of the ahl al-ada' read it", which is the default here. The four other sakt
+# places on that page are read without khilaf: they are in the spine and have no option.
+- id: "hafs.maliyah"
+  title_ar: "مَالِيَهْ: السكت أو الإدغام"
+  choices: ["izhar_sakt", "idgham"]
+  defaults:
+    - {riwayah: "hafs", choice: "izhar_sakt"}
+  affects: ["hafs.maliyah.idgham"]
+  allowed_for: ["hafs"]

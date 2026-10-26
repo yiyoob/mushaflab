@@ -990,3 +990,82 @@ fn native_golden_pages() {
         );
     }
 }
+
+/// T6.2: the Ḥafṣ option `hafs.maliyah` (KFGQPC Ḥafṣ muṣḥaf, explanation of signs, p. ح):
+/// the page holding 69:28 under iẓhār with sakt (the default, as printed) and under idghām.
+/// Both pass rule 6 and line fit, both are pinned, and they differ only on the lines that hold
+/// the two changed words (69:28:4, 69:29:1). The page is found from the layout.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn hafs_maliyah_option_pair() {
+    use mushaf_model::LineKind;
+    use mushaf_render::fit_checked;
+    use std::collections::BTreeMap;
+    let r = Renderer::load(&repo(), "hafs").unwrap();
+    let spine = &r.data.spines[&r.profile.spine];
+    let layout = &r.data.layouts[&r.profile.layout_id];
+    let pos = |id: &str| spine.position(&id.parse().unwrap()).unwrap();
+    let lines_of = |id: &str| -> Vec<(u32, u32)> {
+        let p = pos(id);
+        layout
+            .lines
+            .iter()
+            .filter(|l| match &l.kind {
+                LineKind::Text { first, last } => {
+                    spine.position(first).unwrap() <= p && p <= spine.position(last).unwrap()
+                }
+                _ => false,
+            })
+            .map(|l| (l.page, l.line))
+            .collect()
+    };
+    let mut touched: Vec<(u32, u32)> = lines_of("69:28:4");
+    touched.extend(lines_of("69:29:1"));
+    let page = touched[0].0;
+    let shaper = r.font.shaper();
+    let mut pages = Vec::new();
+    for choice in ["izhar_sakt", "idgham"] {
+        let choices = BTreeMap::from([("hafs.maliyah".to_string(), choice.to_string())]);
+        let resolved = r.resolve_with(&choices, None).unwrap();
+        assert_eq!(resolved.choices["hafs.maliyah"], choice);
+        let mapping = r.map(&resolved).unwrap();
+        let cp = fit_checked(&r, &shaper, &resolved, &mapping, page).unwrap();
+        assert!(cp.blocked.is_none(), "{choice}: {:?}", cp.blocked);
+        assert!(
+            cp.violations.is_empty(),
+            "{choice}: rule 6: {:?}",
+            cp.violations
+        );
+        let d = r.draw(cp.fit.as_ref().unwrap()).unwrap();
+        assert!(d.canonical, "{choice}: an option choice is not a free edit");
+        check_golden(&format!("hafs-maliyah-{choice}-p{page:03}"), &d);
+        pages.push(d);
+    }
+    let by_line = |d: &DrawPage| {
+        let mut m: BTreeMap<u32, Vec<String>> = BTreeMap::new();
+        for it in &d.items {
+            if let mushaf_draw::DrawItem::Glyph { line, .. } = it {
+                m.entry(*line)
+                    .or_default()
+                    .push(serde_json::to_string(it).unwrap());
+            }
+        }
+        m
+    };
+    let (a, b) = (by_line(&pages[0]), by_line(&pages[1]));
+    let differing: Vec<(u32, u32)> = a
+        .keys()
+        .chain(b.keys())
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .filter(|l| a.get(l) != b.get(l))
+        .map(|l| (page, *l))
+        .collect();
+    assert!(!differing.is_empty());
+    for l in &differing {
+        assert!(
+            touched.contains(l),
+            "line {l:?} changed but holds neither word"
+        );
+    }
+}
