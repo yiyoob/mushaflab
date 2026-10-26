@@ -348,7 +348,7 @@ Runs after Phase 2 and before Phase 3 (see execution order). Order: `shuba` → 
 
 Goal: replace raw diffs with rules so toggling works. This is where "complete changeability" becomes a rule engine instead of a lookup table.
 
-- **T6.0 Full verification against al-Futūḥ al-Bāhira** (source `book-al-futuh-al-bahira-vol1..6`). Done before T6.1, so rules are built on checked data. The book's Qurʾānic text is never read as Qurʾān: the PDF text layer (KFGQPC Uthmanic font) is used only to align against the spine, and the page image is the reference.
+- **T6.0 Full verification against al-Futūḥ al-Bāhira** — **DEFERRED (owner, 2026-10-26).** The pilot (branch `claude/phase6-b154d6`, commit 23f0913, unmerged) showed the PDF text layer is too unreliable: about 3.5% false flags even on Ḥafṣ. Phase 6 does not wait on it. Revisit only with a better source (e.g. a clean digital text of the book). Original scope, kept for reference: (source `book-al-futuh-al-bahira-vol1..6`). The book's Qurʾānic text is never read as Qurʾān: the PDF text layer (KFGQPC Uthmanic font) is used only to align against the spine, and the page image is the reference.
   1. Rebuild each reading row from span positions (y-band, then right-to-left x), rejoining colour-split spans. Anchor surah and ayah from the page header and ayah markers.
   2. Align each row to the spine ayah letter by letter. A row that does not align cleanly is flagged, never guessed.
   3. Resolve each row label to its readers using the book's own key (introduction, cited by volume and page). Record **every** reader the book names, so Stage 2 is a rerun with a wider filter; Stage 1 reports only the 8 riwāyāt. Grouped rows (e.g. "واندرج") are handled explicitly.
@@ -376,7 +376,7 @@ Goal: replace raw diffs with rules so toggling works. This is where "complete ch
 - **T6.11 Highlight source.** A highlight is an application of a rule (T6.4) or a curated farsh entry, never a raw patch. Pronunciation-only rules (e.g. taghlīẓ) highlight through the annotation channel (T6.3). Each highlight carries its label (rule or farsh name), the Ḥafṣ form, and its citation. Only cited, owner-confirmed rules highlight by default; uncited candidates are hidden or shown in a distinct style (owner's choice at G4).
 - **T6.12 Draw output.** The core attaches a "differs from Ḥafṣ" flag (with label and reference) to the affected words and clusters in the draw commands. Text, line breaks and justification are identical in plain and highlighted mode. *Accept:* golden page pairs (plain/highlighted) per riwāyah; no encoding-only patch ever produces a highlight (test).
 
-**GATE G4:** the owner reviews the T6.0 verification report and adjudicates every flag, reviews rule registers and sheets, sets `cross-checked` or `muqri-verified` where warranted, and reviews the display-style samples.
+**GATE G4:** the owner reviews rule registers and sheets, sets `cross-checked` or `muqri-verified` where warranted, and reviews the display-style samples.
 
 ---
 
