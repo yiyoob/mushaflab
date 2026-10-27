@@ -1,5 +1,5 @@
 // The web app's UI (T8.3). It draws only what the core returns (rule 7): the page is the core's
-// SVG (D59), highlights, margin notes, options, inspector and provenance are core JSON. Nothing
+// draw list painted in the worker (D63), with the core's SVG on top for taps (D59); highlights, margin notes, options, inspector and provenance are core JSON. Nothing
 // here resolves, shapes, justifies or decides what differs from Ḥafṣ.
 import { call, callJson, callTimed } from "./engine";
 
@@ -51,6 +51,8 @@ declare global {
       state: typeof state;
       go: (p: number) => Promise<void>;
       select: (m: string) => Promise<void>;
+      /** For the Playwright tests: the page as the app paints it, as a PNG data URL. */
+      paint: (page: number, width: number) => Promise<string>;
       /** For the Playwright tests: a raw engine call, then a redraw. */
       call: (method: string, ...args: unknown[]) => Promise<unknown>;
     };
@@ -67,47 +69,79 @@ const status = (s: string) => (ui.status.textContent = s);
 
 // ---- page view -------------------------------------------------------------------------
 
-// Neighbouring pages are drawn ahead while the reader reads (T8.4). Any change of riwayah,
-// choices, edits or highlighting starts a new generation and drops them.
-type Prepared = { view: View; node: Element; ms: number };
+// Pages are painted in the worker into a bitmap (D63); a page turn only shows a bitmap that is
+// already there. Neighbouring pages are painted ahead while the reader reads (T8.4). Any change
+// of riwayah, choices, edits, highlighting or width starts a new generation and drops them.
+type Prepared = { view: View; bitmap: ImageBitmap; ms: number; paintMs: number };
 const ahead = new Map<string, Promise<Prepared>>();
-// The SVG is parsed into a detached element as soon as the worker returns it, so a page turn
-// only swaps an element in.
-const prepare = async (p: number): Promise<Prepared> => {
-  const { result, ms } = await callTimed<string>("view", p, ui.hl.checked);
-  const view = JSON.parse(result) as View;
-  const node = new DOMParser().parseFromString(view.svg, "image/svg+xml").documentElement;
-  return { view, node: document.importNode(node, true), ms };
+const widthPx = () => Math.round(Math.max(200, ui.view.clientWidth) * (window.devicePixelRatio || 1));
+const prepare = async (p: number, w: number): Promise<Prepared> => {
+  const { result, ms } = await callTimed<{ view: string; bitmap: ImageBitmap; paintMs: number }>("page", p, ui.hl.checked, w);
+  return { view: JSON.parse(result.view) as View, bitmap: result.bitmap, ms, paintMs: result.paintMs };
 };
 let gen = 0;
 const invalidate = () => {
   gen++;
+  for (const v of ahead.values()) void v.then((x) => x.bitmap.close()).catch(() => undefined);
   ahead.clear();
 };
 const viewOf = (p: number) => {
-  const k = `${gen}:${p}:${ui.hl.checked}`;
-  if (!ahead.has(k)) ahead.set(k, prepare(p));
+  const w = widthPx();
+  const k = `${gen}:${p}:${ui.hl.checked}:${w}`;
+  if (!ahead.has(k)) ahead.set(k, prepare(p, w));
   return ahead.get(k)!;
 };
+let resizeTimer = 0;
+addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = window.setTimeout(() => {
+    if (!state.view) return;
+    invalidate();
+    void render();
+  }, 200);
+});
+
+let overlayToken = 0;
+const pageCanvas = document.createElement("canvas");
+pageCanvas.className = "page";
+const overlay = document.createElement("div");
+overlay.className = "overlay";
 
 async function render() {
   const p = state.page;
   const t = performance.now();
-  const { view: v, node, ms } = await viewOf(p);
+  const { view: v, bitmap, ms } = await viewOf(p);
   if (p !== state.page) return; // a later page was asked for meanwhile
   state.view = v;
   state.renderMs.push(ms);
   state.turnMs.push(performance.now() - t);
-  ui.view.replaceChildren(node);
+  // Shown without a copy: the bitmap is handed to the canvas (and so used once; a later visit
+  // asks the worker again, which keeps the drawn page).
+  ahead.delete(`${gen}:${p}:${ui.hl.checked}:${bitmap.width}`);
+  // The canvas takes the bitmap's size; otherwise it keeps its default 300x150 and stretches it.
+  [pageCanvas.width, pageCanvas.height] = [bitmap.width, bitmap.height];
+  pageCanvas.getContext("bitmaprenderer")!.transferFromImageBitmap(bitmap);
+  overlay.replaceChildren();
+  if (pageCanvas.parentElement !== ui.view) ui.view.replaceChildren(pageCanvas, overlay);
   ui.view.dataset.page = String(v.page);
   ui.view.dataset.canonical = String(v.canonical);
   ui.page.value = String(p);
   status(`${ms.toFixed(1)} ms${v.canonical ? "" : " · edited"}`);
-  // A turn ends when the page has been painted: the frame after the swap.
+  // A turn ends when the page has been painted: the frame after the swap. Then, out of the way
+  // of the turn, the core's SVG goes on top, invisible, so a tap can name its cluster (D63).
+  const token = ++overlayToken;
   void new Promise((ok) => requestAnimationFrame(() => setTimeout(ok, 0))).then(() => {
     state.turnMs[state.turnMs.length - 1] = performance.now() - t;
+    if (p === state.page)
+      status(`turn ${(performance.now() - t).toFixed(0)} ms · worker ${ms.toFixed(0)} ms${v.canonical ? "" : " · edited"}`);
+    setTimeout(() => {
+      if (token !== overlayToken) return;
+      overlay.innerHTML = v.svg;
+      ui.view.dataset.overlay = String(v.page);
+      markSelection();
+    }, 0);
   });
-  markSelection();
+  delete ui.view.dataset.overlay;
   for (const k of [...ahead.keys()]) if (!k.startsWith(`${gen}:`) || Math.abs(Number(k.split(":")[1]) - p) > 2) ahead.delete(k);
   for (const q of [p + 1, p - 1]) if (q >= 1 && q <= state.pages) void viewOf(q);
   await renderMargin();
@@ -501,6 +535,13 @@ window.mushaf = {
   state,
   go,
   select,
+  paint: async (page, width) => {
+    const r = await call<{ bitmap: ImageBitmap }>("page", page, false, width);
+    const c = document.createElement("canvas");
+    [c.width, c.height] = [r.bitmap.width, r.bitmap.height];
+    c.getContext("2d")!.drawImage(r.bitmap, 0, 0);
+    return c.toDataURL("image/png");
+  },
   call: async (method, ...args) => {
     const r = await call(method, ...args);
     invalidate();

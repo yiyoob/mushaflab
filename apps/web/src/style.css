@@ -20,7 +20,14 @@ button, select, input { font: inherit; }
 #main { display: flex; justify-content: center; gap: 12px; padding: 12px; }
 /* The page is the core's SVG; the browser only paints it (D59). */
 #pageview { flex: 0 1 720px; min-width: 0; position: relative; }
-#pageview svg { display: block; width: 100%; height: auto; box-shadow: 0 1px 6px #0003; }
+/* The page is a bitmap painted by the worker from the core's draw list (D63). */
+#pageview canvas.page { display: block; width: 100%; height: auto; box-shadow: 0 1px 6px #0003; }
+/* The core's SVG lies on top, invisible, so a tap can name its cluster; only a selected or
+   inspected cluster is shown through it. */
+#pageview .overlay { position: absolute; inset: 0; }
+#pageview .overlay svg { display: block; width: 100%; height: 100%; }
+#pageview .overlay rect, #pageview .overlay svg > path, #pageview .overlay g > path { display: none; }
+#pageview .overlay use { fill: transparent; }
 #pageview use[data-c] { cursor: pointer; pointer-events: bounding-box; }
 body.editing #pageview use[data-c]:hover, #pageview use.peek { fill: #1f5fbf; }
 #pageview use.selected { fill: #1f5fbf; }

@@ -1,6 +1,6 @@
 // T8.3: each screen works and shows only what the core returns.
 import { expect, test } from "@playwright/test";
-import { golden, markerIn, open, readText } from "./helpers";
+import { canvasRed, golden, markerIn, open, readText } from "./helpers";
 
 test("the riwayah picker offers exactly the core's styles", async ({ page }) => {
   await open(page, "hafs/hijazi", 1);
@@ -66,7 +66,8 @@ test("free edit: the marker is in the view and in every export; undo restores th
   await page.locator("#val").fill("32");
   await page.locator('button[data-op="set_width"]').click();
   await expect(page.locator("#pageview")).toHaveAttribute("data-canonical", "false");
-  expect(markerIn(await page.locator("#pageview").innerHTML())).toBe(true);
+  // the marker is painted on the page on screen (rule 11)
+  expect(await canvasRed(page)).toBeGreaterThan(0);
   const [svgDl] = await Promise.all([page.waitForEvent("download"), page.locator("#export").selectOption("svg")]);
   expect(markerIn(readText((await svgDl.path())!))).toBe(true);
   const [jsonDl] = await Promise.all([page.waitForEvent("download"), page.locator("#export").selectOption("json")]);
@@ -92,6 +93,7 @@ test("free edit: the marker is in the view and in every export; undo restores th
   expect(await red(plain)).toBe(0);
   await page.locator('button[data-op="undo"]').click();
   await expect(page.locator("#pageview")).toHaveAttribute("data-canonical", "true");
+  expect(await canvasRed(page)).toBe(0);
   expect((await page.evaluate(() => window.mushaf.call("svg", 3, false))) as string).toBe(plain);
 });
 
@@ -152,4 +154,17 @@ test("offline: after one load, a reload with no network still draws pages (rule 
   await page.evaluate(() => window.mushaf.go(10));
   await expect(page.locator("#pageview")).toHaveAttribute("data-page", "10");
   await context.setOffline(false);
+});
+
+test("the page on screen keeps the page's proportions and matches the golden painting", async ({ page }) => {
+  await open(page, "hafs/hijazi", 3);
+  const r = await page.evaluate(() => {
+    const c = document.querySelector<HTMLCanvasElement>("#pageview canvas.page")!;
+    const b = c.getBoundingClientRect();
+    return { w: c.width, h: c.height, cssRatio: b.height / b.width };
+  });
+  // proportions of the golden PNG of the same page (1000 x 1577, tests/golden/pages/hafs-p003.png)
+  const goldenRatio = 1577 / 1000;
+  expect(Math.abs(r.h / r.w - goldenRatio)).toBeLessThan(0.002);
+  expect(Math.abs(r.cssRatio - goldenRatio)).toBeLessThan(0.01);
 });

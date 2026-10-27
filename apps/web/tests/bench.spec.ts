@@ -1,8 +1,8 @@
 // T8.4 (D62): the 16 ms/page budget in Chromium with the CPU throttled 4x, as a proxy for a
 // mid-range phone (the real device is the owner's check at G5, G-214). For each muṣḥaf the
-// reader pages forward through a sweep; the app draws neighbours ahead (D62). Reported:
-// - engine: the core's work for a page (resolve-cached fit, draw, SVG) in the worker;
-// - turn: from the page request to the core's SVG on screen. The budget applies here.
+// reader pages forward through a sweep; the worker paints neighbours ahead (D62, D63). Reported:
+// - engine: the worker's work for a page (core fit, draw, SVG, and canvas painting);
+// - turn: from the page request to the painted page on screen. The budget applies here.
 import { expect, test } from "@playwright/test";
 import { open } from "./helpers";
 

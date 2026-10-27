@@ -1,7 +1,6 @@
 // T8.5: every core golden page, as the app draws it in Chromium, against the core's golden PNG
-// (tests/golden/pages, rasterised by resvg at 1000 px). The app's SVG is the core's (D59), so
-// the drawing is byte-identical (mushaf-draw tests, `just web-parity`); what this checks is the
-// browser's painting of it. Two rasterisers anti-alias edges differently (D61), so both images
+// (tests/golden/pages, rasterised by resvg at 1000 px). The app paints the core's draw list into
+// a canvas in its worker (D63) at the golden's width; this checks that painting. Two rasterisers anti-alias edges differently (D61), so both images
 // are box-blurred 3x3, and a pixel differs only when no pixel within 1 px of it in the other
 // image is within 32 on every channel (both ways). At most 0.1 % may differ, as in golden.rs.
 // A control (the plain page against the edit golden, which moves one line) must fail.
@@ -18,11 +17,12 @@ const cases = readdirSync(golden(""))
 
 const maghribi = new Set(["warsh", "qalun"]); // default styles (D36), as `styles()` reports them
 
-async function compare(page: Page, file: string) {
-  const svg = await page.locator("#pageview").innerHTML();
+async function compare(page: Page, file: string, p: number) {
   const png = readFileSync(golden(file)).toString("base64");
+  const w = (await page.evaluate((src) => new Promise<number>((ok) => { const i = new Image(); i.onload = () => ok(i.naturalWidth); i.src = src; }), `data:image/png;base64,${png}`));
+  const painted = await page.evaluate(([q, width]) => window.mushaf.paint(q, width), [p, w] as const);
   return page.evaluate(
-    async ({ svg, png }) => {
+    async ({ painted, png }) => {
       const TOL = 32;
       const load = async (src: string) => {
         const i = new Image();
@@ -32,14 +32,8 @@ async function compare(page: Page, file: string) {
       };
       const want = await load(`data:image/png;base64,${png}`);
       const [w, h] = [want.naturalWidth, want.naturalHeight];
-      // Paint the vector at the golden's pixel size (as resvg does), not a resample of it.
-      const root = new DOMParser().parseFromString(svg, "image/svg+xml").documentElement;
-      const [vw, vh] = root.getAttribute("viewBox")!.split(" ").slice(2).map(Number);
-      if (Math.round((vh * w) / vw) !== h) return { size: false, bad: 0, n: 0 };
-      root.setAttribute("width", String(w));
-      root.setAttribute("height", String(h));
-      const sized = new XMLSerializer().serializeToString(root);
-      const got = await load(URL.createObjectURL(new Blob([sized], { type: "image/svg+xml" })));
+      const got = await load(painted);
+      if (got.naturalWidth !== w || got.naturalHeight !== h) return { size: false, bad: 0, n: 0 };
       const blurred = (img: HTMLImageElement) => {
         const c = document.createElement("canvas");
         [c.width, c.height] = [w, h];
@@ -80,7 +74,7 @@ async function compare(page: Page, file: string) {
       for (let py = 0; py < h; py++) for (let px = 0; px < w; px++) if (!near(a, b, px, py) || !near(b, a, px, py)) bad++;
       return { size: true, bad, n: w * h };
     },
-    { svg, png },
+    { painted, png },
   );
 }
 
@@ -93,7 +87,7 @@ for (const m of cases) {
     await open(page, `${riwayah}/${style}`, Number(pageStr));
     if (kind === "edit")
       await page.evaluate((t) => window.mushaf.call("import_edits", t), readText(golden(file.replace(".png", ".overlay.yaml"))));
-    const r = await compare(page, file);
+    const r = await compare(page, file, Number(pageStr));
     expect(r.size, "image size").toBe(true);
     console.log(`${file}: ${r.bad} of ${r.n} pixels differ (${((1000 * r.bad) / r.n).toFixed(3)} per mille)`);
     expect(r.bad * 1000).toBeLessThanOrEqual(r.n);
@@ -102,7 +96,7 @@ for (const m of cases) {
 
 test("control: the check fails on a page that differs by one edited line", async ({ page }) => {
   await open(page, "hafs/hijazi", 3);
-  const r = await compare(page, "hafs-p003-edit.png");
+  const r = await compare(page, "hafs-p003-edit.png", 3);
   console.log(`control: ${r.bad} of ${r.n} pixels differ`);
   expect(r.bad * 1000).toBeGreaterThan(r.n);
 });

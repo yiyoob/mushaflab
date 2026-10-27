@@ -1,6 +1,7 @@
 // The core runs here, off the UI thread (D58). This file only forwards calls to the WASM
 // engine and times them; every answer is the core's (rule 7).
 /// <reference lib="webworker" />
+import { paint, type DrawPage } from "./paint";
 
 type Engine = Record<string, (...args: unknown[]) => unknown> & { free(): void };
 let engine: Engine | null = null;
@@ -22,14 +23,26 @@ self.onmessage = async (e: MessageEvent<{ id: number; method: string; args: unkn
   const t = performance.now();
   try {
     let result: unknown;
+    let transfer: Transferable[] = [];
     if (method === "init") result = await init();
+    else if (method === "page") {
+      // D63: the page painted here, plus the view (SVG for taps, highlights) for the UI.
+      if (!engine) throw new Error("engine not loaded");
+      const [page, highlighted, widthPx] = args as [number, boolean, number];
+      const draw = JSON.parse(engine.render(page, highlighted) as string) as DrawPage;
+      const t1 = performance.now();
+      const bitmap = paint(draw, widthPx);
+      const paintMs = performance.now() - t1;
+      result = { view: engine.view(page, highlighted), bitmap, paintMs };
+      transfer = [bitmap];
+    }
     else {
       if (!engine) throw new Error("engine not loaded");
       const f = engine[method];
       if (typeof f !== "function") throw new Error(`no engine method ${method}`);
       result = f.apply(engine, args);
     }
-    self.postMessage({ id, result, ms: performance.now() - t });
+    self.postMessage({ id, result, ms: performance.now() - t }, { transfer });
   } catch (err) {
     self.postMessage({ id, error: String((err as Error)?.message ?? err), ms: performance.now() - t });
   }

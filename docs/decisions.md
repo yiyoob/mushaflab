@@ -1705,7 +1705,8 @@ service worker (`public/sw.js`) caches the data bundle by SHA-256 and everything
 first with the cache as fallback; no other origin is fetched.
 
 ## D59: The page is the core's SVG (T8.3)
-Status: proposed
+Status: proposed; the on-screen page is replaced by D63 (canvas). Exports, taps and the
+interactive SVG below still hold.
 Context: Draw commands can be painted by TypeScript (SVG or Canvas) or the core's own SVG
 backend can be shown as is.
 Decision: the core's SVG. `mushaf_draw::to_svg_interactive` is `to_svg` plus `data-c`
@@ -1735,7 +1736,8 @@ not say which is which (G-215). A dedicated margin data source (G-151) would add
 same `MarginNote` list.
 
 ## D61: Browser screenshots are compared with a blur and a 1-pixel neighbourhood (T8.5)
-Status: proposed
+Status: proposed. Since D63 the test compares the app's canvas painting (worst: 1 pixel in
+1,577,000); the tolerance below is kept unchanged.
 Context: The goldens are rasterised by resvg; Chromium rasterises the same SVG with Skia. On
 `hafs-p001`, 1.2 % of pixels differed by more than 32 on a channel. Every difference was on an
 edge (a diff image showed no moved or missing glyph); 1-px frame lines are grey in one image and
@@ -1767,11 +1769,35 @@ Decision:
   The real device is the owner's check at G5 (G-214).
 - The SVG of a page drawn ahead is parsed into a detached element when it arrives, so a turn
   only swaps it in. A turn ends at the first frame after the swap.
-Result (this Mac, 2026-10-27, `just web-bench`): **the budget is not met.** Turn median
+Result with SVG on screen (this Mac, 2026-10-27, `just web-bench`): **the budget was not met.** Turn median
 42 ms / p95 59 ms for Ḥafṣ, median 28 ms / p95 34 ms for Warsh. The core's time per page in the
 worker is median 17 ms (Ḥafṣ) and 7 ms (Warsh); the worker does not appear to be slowed by
 CDP's throttle (Node, unthrottled, gives about the same), so these are desktop numbers. The turn
 is dominated by the browser styling and painting about 2,000 `<use>` elements; CSS containment
 did not help. A way to meet it would be to paint the core's draw list into an `OffscreenCanvas`
 in the worker and show a bitmap, keeping the SVG only for taps. That changes D59 and is left to
-the owner (G-214).
+the owner (G-214). The owner chose it (2026-10-27): D63. With D63 the budget is met.
+
+## D63: The page on screen is painted into a canvas in the worker (T8.4)
+Status: accepted (owner, 2026-10-27: "Lets make the switch to canvas painting")
+Context: With the core's SVG on screen (D59), a page turn cost 28–42 ms median at CPU/4, almost
+all of it the browser parsing, styling and painting about 2,000 SVG elements (D62).
+Decision:
+- The worker paints the core's draw list (`render` JSON) into an `OffscreenCanvas` at the page's
+  pixel width and sends an `ImageBitmap` (`apps/web/src/paint.ts`). The painter replays the
+  draw commands as given: each glyph outline under its transform, then fills, then strokes, in
+  the colours of `mushaf-draw`'s SVG backend. It decides nothing (rule 7).
+- Neighbouring pages are painted ahead (D62). A turn hands the bitmap to a `bitmaprenderer`
+  canvas, with no copy.
+- After the turn, the core's interactive SVG is laid on top, transparent, so a tap names its
+  cluster; a selected or inspected cluster shows through it. Taps work from the frame after.
+- A width or pixel-density change repaints. Exports are unchanged: the SVG and JSON are the
+  core's bytes; the PNG export is the browser's raster of that SVG.
+- The edited marker is in the draw list, so it is painted on screen (Playwright `free edit`
+  checks red pixels in the canvas, and none after undo).
+Evidence:
+- `just web-golden`: all 50 golden pages, painted at 1000 px, match the golden PNGs; the worst
+  differs on 1 pixel in 1,577,000. The control still fails.
+- `just web-bench` (CPU/4, 20 turns each, two runs): turn median 9.7–10.4 ms / p95 15.1–15.3 ms
+  (Ḥafṣ), median 7.8–8.5 ms / p95 10.5–12.6 ms (Warsh). The budget is met. The worker's time per
+  page (core plus painting) is 22–34 ms median; it runs while the reader reads.
