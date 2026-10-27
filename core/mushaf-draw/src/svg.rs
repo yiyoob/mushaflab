@@ -3,6 +3,8 @@
 
 use std::fmt::Write;
 
+use mushaf_model::ClusterRef;
+
 use crate::{DrawItem, DrawPage, PathOp, Role};
 
 fn fmt_fixed(v: i64, bits: u32) -> String {
@@ -103,6 +105,12 @@ pub fn to_svg(page: &DrawPage) -> String {
         writeln!(s, "<path id=\"g{gid}\" d=\"{}\"/>", path_d(path)).expect("string");
     }
     s.push_str("</defs>\n<g fill=\"#000000\">\n");
+    // Highlighted clusters are drawn in red, as in the owner's print (D45, 2026-10-26).
+    let marked: std::collections::BTreeSet<(u32, &ClusterRef)> = page
+        .highlights
+        .iter()
+        .map(|h| (h.line, &h.cluster))
+        .collect();
     for item in &page.items {
         if let DrawItem::Glyph {
             glyph,
@@ -110,12 +118,21 @@ pub fn to_svg(page: &DrawPage) -> String {
             y,
             sx,
             sy,
-            ..
+            line,
+            cluster,
         } = item
         {
+            let fill = if cluster
+                .as_ref()
+                .is_some_and(|c| marked.contains(&(*line, c)))
+            {
+                " fill=\"#cc0000\""
+            } else {
+                ""
+            };
             writeln!(
                 s,
-                "<use xlink:href=\"#g{glyph}\" transform=\"matrix({} 0 0 -{} {} {})\"/>",
+                "<use xlink:href=\"#g{glyph}\"{fill} transform=\"matrix({} 0 0 -{} {} {})\"/>",
                 fmt_16_16(*sx),
                 fmt_16_16(*sy),
                 fmt_26_6(*x),

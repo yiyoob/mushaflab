@@ -40,9 +40,8 @@ fn warsh_renders_on_its_native_layout() {
     assert_eq!(&png(&svg(&d), 300).unwrap()[1..4], b"PNG");
 }
 
-/// D36: render profiles are keyed by (riwāyah, style). Phase 5 renders each riwāyah's default
-/// style only (Maghribi for Warsh and Qālūn, Ḥijāzī for the rest); any other style is refused
-/// with a reason until Phase 6 builds it.
+/// D36/D44/D46: render profiles are keyed by (riwāyah, style). A non-default style is refused,
+/// with the T6.9 audit's counts, unless it is offered (Warsh and Qālūn in Ḥijāzī, D46).
 #[test]
 fn render_profiles_are_keyed_by_riwayah_and_style() {
     use mushaf_render::{default_style, profile_path};
@@ -66,6 +65,15 @@ fn render_profiles_are_keyed_by_riwayah_and_style() {
     let err = Renderer::load_style(&repo(), "hafs", "maghribi")
         .err()
         .unwrap();
-    assert!(err.to_string().contains("D36"), "{err}");
-    assert!(Renderer::load_style(&repo(), "warsh", "hijazi").is_err());
+    assert!(err.to_string().contains("not available (D44"), "{err}");
+    assert!(err.to_string().contains("fail rule 6"), "{err}");
+    // D46: Warsh and Qālūn are offered in the Ḥijāzī style (their profile exists).
+    for r in ["warsh", "qalun"] {
+        let h = Renderer::load_style(&repo(), r, "hijazi").unwrap();
+        assert_eq!(
+            (h.profile.riwayah.as_str(), h.profile.style.as_str()),
+            (r, "hijazi")
+        );
+    }
+    assert!(Renderer::load_style(&repo(), "hafs", "naskh").is_err());
 }

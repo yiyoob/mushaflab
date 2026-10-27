@@ -70,7 +70,9 @@ def patch_dict(riwayah: str, change: differ.Change, ref: str, tag: classify.Tag)
 
 
 def flow(value: object) -> str:
-    """YAML flow style: strings double-quoted (ASCII, JSON escapes), ints and bools bare."""
+    """YAML flow style: strings double-quoted (ASCII, JSON escapes), ints, bools, null bare."""
+    if value is None:
+        return "null"
     if isinstance(value, bool):
         return "true" if value else "false"
     if isinstance(value, int):

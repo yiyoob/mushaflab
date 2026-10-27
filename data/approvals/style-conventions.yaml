@@ -1,0 +1,43 @@
+# Owner decisions on Maghribi -> Hijazi writing conventions (D46). Written on the owner's
+# explicit instruction (CLAUDE.md rule 4) after review of the example sheet
+# build/review/phase6/sukun-examples.html (Warsh and Qalun), 2026-10-26.
+decisions:
+  - id: "maghribi-to-hijazi.conventions"
+    by: "Yusuf"
+    date: "2026-10-26"
+    quote: "the sheet looks good"
+    scope: ["warsh", "qalun"]
+    conventions:
+      - "sukun: Maghribi U+0652 takes the sign Hafs has on the aligned letter (U+06E1 sukun or U+0652 silent-letter circle); where Hafs has neither, alif keeps U+0652 and any other letter takes U+06E1"
+      - "alif wasla: Maghribi alif + vowel + U+06EC/U+06EA/U+06DF where Hafs has U+0671 is written as Hafs writes it"
+      - "final ya: U+06D2 where Hafs has U+064A/U+0649 with the same marks is written as Hafs writes it"
+      - "hamza: Maghribi U+0627 U+06DF where Hafs has U+0623 U+064F is written as Hafs writes it"
+      - "marks stored on a neighbouring letter: a word with the same letters and the same marks as Hafs is written as Hafs writes it"
+      - "reading differences (naql, taqlil, ibdal, silah, other vowels) keep the riwayah's own form"
+  - id: "maghribi-to-hijazi.pause-signs"
+    by: "Yusuf"
+    date: "2026-10-26"
+    quote: "warsh and qalun should show their own pause signs"
+    scope: ["warsh", "qalun"]
+  - id: "maghribi-to-hijazi.word-forms"
+    by: "Yusuf"
+    date: "2026-10-26"
+    quote: "Approve the first 5:18:16, the 12:90:2 drawing, and the first 2:225:2. Record all picks and implement."
+    scope: ["warsh", "qalun"]
+    note: "Picks from the candidate sheet build/review/phase6/form-candidates.html and follow-up renders, compared with the owner's print photos (IMG_2514-2517 and the 12:90:2 crop). Font: DigitalKhatt hb-madina.otf. Offsets are font units on the glyph in visual order, applied at draw time."
+    picks:
+      - {words: ["5:18:16"], pick: "A (offset)", detail: "pause sign U+06D6 moved left 350, down 60", quote: "the صل sign should be moved more to the left"}
+      - {words: ["2:73:7", "2:142:6", "20:76:12"], pick: "B3", detail: "dot written U+065C after the final ya + U+0670"}
+      - {words: ["20:58:14"], pick: "C1", detail: "tanwin U+08F0 on the waw"}
+      - {words: ["2:48:8"], pick: "D1", detail: "Hafs DigitalKhatt form of the word"}
+      - {words: ["2:49:4"], pick: "E2", detail: "short stroke U+0640 then space then the word without the hamza vowel"}
+      - {words: ["6:143:10"], pick: "F1", detail: "stroke U+0640 then the madda-alif word"}
+      - {words: ["12:90:2"], pick: "G (offset)", detail: "hamza-alif, a gap with the dot U+06EC on the line, then the rest; alif side moved 180, dot 90 left, down 60", quote: "it is a hamza, then the next space is just a dot, then just a nun and then kaf"}
+      - {words: ["2:65:12", "2:61:52"], pick: "H2", detail: "hamza written CGJ U+0654 CGJ on a kashida"}
+      - {words: ["2:225:2"], pick: "I (offset)", detail: "dot U+06EC raised onto the waw (x -30, y +450), fatha above it (x -20, y +560)", quote: "The dot should be on top of the waw and the fatha on top of the dot"}
+  - id: "maghribi-to-hijazi.remaining-forms"
+    by: "Yusuf"
+    date: "2026-10-27"
+    quote: "the remainig forms look good. just on some of them the waqf sign is touching the harakah so just move it a little to the left. otherwise looks good."
+    scope: ["warsh", "qalun"]
+    note: "Review sheet build/review/phase6/remaining-forms.html. Approved: group 'pause sign on a form that converts' (form, then the pause sign; pause sign moved left as in pick A of maghribi-to-hijazi.word-forms where it sits over a vowel) and group 'final ya written as Hafs does'. The forms with no proposal stay blocked."

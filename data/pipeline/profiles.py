@@ -108,6 +108,10 @@ def hafs_kinds() -> dict[Pos, str]:
     return {(ln["page"], ln["line"]): ln["type"] for ln in ingest_layout.load_layout()["lines"]}
 
 
+RULES_DIR = Path(__file__).resolve().parents[1] / "rules"
+CORRECTIONS_DIR = Path(__file__).resolve().parents[1] / "patches" / "corrections"
+
+
 def build(riwayah: str) -> dict:
     rows = kfgqpc.rows(riwayah)
     p: dict = {
@@ -117,11 +121,21 @@ def build(riwayah: str) -> dict:
         "text_source": kfgqpc.source_id(riwayah),
     }
     if riwayah == "hafs":
-        p["patch_stack"] = []
+        # D39: owner corrections to the spine text, when there are any.
+        corrections = CORRECTIONS_DIR / "hafs.yaml"
+        p["patch_stack"] = ["patches/corrections/hafs.yaml"] if corrections.exists() else []
     else:
         p["single_source"] = True
-        p["patch_stack"] = [f"patches/raw/{riwayah}.yaml"]
+        # T6.4 (D42): data-derived rules plus the residual raw patches they leave, if mined.
+        residual = CORRECTIONS_DIR.parent / "curated" / f"{riwayah}.yaml"
+        p["patch_stack"] = (
+            [f"patches/curated/{riwayah}.yaml"]
+            if residual.exists()
+            else [f"patches/raw/{riwayah}.yaml"]
+        )
         p["ayah_map"] = riwayah
+    if (RULES_DIR / f"{riwayah}.yaml").exists():  # T6.2: a riwayah's own rule file
+        p["rule_stack"] = [f"rules/{riwayah}.yaml"]
     p["surah_headers"] = headers(gap_lines(rows, lines_per_page()), hafs_kinds())
     return p
 

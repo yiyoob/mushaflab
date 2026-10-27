@@ -1,0 +1,8 @@
+# Owner approvals for Hafs (PROJECT_PLAN §3.5). Written only on the owner's explicit
+# instruction (CLAUDE.md rule 4).
+approvals:
+  - target_ref: "hafs.g142.52.37.7.4.rep"
+    status: "cross-checked"
+    by: "Yusuf"
+    date: "2026-10-26"
+    note: "Owner, 2026-10-26: \"sīn should be below the ṣāḍ on 52:37.\" Basis: KFGQPC Hafs mushaf, explanation of signs, p. و (sin under the sad in المصيطرون)."

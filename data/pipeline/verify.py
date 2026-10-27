@@ -21,6 +21,7 @@ from pipeline import (
     ayah_maps,
     codepoints,
     compile_db,
+    corrections,
     dk_riwayat,
     drift,
     emit_patches,
@@ -29,8 +30,11 @@ from pipeline import (
     phase4_report,
     phase5_readme,
     profiles,
+    rule_mining,
+    rules_register,
     sources,
     spine,
+    style_conversion,
 )
 
 GOLDEN = Path(__file__).resolve().parents[2] / "tests" / "golden" / "page_boundaries.json"
@@ -174,10 +178,22 @@ def check_phase5_files_current() -> list[str]:
     return out
 
 
+def check_phase6_files_current() -> list[str]:
+    out = []
+    if corrections.main(["", "check"]) != 0:
+        out.append("data/encodings/hafs-v1.correction-rows.json differs from a rebuild")
+    if rule_mining.main(["", "check"]) != 0:
+        out.append("data-derived rules, registers or residual patches differ from a rebuild")
+    if style_conversion.main(["", "check"]) != 0:
+        out.append("style conversion rows or docs/review/phase6/style-conventions.md are stale")
+    return out
+
+
 CHECKS: dict[str, Callable[[], list[str]]] = {
     "sources": check_sources,
     "tracked files current": check_tracked_files_current,
     "phase 5 files current": check_phase5_files_current,
+    "phase 6 files current": check_phase6_files_current,
     "lines per page": check_lines_per_page,
     "every item once, in order": check_every_item_once_in_order,
     "line types": check_line_types,
@@ -185,6 +201,7 @@ CHECKS: dict[str, Callable[[], list[str]]] = {
     "qcf4 line data": check_qcf4_lines,
     "word texts": check_text_differences,
     "database": check_db,
+    "rule register": rules_register.check,
 }
 
 

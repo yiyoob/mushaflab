@@ -4,6 +4,6 @@ mod encoding;
 mod font;
 mod integrity;
 
-pub use encoding::{Converted, Digest, EncodingTable, Span, Unmapped};
+pub use encoding::{Adjust, Converted, Digest, EncodingTable, Span, Unmapped};
 pub use font::{CacheStats, FeatureRange, FontData, ShapedGlyph, Shaper};
 pub use integrity::{Exceptions, Violation, check_word};

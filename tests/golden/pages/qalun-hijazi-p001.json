@@ -1,0 +1,132 @@
+{
+  "canonical": true,
+  "draw_sha256": "4782cd785b48cfb1a22ce9683618019342cb201f521d7ad45574695e6e7e9ba5",
+  "layout_id": "uthmani-qalun-kfgqpc",
+  "lines": [
+    {
+      "baseline": 596992,
+      "kind": {
+        "kind": "surah_name",
+        "surah": 1
+      },
+      "left": 555808,
+      "letter_gain": 0,
+      "line": 1,
+      "natural": 142784,
+      "right": 698592,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 142784,
+      "width": 142784
+    },
+    {
+      "baseline": 718592,
+      "kind": {
+        "kind": "basmalah"
+      },
+      "left": 395232,
+      "letter_gain": 0,
+      "line": 2,
+      "natural": 463936,
+      "right": 859168,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 463936,
+      "width": 463936
+    },
+    {
+      "baseline": 840192,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 273722,
+      "letter_gain": 30016,
+      "line": 3,
+      "natural": 627328,
+      "right": 980678,
+      "short_ppm": 620573,
+      "squeeze": null,
+      "target": 706956,
+      "width": 706956
+    },
+    {
+      "baseline": 961792,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 257075,
+      "letter_gain": 0,
+      "line": 4,
+      "natural": 675648,
+      "right": 997326,
+      "short_ppm": 649799,
+      "squeeze": null,
+      "target": 740251,
+      "width": 740251
+    },
+    {
+      "baseline": 1083392,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 318565,
+      "letter_gain": 31488,
+      "line": 5,
+      "natural": 545856,
+      "right": 935835,
+      "short_ppm": 541846,
+      "squeeze": null,
+      "target": 617270,
+      "width": 617270
+    },
+    {
+      "baseline": 1204992,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 182203,
+      "letter_gain": 0,
+      "line": 6,
+      "natural": 852160,
+      "right": 1072198,
+      "short_ppm": 781246,
+      "squeeze": null,
+      "target": 889995,
+      "width": 889995
+    },
+    {
+      "baseline": 1326592,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 277507,
+      "letter_gain": 15360,
+      "line": 7,
+      "natural": 634944,
+      "right": 976894,
+      "short_ppm": 613929,
+      "squeeze": null,
+      "target": 699387,
+      "width": 699387
+    },
+    {
+      "baseline": 1448192,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 420739,
+      "letter_gain": 101312,
+      "line": 8,
+      "natural": 291008,
+      "right": 833661,
+      "short_ppm": 362467,
+      "squeeze": null,
+      "target": 412922,
+      "width": 412922
+    }
+  ],
+  "notes": [],
+  "page": 1,
+  "riwayah": "qalun",
+  "scale": 65536
+}

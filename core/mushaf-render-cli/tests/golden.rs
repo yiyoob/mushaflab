@@ -990,3 +990,301 @@ fn native_golden_pages() {
         );
     }
 }
+
+/// T6.2/T6.3: the Ḥafṣ option `hafs.maliyah` (KFGQPC Ḥafṣ muṣḥaf, explanation of signs, p. ح).
+/// By the owner's decision (D41) the idghām wajh changes no glyph: it only writes the
+/// annotation channel (D40). The page holding 69:28 is pinned under the default (iẓhār with
+/// sakt), passes rule 6 and line fit, and the idghām draw list must be byte-identical to it.
+/// The page is found from the layout.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn hafs_maliyah_option_pair() {
+    use mushaf_model::LineKind;
+    use mushaf_render::fit_checked;
+    use std::collections::BTreeMap;
+    let r = Renderer::load(&repo(), "hafs").unwrap();
+    let spine = &r.data.spines[&r.profile.spine];
+    let layout = &r.data.layouts[&r.profile.layout_id];
+    let p = spine.position(&"69:28:4".parse().unwrap()).unwrap();
+    let page = layout
+        .lines
+        .iter()
+        .find(|l| match &l.kind {
+            LineKind::Text { first, last } => {
+                spine.position(first).unwrap() <= p && p <= spine.position(last).unwrap()
+            }
+            _ => false,
+        })
+        .unwrap()
+        .page;
+    let shaper = r.font.shaper();
+    let mut drawn = Vec::new();
+    for choice in ["izhar_sakt", "idgham"] {
+        let choices = BTreeMap::from([("hafs.maliyah".to_string(), choice.to_string())]);
+        let resolved = r.resolve_with(&choices, None).unwrap();
+        assert_eq!(resolved.choices["hafs.maliyah"], choice);
+        let mapping = r.map(&resolved).unwrap();
+        let cp = fit_checked(&r, &shaper, &resolved, &mapping, page).unwrap();
+        assert!(cp.blocked.is_none(), "{choice}: {:?}", cp.blocked);
+        assert!(
+            cp.violations.is_empty(),
+            "{choice}: rule 6: {:?}",
+            cp.violations
+        );
+        let d = r.draw(cp.fit.as_ref().unwrap()).unwrap();
+        assert!(d.canonical, "{choice}: an option choice is not a free edit");
+        drawn.push(serde_json::to_string(&d).unwrap());
+        if choice == "izhar_sakt" {
+            check_golden(&format!("hafs-maliyah-p{page:03}"), &d);
+        }
+    }
+    assert_eq!(
+        drawn[0], drawn[1],
+        "the idgham wajh must draw exactly as the printed text"
+    );
+}
+
+/// T6.9 (D44): coverage of every riwāyah in the style it does not use by default. Maghribi:
+/// the KFGQPC Warsh font, KFGQPC codepoints after the owner-confirmed style rows. Ḥijāzī:
+/// DigitalKhatt Madina through the Ḥafṣ table and the approved riwāyah rows (D28), after the
+/// style rows (there are none from Maghribi). Every resolved word is converted, shaped and
+/// checked against rule 6. A combination is available only if no word fails. The result is
+/// pinned in `STYLE_AVAILABILITY` (rewritten with MUSHAF_UPDATE_GOLDEN=1).
+const STYLE_AVAILABILITY: &str = "data/render/style-availability.json";
+const STYLE_FONTS: [(&str, &str); 2] = [
+    ("maghribi", "fonts/kfgqpc/uthmanic_warsh_v21.ttf"),
+    ("hijazi", "fonts/digitalkhatt/hb-madina.otf"),
+];
+const ALL_RIWAYAT: [&str; 8] = [
+    "hafs",
+    "shuba",
+    "warsh",
+    "qalun",
+    "bazzi",
+    "qunbul",
+    "duri_abuamr",
+    "susi",
+];
+const SHOWN_FORMS: usize = 10;
+
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn style_availability_audit() {
+    use std::collections::BTreeMap;
+    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let conv = fs::read_to_string(repo().join("data/encodings/style-conversion.json")).unwrap();
+    let hafs = Renderer::load(&repo(), "hafs").unwrap();
+    let mut entries = Vec::new();
+    for riwayah in ALL_RIWAYAT {
+        let own = mushaf_render::default_style(riwayah).unwrap();
+        let (style, font_path) = *STYLE_FONTS.iter().find(|(s, _)| *s != own).unwrap();
+        let spine = &ds.profiles[riwayah].spine;
+        let base = if style == "maghribi" {
+            mushaf_shape::EncodingTable::identity(spine)
+        } else {
+            let mut t = hafs.table.clone();
+            if riwayah != "hafs" {
+                t.extend_from_json(
+                    &fs::read_to_string(repo().join("data/encodings/hafs-v1.riwayat-rows.json"))
+                        .unwrap(),
+                )
+                .unwrap();
+            }
+            t
+        };
+        let table = base.with_style_conversion(&conv, own, style).unwrap();
+        let font = mushaf_shape::FontData::new(fs::read(repo().join(font_path)).unwrap()).unwrap();
+        let shaper = font.shaper();
+        let sel = mushaf_resolve::Selection {
+            riwayah: riwayah.into(),
+            ..Default::default()
+        };
+        let mut resolved =
+            mushaf_resolve::resolve_profile(&ds, &sel, None, mushaf_resolve::Mode::Data).unwrap();
+        if own == "maghribi" {
+            // D46: the owner-approved Maghribi -> Hijazi writing conventions.
+            resolved = mushaf_resolve::maghribi_to_hijazi(&resolved, &ds.spines[spine]);
+        }
+        let (mut words, mut unconvertible, mut rule6) = (0usize, 0usize, 0usize);
+        let mut forms: BTreeMap<String, usize> = BTreeMap::new();
+        let mut kinds: BTreeMap<String, usize> = BTreeMap::new();
+        for it in resolved
+            .items
+            .iter()
+            .filter(|i| i.kind == mushaf_model::ItemKind::Word)
+        {
+            words += 1;
+            let cl: Vec<&[char]> = it.clusters.iter().map(|c| c.cps.0.as_slice()).collect();
+            let chars = match table.convert(&cl) {
+                Ok(c) => c.chars,
+                Err(u) => {
+                    unconvertible += 1;
+                    *forms.entry(u.cps.to_string()).or_default() += 1;
+                    continue;
+                }
+            };
+            let glyphs = shaper.shape(&chars, &[]).unwrap();
+            let v = check_word(&font, &shaper, &chars, &[], &glyphs).unwrap();
+            if !v.is_empty() {
+                rule6 += 1;
+                for x in v {
+                    let k = format!("{x:?}");
+                    let k = k
+                        .split(['{', '(', ' '])
+                        .next()
+                        .unwrap_or_default()
+                        .to_string();
+                    *kinds.entry(k).or_default() += 1;
+                }
+            }
+        }
+        let mut top: Vec<(String, usize)> = forms.into_iter().collect();
+        top.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+        top.truncate(SHOWN_FORMS);
+        entries.push(serde_json::json!({
+            "riwayah": riwayah,
+            "style": style,
+            "font": font_path,
+            "words": words,
+            "unconvertible_words": unconvertible,
+            "rule6_failing_words": rule6,
+            // D46: offered when a render profile exists; words that cannot convert block their
+            // pages, and rule-6 findings are pinned (`maghribi_hijazi_pages`).
+            "available": repo().join(format!("data/render/{riwayah}-{style}.json")).exists(),
+            "top_unconvertible_forms": top,
+            "rule6_kinds": kinds,
+        }));
+    }
+    let doc = serde_json::json!({
+        "note": "T6.9 (D44, D46): every riwayah in its non-default style. Generated by the golden test style_availability_audit (MUSHAF_UPDATE_GOLDEN=1). A combination is available when its render profile exists; its words that cannot convert block their pages (pinned by maghribi_hijazi_pages).",
+        "entries": entries,
+    });
+    let text = serde_json::to_string_pretty(&doc).unwrap() + "\n";
+    let path = repo().join(STYLE_AVAILABILITY);
+    if std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some() {
+        fs::write(&path, &text).unwrap();
+        return;
+    }
+    assert_eq!(
+        text,
+        fs::read_to_string(&path).unwrap(),
+        "style availability changed"
+    );
+}
+
+/// T6.11–T6.12 (D37, D45): difference highlighting per riwāyah, on the first page from 3 that
+/// draws and has a highlight. Highlighting changes nothing drawn: the highlighted page's draw list without its
+/// highlights equals the plain page byte for byte. With cited rules only nothing highlights
+/// today, as every data-derived rule is a hypothesis; by default hypotheses are shown. With hypotheses
+/// shown, every highlight comes from a rule that is neither `encoding` nor `spelling`, and an
+/// encoding rule applied on the page never highlights. The highlights are pinned per riwāyah
+/// in `tests/golden/pages/<r>-p<NNN>-highlights.json`.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn highlight_pairs_per_riwayah() {
+    use mushaf_render::HighlightPolicy;
+    use std::collections::BTreeMap;
+    let update = std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some();
+    let none = BTreeMap::new();
+    for riwayah in [
+        "shuba",
+        "warsh",
+        "qalun",
+        "bazzi",
+        "qunbul",
+        "duri_abuamr",
+        "susi",
+    ] {
+        let r = Renderer::load(&repo(), riwayah).unwrap();
+        let shown = HighlightPolicy::default(); // hypotheses shown (owner, D45)
+        let (page, mut hl) = (3..=604)
+            .find_map(|p| {
+                r.render_highlighted(p, &none, shown)
+                    .ok()
+                    .filter(|d| !d.highlights.is_empty())
+                    .map(|d| (p, d))
+            })
+            .unwrap();
+        let plain = r.render(page, None).unwrap();
+        let cited = r
+            .render_highlighted(page, &none, HighlightPolicy::CITED_ONLY)
+            .unwrap();
+        assert_eq!(
+            cited, plain,
+            "{riwayah}: no rule is cited yet, so nothing highlights"
+        );
+        let highlights = std::mem::take(&mut hl.highlights);
+        assert_eq!(
+            serde_json::to_string(&hl).unwrap(),
+            serde_json::to_string(&plain).unwrap(),
+            "{riwayah}: highlighting changed the drawing"
+        );
+        // D45 addendum 2: a highlight is a reading difference from Hafs, whatever made it;
+        // labelled with what made it, never cited yet.
+        for h in &highlights {
+            assert!(!h.label.is_empty(), "{riwayah}: unlabelled highlight");
+            assert!(!h.cited, "{riwayah}: {} is shown as cited", h.label);
+        }
+        let name = format!("{riwayah}-p{page:03}-highlights");
+        let path = repo().join(format!("tests/golden/pages/{name}.json"));
+        let text = serde_json::to_string_pretty(&highlights).unwrap() + "\n";
+        if update {
+            fs::write(&path, &text).unwrap();
+        } else {
+            assert_eq!(text, fs::read_to_string(&path).unwrap(), "{name} changed");
+        }
+    }
+}
+
+/// D46: Warsh and Qālūn in the Ḥijāzī style, every page. A page whose words all convert is
+/// drawn and checked against rule 6 and line fit; a page with a word that has no approved
+/// DigitalKhatt row is blocked. The blocked pages and every rule-6 finding are pinned in
+/// `MAGHRIBI_HIJAZI_PENDING` for the owner (G-148); any change fails. A few drawn pages are
+/// pinned as goldens.
+const MAGHRIBI_HIJAZI_PENDING: &str = "tests/golden/shape/maghribi-hijazi-pending.json";
+
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn maghribi_hijazi_pages() {
+    use mushaf_render::fit_checked;
+    let update = std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some();
+    let mut doc = serde_json::Map::new();
+    for riwayah in ["warsh", "qalun"] {
+        let r = Renderer::load_style(&repo(), riwayah, "hijazi").unwrap();
+        let resolved = r.resolve(None).unwrap();
+        let mapping = r.map(&resolved).unwrap();
+        let shaper = r.font.shaper();
+        let pages = r.data.layouts[&r.profile.layout_id].pages;
+        let (mut blocked, mut violations, mut drawn) = (Vec::new(), Vec::new(), Vec::new());
+        for page in 1..=pages {
+            let cp = fit_checked(&r, &shaper, &resolved, &mapping, page).unwrap();
+            if cp.blocked.is_some() {
+                blocked.push(page);
+                continue;
+            }
+            drawn.push(page);
+            for (at, v) in &cp.violations {
+                violations.push(format!("p{page} {at}: {v:?}"));
+            }
+            if drawn.len() <= 2 {
+                let d = r.draw(cp.fit.as_ref().unwrap()).unwrap();
+                check_golden(&format!("{riwayah}-hijazi-p{page:03}"), &d);
+            }
+        }
+        doc.insert(
+            riwayah.into(),
+            serde_json::json!({"pages": pages, "drawn": drawn.len(), "blocked": blocked, "rule6": violations}),
+        );
+    }
+    let text = serde_json::to_string_pretty(&doc).unwrap() + "\n";
+    let path = repo().join(MAGHRIBI_HIJAZI_PENDING);
+    if update {
+        fs::write(&path, &text).unwrap();
+        return;
+    }
+    assert_eq!(
+        text,
+        fs::read_to_string(&path).unwrap(),
+        "Maghribi -> Hijazi pages changed"
+    );
+}

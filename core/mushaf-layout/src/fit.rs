@@ -21,7 +21,7 @@ use mushaf_justify::{
 };
 use mushaf_model::{ClusterRef, Cps, Error, ItemRef, LineKind};
 use mushaf_resolve::Resolved;
-use mushaf_shape::{EncodingTable, FeatureRange, ShapedGlyph, Shaper};
+use mushaf_shape::{Adjust, EncodingTable, FeatureRange, ShapedGlyph, Shaper};
 use serde::{Deserialize, Serialize};
 
 use crate::Mapping;
@@ -46,6 +46,17 @@ pub struct Profile {
     /// Owner-approved rows for cluster forms outside Ḥafṣ (D28), loaded next to `encoding`.
     #[serde(default)]
     pub encoding_extra: Option<String>,
+    /// Style conversion rows (T6.7, D44) and the style of the riwāyah's text: the rows from
+    /// `text_style` to this profile's `style` are applied before the encoding table. A
+    /// Maghribi text in a Hijazi profile is also rewritten with the owner-approved
+    /// conventions (D46, `mushaf_resolve::maghribi_to_hijazi`) when resolved.
+    #[serde(default)]
+    pub style_conversion: Option<String>,
+    #[serde(default)]
+    pub text_style: Option<String>,
+    /// Owner-approved Hijazi forms of a Maghribi text (D47), loaded after `encoding_extra`.
+    #[serde(default)]
+    pub hijazi_forms: Option<String>,
     pub line_widths: String,
     pub surah_names: String,
     pub note: String,
@@ -167,6 +178,20 @@ impl SurahNames {
 impl Profile {
     /// The profile's encoding table: the identity table without `encoding`, else the table
     /// plus any `encoding_extra` rows. `read` returns a repository file's text.
+    fn with_style(
+        &self,
+        table: EncodingTable,
+        read: &impl Fn(&str) -> Result<String, Error>,
+    ) -> Result<EncodingTable, Error> {
+        match (&self.style_conversion, &self.text_style) {
+            (None, _) => Ok(table),
+            (Some(path), Some(from)) => {
+                table.with_style_conversion(&read(path)?, from, &self.style)
+            }
+            (Some(_), None) => Err(Error::new("style_conversion needs text_style")),
+        }
+    }
+
     pub fn encoding_table(
         &self,
         read: impl Fn(&str) -> Result<String, Error>,
@@ -175,13 +200,16 @@ impl Profile {
             if self.encoding_extra.is_some() {
                 return Err(Error::new("encoding_extra without an encoding table"));
             }
-            return Ok(EncodingTable::identity(&self.spine));
+            return self.with_style(EncodingTable::identity(&self.spine), &read);
         };
         let mut table = EncodingTable::from_json(&read(path)?)?;
         if let Some(extra) = &self.encoding_extra {
             table.extend_from_json(&read(extra)?)?;
         }
-        Ok(table)
+        if let Some(forms) = &self.hijazi_forms {
+            table.extend_forms_from_json(&read(forms)?)?;
+        }
+        self.with_style(table, &read)
     }
 }
 
@@ -245,6 +273,9 @@ pub struct FitWord {
     pub width: i64,
     /// Draw the sajdah overline over this word (D18).
     pub overline: bool,
+    /// Owner-approved glyph moves (D47): (char index, its codepoint, dx, dy), font units, y up.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub shifts: Vec<(usize, char, i32, i32)>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -337,6 +368,36 @@ fn em(value: i32, upem: i64) -> i64 {
     i64::from(value) * upem * ONE / 1000
 }
 
+/// Moves the glyph of each shifted character (D47): the character's nominal glyph in the
+/// cluster that holds it. Exactly one glyph must match, else the form is an error.
+fn apply_shifts(shaper: &Shaper, w: &mut FitWord) -> Result<(), Error> {
+    for &(at, cp, dx, dy) in &w.shifts {
+        let at = u32::try_from(at).expect("index fits");
+        let cluster = w
+            .glyphs
+            .iter()
+            .map(|g| g.cluster)
+            .filter(|c| *c <= at)
+            .max();
+        let glyph = shaper.nominal_glyph(cp);
+        let mut hit: Vec<&mut ShapedGlyph> = w
+            .glyphs
+            .iter_mut()
+            .filter(|g| Some(g.cluster) == cluster && Some(g.glyph) == glyph)
+            .collect();
+        let [g] = hit.as_mut_slice() else {
+            return Err(Error::new(format!(
+                "shift: {} glyphs for U+{:04X} at character {at} of the word",
+                hit.len(),
+                u32::from(cp)
+            )));
+        };
+        g.x_offset += dx;
+        g.y_offset += dy;
+    }
+    Ok(())
+}
+
 fn plain_word(chars: Vec<char>) -> FitWord {
     FitWord {
         item: None,
@@ -347,6 +408,7 @@ fn plain_word(chars: Vec<char>) -> FitWord {
         gaps: Vec::new(),
         width: 0,
         overline: false,
+        shifts: Vec::new(),
     }
 }
 
@@ -383,6 +445,25 @@ fn text_plan(
                 .any(|m| c.windows(m.0.len()).any(|w| w == m.0.as_slice()))
         });
         let mut word_extra = 0;
+        for a in &conv.adjust {
+            match *a {
+                Adjust::Gap { at, fu } => {
+                    let w = i64::from(fu) * ONE;
+                    word.gaps.push((at, w));
+                    word_extra += w;
+                }
+                Adjust::Shift { at, cp, dx, dy } => {
+                    if word.chars.get(at) != Some(&cp.0) {
+                        return Err(Error::new(format!(
+                            "{}: shift of U+{:04X} does not match the form",
+                            it.id,
+                            u32::from(cp.0)
+                        )));
+                    }
+                    word.shifts.push((at, cp.0, dx, dy));
+                }
+            }
+        }
         for s in &conv.spans {
             word.spans.push(WordSpan {
                 clusters: it.clusters[s.clusters.clone()]
@@ -603,6 +684,7 @@ pub fn fit_page(
                 })
                 .collect();
             w.glyphs = shaper.shape(&w.chars, &w.features)?;
+            apply_shifts(shaper, w)?;
             w.width = w.glyphs.iter().map(|g| i64::from(g.x_advance)).sum::<i64>() * ONE
                 + w.gaps.iter().map(|g| g.1).sum::<i64>();
         }

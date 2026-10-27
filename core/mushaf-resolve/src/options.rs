@@ -1,12 +1,15 @@
 //! T2.4: option groups (§3.3, D12). A choice comes from the user's selection, else the ṭarīq's
 //! default, else the riwāyah's default; with none of these the resolution fails rather than
 //! guess. Only groups that the stack's patches depend on need a choice. `allowed_for` is
-//! advisory: it yields lint notes and never blocks (rule 11).
+//! advisory: it yields lint notes and never blocks (rule 11). A group's `affects` may name a
+//! patch id or a rule id (§3.3): patches expanded from a rule (T6.1) are covered by the rule.
 
 use std::collections::{BTreeMap, BTreeSet};
 
 use mushaf_model::{DataSet, EditOverlay, OptionGroup, OwnerLevel, Patch, PatchFile, Spine};
 use serde::Serialize;
+
+use mushaf_rules::Note;
 
 use crate::{Mode, ResolveError, Resolved, resolve_patches};
 
@@ -25,6 +28,10 @@ pub struct Selection {
 pub enum LintNote {
     /// The group is used for a riwāyah outside its `allowed_for` list.
     OptionNotAllowed { group: String, riwayah: String },
+    /// A rule matched nowhere (an error in `Mode::Data`).
+    RuleNoMatch { rule: String },
+    /// A rule exception names a place the pattern never matches (an error in `Mode::Data`).
+    RuleUnusedException { rule: String, cluster: String },
 }
 
 fn choice_for(g: &OptionGroup, sel: &Selection) -> Result<String, ResolveError> {
@@ -84,6 +91,28 @@ pub fn resolve(
             patch: p.id.clone(),
         });
     }
+    // T6.6 (D43): a riwāyah's ṭarīq is the option group `<riwāyah>.tariq`, when loaded. The
+    // selection's `tariq` and a choice for that group must agree; without either, the
+    // group's default for the riwāyah is the ṭarīq.
+    let mut owned = sel.clone();
+    let tariq_group = groups.get(&format!("{}.tariq", sel.riwayah));
+    if let Some(g) = tariq_group {
+        let chosen = match (sel.choices.get(&g.id), &sel.tariq) {
+            (Some(c), Some(t)) if c != t => {
+                return Err(ResolveError::TariqMismatch {
+                    choice: c.clone(),
+                    tariq: t.clone(),
+                });
+            }
+            (Some(c), _) => c.clone(),
+            (None, Some(t)) => t.clone(),
+            (None, None) => choice_for(g, sel)?,
+        };
+        known_choice(g, &chosen)?;
+        owned.tariq = Some(chosen.clone());
+        owned.choices.insert(g.id.clone(), chosen);
+    }
+    let sel = &owned;
     for (id, c) in &sel.choices {
         known_choice(group(id)?, c)?;
     }
@@ -95,7 +124,8 @@ pub fn resolve(
         if let Some(w) = &p.when {
             let g = group(&w.option)?;
             known_choice(g, &w.choice)?;
-            if !g.affects.contains(&p.id) {
+            let by_rule = p.rule_id.as_ref().is_some_and(|r| g.affects.contains(r));
+            if !g.affects.contains(&p.id) && !by_rule {
                 return Err(ResolveError::NotInAffects {
                     group: g.id.clone(),
                     patch: p.id.clone(),
@@ -123,6 +153,12 @@ pub fn resolve(
                 .as_ref()
                 .is_none_or(|w| choices[&w.option] == w.choice)
         })
+        // A ṭarīq-level patch applies only under its own ṭarīq (when the riwāyah has a group).
+        .filter(|p| {
+            p.owner.level != OwnerLevel::Tariq
+                || tariq_group.is_none()
+                || sel.tariq.as_deref() == Some(p.owner.id.as_str())
+        })
         .collect();
     let mut r = resolve_patches(spine, &active, mode)?;
     r.choices = choices;
@@ -144,8 +180,31 @@ pub fn resolve_profile(
         .ok_or_else(|| ResolveError::UnknownRiwayah {
             riwayah: sel.riwayah.clone(),
         })?;
-    // `DataSet` validation guarantees the spine and every patch file exist.
+    // `DataSet` validation guarantees the spine and every patch and rule file exist.
     let spine = &ds.spines[&p.spine];
-    let files: Vec<&PatchFile> = p.patch_stack.iter().map(|f| &ds.patch_files[f]).collect();
-    resolve(spine, &files, &ds.option_groups, sel, overlay, mode)
+    let mut expanded = Vec::new();
+    let mut notes = Vec::new();
+    for path in &p.rule_stack {
+        let e = mushaf_rules::expand(&ds.rule_files[path], spine)
+            .map_err(|e| ResolveError::Rule(format!("{path}: {e}")))?;
+        notes.extend(e.notes.into_iter().map(|n| match n {
+            Note::NoMatch { rule } => LintNote::RuleNoMatch { rule },
+            Note::UnusedException { rule, cluster } => LintNote::RuleUnusedException {
+                rule,
+                cluster: cluster.to_string(),
+            },
+        }));
+        expanded.push(e.file);
+    }
+    if mode == Mode::Data && !notes.is_empty() {
+        return Err(ResolveError::Rule(format!("{notes:?}")));
+    }
+    let files: Vec<&PatchFile> = expanded
+        .iter()
+        .chain(p.patch_stack.iter().map(|f| &ds.patch_files[f]))
+        .collect();
+    let mut r = resolve(spine, &files, &ds.option_groups, sel, overlay, mode)?;
+    r.lint.extend(notes);
+    r.lint.sort();
+    Ok(r)
 }

@@ -5,8 +5,9 @@ spine: "hafs/v1"
 script_id: "uthmani"
 text_source: "kfgqpc-official-shuba"
 single_source: true
-patch_stack: ["patches/raw/shuba.yaml"]
+patch_stack: ["patches/curated/shuba.yaml"]
 ayah_map: "shuba"
+rule_stack: ["rules/shuba.yaml"]
 surah_headers:
   - {surah: 1, page: 1, name_line: 1}
   - {surah: 2, page: 2, name_line: 1, basmalah_line: 2}

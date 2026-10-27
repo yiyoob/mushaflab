@@ -5,6 +5,7 @@
 
 pub mod collide;
 
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -28,18 +29,54 @@ pub fn default_style(riwayah: &str) -> Result<&'static str, Error> {
 }
 
 /// Render profiles by (riwāyah, style) (D36): Ḥafṣ on the 1441H layout, the others on their
-/// native KFGQPC layouts (T5.2). Only each riwāyah's default style exists in Phase 5.
+/// native KFGQPC layouts (T5.2); a non-default style has `data/render/<riwāyah>-<style>.json`
+/// (T6.10, D44), used only when the T6.9 audit marks the combination available.
 pub fn profile_path(riwayah: &str, style: &str) -> Result<String, Error> {
+    if !matches!(style, "hijazi" | "maghribi") {
+        return Err(Error::new(format!("unknown style {style:?}")));
+    }
     if style != default_style(riwayah)? {
-        return Err(Error::new(format!(
-            "style {style:?} of riwayah {riwayah:?} is not available yet (D36: other styles are \
-             built in Phase 6, T6.7-T6.10)"
-        )));
+        return Ok(format!("data/render/{riwayah}-{style}.json"));
     }
     Ok(match riwayah {
         "hafs" => "data/render/hafs-uthmani-1441h.json".into(),
         _ => format!("data/render/{riwayah}-uthmani-kfgqpc.json"),
     })
+}
+
+fn hijazi_from_maghribi(p: &Profile) -> bool {
+    p.style == "hijazi" && p.text_style.as_deref() == Some("maghribi")
+}
+
+/// The T6.9 audit of every (riwāyah, non-default style) (D44).
+pub const STYLE_AVAILABILITY: &str = "data/render/style-availability.json";
+
+/// Refuses a non-default style the T6.9 audit does not mark available, with the audit's counts.
+pub fn check_style_available(repo: &Path, riwayah: &str, style: &str) -> Result<(), Error> {
+    if style == default_style(riwayah)? {
+        return Ok(());
+    }
+    let doc: serde_json::Value = serde_json::from_str(&read(repo, STYLE_AVAILABILITY)?)
+        .map_err(|e| Error::new(format!("{STYLE_AVAILABILITY}: {e}")))?;
+    let entry = doc["entries"]
+        .as_array()
+        .and_then(|es| {
+            es.iter()
+                .find(|e| e["riwayah"] == riwayah && e["style"] == style)
+        })
+        .ok_or_else(|| {
+            Error::new(format!(
+                "{STYLE_AVAILABILITY}: no entry for {riwayah} {style}"
+            ))
+        })?;
+    if entry["available"] == true {
+        return Ok(());
+    }
+    Err(Error::new(format!(
+        "style {style:?} of riwayah {riwayah:?} is not available (D44, T6.9 audit in \
+         {STYLE_AVAILABILITY}): {} of {} words cannot convert, {} fail rule 6",
+        entry["unconvertible_words"], entry["words"], entry["rule6_failing_words"]
+    )))
 }
 
 /// Owner-approved per-glyph rule-6 exceptions (D27, G-100).
@@ -82,6 +119,7 @@ impl Renderer {
     }
 
     pub fn load_style(repo: &Path, riwayah: &str, style: &str) -> Result<Self, Error> {
+        check_style_available(repo, riwayah, style)?;
         let profile = Profile::from_json(&read(repo, &profile_path(riwayah, style)?)?)?;
         if profile.riwayah != riwayah || profile.style != style {
             return Err(Error::new(format!(
@@ -102,8 +140,11 @@ impl Renderer {
             riwayah: profile.riwayah.clone(),
             ..Selection::default()
         };
-        let base = resolve_profile(&data, &sel, None, Mode::Data)
+        let mut base = resolve_profile(&data, &sel, None, Mode::Data)
             .map_err(|e| Error::new(format!("resolve: {e:?}")))?;
+        if hijazi_from_maghribi(&profile) {
+            base = mushaf_resolve::maghribi_to_hijazi(&base, spine);
+        }
         let basmalah = basmalah_words(&base, &table)?;
         let bytes = fs::read(repo.join(&profile.font))
             .map_err(|e| Error::new(format!("{}: {e}", profile.font)))?;
@@ -126,17 +167,37 @@ impl Renderer {
     /// Resolves through the riwāyah's profile (T5.1). An overlay (free edits) resolves in free
     /// mode.
     pub fn resolve(&self, overlay: Option<&EditOverlay>) -> Result<Resolved, Error> {
+        self.resolve_with(&BTreeMap::new(), overlay)
+    }
+
+    /// Resolves with option choices (T6.2) by group id; groups not named take their defaults.
+    pub fn resolve_with(
+        &self,
+        choices: &BTreeMap<String, String>,
+        overlay: Option<&EditOverlay>,
+    ) -> Result<Resolved, Error> {
         let sel = Selection {
             riwayah: self.profile.riwayah.clone(),
-            ..Selection::default()
+            tariq: None,
+            choices: choices.clone(),
         };
         let mode = if overlay.is_some() {
             Mode::Free
         } else {
             Mode::Data
         };
-        resolve_profile(&self.data, &sel, overlay, mode)
-            .map_err(|e| Error::new(format!("resolve: {e:?}")))
+        let r = resolve_profile(&self.data, &sel, overlay, mode)
+            .map_err(|e| Error::new(format!("resolve: {e:?}")))?;
+        Ok(self.restyle(r))
+    }
+
+    /// D46: a Maghribi riwāyah in a Hijazi profile is written in Hijazi conventions.
+    fn restyle(&self, r: Resolved) -> Resolved {
+        if hijazi_from_maghribi(&self.profile) {
+            mushaf_resolve::maghribi_to_hijazi(&r, &self.data.spines[&self.profile.spine])
+        } else {
+            r
+        }
     }
 
     pub fn map(&self, resolved: &Resolved) -> Result<Mapping, Error> {
@@ -266,4 +327,190 @@ pub fn png(svg: &str, width_px: u32) -> Result<Vec<u8>, Error> {
 /// The page as SVG (`mushaf-draw`'s backend).
 pub fn svg(page: &DrawPage) -> String {
     to_svg(page)
+}
+
+/// Which differences from Ḥafṣ to highlight (T6.11, D37, D45).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct HighlightPolicy {
+    /// Also highlight uncited rules (hypotheses), flagged `cited: false` for a distinct style.
+    /// On by default: the owner chose to show them (2026-10-26, D45).
+    pub hypotheses: bool,
+}
+
+impl Default for HighlightPolicy {
+    fn default() -> Self {
+        HighlightPolicy { hypotheses: true }
+    }
+}
+
+impl HighlightPolicy {
+    /// Only cited rules and curated farsh.
+    pub const CITED_ONLY: HighlightPolicy = HighlightPolicy { hypotheses: false };
+}
+
+/// The highlights of a drawn page (T6.11–T6.12, D45). A highlight is an application of a
+/// rule, or of a curated farsh patch (`source.kind: farsh`), on a cluster drawn on the page;
+/// never a raw or residual patch, never an `encoding` or `spelling` rule, and nothing on
+/// Ḥafṣ itself (highlights compare with Ḥafṣ).
+pub fn highlights(
+    data: &mushaf_model::DataSet,
+    spine: &mushaf_model::Spine,
+    resolved: &Resolved,
+    page: &DrawPage,
+    policy: HighlightPolicy,
+) -> Vec<mushaf_draw::Highlight> {
+    use mushaf_model::RuleStatus;
+    if page.riwayah == "hafs" {
+        return Vec::new();
+    }
+    let mut line_of: BTreeMap<&mushaf_model::ClusterRef, u32> = BTreeMap::new();
+    for it in &page.items {
+        if let mushaf_draw::DrawItem::Glyph {
+            line,
+            cluster: Some(c),
+            ..
+        } = it
+        {
+            line_of.entry(c).or_insert(*line);
+        }
+    }
+    // Writing conventions are not differences (D46): a Maghribi text is compared in Hijazi
+    // writing, and pause signs and the sukun sign's form are ignored.
+    let written = if page.riwayah == "warsh" || page.riwayah == "qalun" {
+        mushaf_resolve::maghribi_to_hijazi(resolved, spine)
+    } else {
+        resolved.clone()
+    };
+    // Sukun is ignored outright: Hafs leaves it off before an assimilated letter, the Maghribi
+    // print writes it (owner, 2026-10-26: أَنْ is not a difference).
+    let norm = |cps: &[char]| -> Vec<char> {
+        cps.iter()
+            .filter(|c| !('\u{06D6}'..='\u{06DB}').contains(*c))
+            .filter(|c| !matches!(c, '\u{0652}' | '\u{06E1}'))
+            // the three shapes of final ya are one letter (spelling, not reading)
+            .map(|c| match c {
+                '\u{0649}' | '\u{06D2}' => '\u{064A}',
+                // hamza on alif written as alif + the same vowel (spelling); a lost vowel
+                // (ibdal, tashil) still differs
+                '\u{0623}' | '\u{0625}' => '\u{0627}',
+                c => *c,
+            })
+            .collect()
+    };
+    // The Maghribi print writes a bare lam where Hafs has lam + shadda + fatha (ٱلَّذِي, لِلَّهِ;
+    // 1,674 places in both Warsh and Qalun; owner, 2026-10-26: not a difference).
+    // The Maghribi print also writes the shadda of idgham with ghunna on a word's first letter
+    // after nun or tanwin, where Hafs leaves it off (مَن يَّقُولُ / مَن يَقُولُ): same reading.
+    let same = |h: &[char], w: &[char], after_nun: bool| {
+        let (h, w) = (norm(h), norm(w));
+        let unshadda =
+            |x: &[char]| -> Vec<char> { x.iter().filter(|c| **c != '\u{0651}').copied().collect() };
+        h == w
+            || (w == ['\u{0644}'] && h == ['\u{0644}', '\u{0651}', '\u{064E}'])
+            || (after_nun && !h.contains(&'\u{0651}') && unshadda(&w) == h)
+    };
+    let ends_in_nun = |cps: &[char]| {
+        let n = norm(cps);
+        (n.first() == Some(&'\u{0646}') && n.len() == 1)
+            || n.iter()
+                .any(|c| matches!(c, '\u{064B}'..='\u{064D}' | '\u{08F0}'..='\u{08F2}'))
+    };
+    let mut prev_last: Option<Vec<char>> = None;
+    let mut out = Vec::new();
+    for item in written
+        .items
+        .iter()
+        .filter(|i| i.kind == mushaf_model::ItemKind::Word)
+    {
+        // The disjoined letters (الٓمٓ …) carry vowels in the Maghribi print only: same reading.
+        // In Hafs they are the words with a maddah and no vowel at all.
+        let hafs_word: Vec<char> = item
+            .clusters
+            .iter()
+            .filter_map(|c| spine.cluster(&c.id))
+            .flat_map(|h| h.cps.0.iter().copied())
+            .collect();
+        let muqattaa = hafs_word.contains(&'\u{0653}')
+            && !hafs_word
+                .iter()
+                .any(|c| matches!(c, '\u{064B}'..='\u{0650}' | '\u{08F0}'..='\u{08F2}'));
+        let after_nun = prev_last.as_deref().is_some_and(ends_in_nun);
+        prev_last = item
+            .clusters
+            .last()
+            .and_then(|c| spine.cluster(&c.id))
+            .map(|h| h.cps.0.clone());
+        for (k, c) in item.clusters.iter().enumerate() {
+            if muqattaa {
+                break;
+            }
+            let Some(line) = line_of.get(&c.id) else {
+                continue;
+            };
+            let hafs_cps = spine.cluster(&c.id).map(|h| h.cps.clone());
+            if hafs_cps
+                .as_ref()
+                .is_some_and(|h| same(&h.0, &c.cps.0, k == 0 && after_nun))
+            {
+                continue;
+            }
+            let rule = c.provenance.iter().find_map(|pid| {
+                let (rule, _) = pid.split_once('@')?;
+                let e = data.register.entry(rule)?;
+                let cited = e.status == RuleStatus::RuleDerived && e.source.is_some();
+                let cite = e.source.as_ref().map(|s| match s.volume {
+                    Some(v) => format!("{}, vol {v}, p. {}", s.book, s.page),
+                    None => format!("{}, p. {}", s.book, s.page),
+                });
+                Some((rule.to_string(), cite, cited))
+            });
+            let (label, cite, cited) = match rule {
+                Some(r) => r,
+                None => (
+                    c.provenance.first().cloned().unwrap_or_default(),
+                    None,
+                    false,
+                ),
+            };
+            if !cited && !policy.hypotheses {
+                continue;
+            }
+            out.push(mushaf_draw::Highlight {
+                line: *line,
+                cluster: c.id.clone(),
+                label,
+                hafs: hafs_cps
+                    .as_ref()
+                    .map(ToString::to_string)
+                    .unwrap_or_default(),
+                cite,
+                cited,
+                annotation: false,
+            });
+        }
+    }
+    out
+}
+
+impl Renderer {
+    /// Resolve, fit and draw one page, then attach its highlights (T6.12). Everything drawn is
+    /// the same as `render` with the same choices: only `DrawPage::highlights` is added.
+    pub fn render_highlighted(
+        &self,
+        page: u32,
+        choices: &BTreeMap<String, String>,
+        policy: HighlightPolicy,
+    ) -> Result<DrawPage, Error> {
+        let resolved = self.resolve_with(choices, None)?;
+        let mapping = self.map(&resolved)?;
+        let mut d = self.draw(&self.fit(&resolved, &mapping, page)?)?;
+        d.highlights = highlights(
+            &self.data,
+            &self.data.spines[&self.profile.spine],
+            &resolved,
+            &d,
+            policy,
+        );
+        Ok(d)
+    }
 }

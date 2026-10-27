@@ -96,6 +96,7 @@ impl FontData {
 
     pub fn shaper(&self) -> Shaper<'_> {
         Shaper {
+            font: &self.font,
             shaper: ShaperFont::new(&self.font),
             cache: RefCell::new(HashMap::new()),
             stats: RefCell::new(CacheStats::default()),
@@ -110,6 +111,7 @@ type WordCache = HashMap<(Vec<char>, Vec<FeatureRange>), Vec<ShapedGlyph>>;
 /// characters and its feature ranges (T3.6). Shaping is pure, so the cache cannot change any
 /// output; the map is only looked up, never iterated.
 pub struct Shaper<'a> {
+    font: &'a harfrust::Font,
     shaper: ShaperFont<'a, 'a>,
     cache: RefCell<WordCache>,
     stats: RefCell<CacheStats>,
@@ -122,6 +124,14 @@ pub struct CacheStats {
 }
 
 impl Shaper<'_> {
+    /// The font's glyph for a character, if its cmap has one.
+    pub fn nominal_glyph(&self, ch: char) -> Option<u32> {
+        self.font
+            .charmap()
+            .map_unicode(u32::from(ch))
+            .map(|g| g.to_u32())
+    }
+
     pub fn cache_stats(&self) -> CacheStats {
         *self.stats.borrow()
     }

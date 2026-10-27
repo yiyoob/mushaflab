@@ -1,11 +1,12 @@
-"""T1.4/T2.2: compile tracked data files into build/mushaf.db (schema v2).
+"""T1.4/T2.2: compile tracked data files into build/mushaf.db (schema v4).
 
     python -m pipeline.compile_db [--root DIR] [PATH]   # default: data/ -> build/mushaf.db
 
 The DB is a build artifact (rule 3) holding exactly the tracked data under a data root:
 spines (`spine/<name>/v<k>/`), layouts (`layouts/*.json`), patch files (`patches/**/*.yaml`),
 option groups (`options/*.yaml`), ayah maps (`ayah_maps/*.yaml`) and riwayah profiles
-(`profiles/*.yaml`, T5.1). Rows are inserted in a
+(`profiles/*.yaml`, T5.1), rule files and the rule register (`rules/*.yaml`, T6.1). Rows are
+inserted in a
 fixed order into a fresh file, so the same inputs give a byte-identical DB. Spine text is
 stored as real codepoints (the app's form); patch files, option groups and ayah maps as
 canonical JSON, which the Rust core parses with the same types as the YAML files (D12).
@@ -29,7 +30,7 @@ import yaml
 from pipeline import spine
 from pipeline.codepoints import TABLE_PATH
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 DATA_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DB = DATA_ROOT.parent / "build" / "mushaf.db"
 SPINE_ID = f"hafs/v{spine.SPINE_VERSION}"
@@ -46,10 +47,14 @@ INT_KEYS = frozenset(
         "page",
         "name_line",
         "basmalah_line",
+        "from",
+        "to",
+        "volume",
     }
 )
-BOOL_KEYS = frozenset({"single_source"})
-NULL_KEYS = frozenset({"rule_id"})
+BOOL_KEYS = frozenset({"single_source", "bare"})
+NULL_KEYS = frozenset({"rule_id", "option", "source"})
+REGISTER = "rules/register.yaml"
 MERGE_TAG = "tag:yaml.org,2002:merge"
 
 SCHEMA = """
@@ -74,6 +79,8 @@ create table patch_files (path text primary key, spine_id text not null, body te
 create table option_groups (id text primary key, body text not null);
 create table ayah_maps (riwayah_id text primary key, spine_id text not null, body text not null);
 create table profiles (riwayah_id text primary key, spine_id text not null, body text not null);
+create table rule_files (path text primary key, spine_id text not null, body text not null);
+create table rule_register (path text primary key, body text not null);
 """
 
 
@@ -183,9 +190,11 @@ def build(db_path: Path = DEFAULT_DB, root: Path = DATA_ROOT) -> None:
     option_files = [(p, load_yaml(p, ascii_only=False)) for p in yaml_files(root, "options")]
     ayah_maps = [(p, load_yaml(p)) for p in yaml_files(root, "ayah_maps")]
     profiles = [(p, load_yaml(p)) for p in yaml_files(root, "profiles")]
+    rules = _load_rules(root)
 
     inputs = [d / f for d in spine_dirs(root) for f in ("items.jsonl", "manifest.json")]
     inputs += [p for p, _ in layouts + patch_files + option_files + ayah_maps + profiles]
+    inputs += [p for p, _ in rules]
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
     tmp = db_path.with_name(db_path.name + ".tmp")
@@ -235,10 +244,39 @@ def build(db_path: Path = DEFAULT_DB, root: Path = DATA_ROOT) -> None:
             "insert into profiles values (?, ?, ?)",
             (data["riwayah"], data["spine"], canonical_json(data)),
         )
+    _insert_rules(con, root, rules)
     con.commit()
     con.execute("vacuum")
     con.close()
     tmp.replace(db_path)
+
+
+def _load_rules(root: Path) -> list[tuple[Path, object]]:
+    """Rule files (ASCII) and register files (descriptions may be Arabic), in path order."""
+    out = []
+    for p in yaml_files(root, "rules"):
+        out.append((p, load_yaml(p, ascii_only=not is_register(p))))
+    return out
+
+
+def is_register(path: Path) -> bool:
+    """`rules/register.yaml` (hand-written) or `rules/<name>.register.yaml` (generated)."""
+    return path.name == "register.yaml" or path.name.endswith(".register.yaml")
+
+
+def _insert_rules(con: sqlite3.Connection, root: Path, rules: list[tuple[Path, object]]) -> None:
+    for p, data in rules:
+        rel = _rel(p, root)
+        if is_register(p):
+            if not isinstance(data, dict) or not isinstance(data.get("rules"), list):
+                raise DataError(f"{p}: the register is a mapping with a `rules` list")
+            con.execute("insert into rule_register values (?, ?)", (rel, canonical_json(data)))
+            continue
+        if not isinstance(data, dict) or not isinstance(data.get("spine"), str):
+            raise DataError(f"{p}: a rule file is a mapping with a `spine` id")
+        con.execute(
+            "insert into rule_files values (?, ?, ?)", (rel, data["spine"], canonical_json(data))
+        )
 
 
 def _insert_spine(con: sqlite3.Connection, spine_id: str, manifest: dict, recs: list) -> None:

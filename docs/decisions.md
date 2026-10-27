@@ -49,6 +49,15 @@ Consequences: what follows, what it rules out
 | D33 | Display style as a render key: (riwāyah, style), default style only in Phase 5 | accepted (owner requirement, relayed 2026-10-23; confirmed at GATE G3); implements D36's Phase 5 part |
 | D36 | Display styles: Ḥijāzī and Maghribi for every riwāyah | accepted (scope); built in Phase 6 |
 | D37 | Highlighting differences from Ḥafṣ | accepted (scope); built in Phase 6, UI in Phase 8 |
+| D38 | Rule DSL: declarative patterns expanded into ordinary patches in the core | accepted with the T6.1 plan (2026-10-26) |
+| D39 | Owner corrections to the Ḥafṣ spine text as patches; G-142 (52:37 sīn below the ṣād) | accepted (owner decision, 2026-10-26) |
+| D40 | Annotation channel: pronunciation-only features as `pron.<feature>` cluster annotations | accepted (T6.3, 2026-10-26) |
+| D41 | مَالِيَهْ idghām wajh changes no glyph (owner decision, departs from p. ح) | accepted (owner decision, 2026-10-26) |
+| D42 | T6.4: data-derived rules (hypotheses) plus residual patches per riwāyah | accepted (T6.4, 2026-10-26); every rule awaits a citation |
+| D43 | Ṭarīq as the option group `<riwāyah>.tariq`; ṭarīq-level patches apply under their ṭarīq only | accepted (T6.6, 2026-10-26) |
+| D44 | Display styles: render-time conversion from owner-confirmed rows; per-(riwāyah, style) audit decides availability | accepted (T6.7–T6.10, 2026-10-26) |
+| D45 | Difference highlighting from rule provenance; cited rules by default, hypotheses opt-in and flagged | accepted (T6.11–T6.12, 2026-10-26); the owner chose to show hypotheses (2026-10-26) |
+| D46 | Warsh and Qālūn in the Ḥijāzī style: owner-approved writing conventions, own pause signs, blocked pages listed | accepted (owner, 2026-10-26) |
 
 ---
 
@@ -1129,3 +1138,329 @@ Phase 6 rules and curated farsh (T6.11–T6.12), including pronunciation-only ru
 the annotation channel; each carries a label, the Ḥafṣ form and a citation. Text and layout
 are identical in both modes. The toggle is in the Phase 8 UI.
 
+
+## D38: Rule DSL (T6.1)
+Status: accepted with the T6.1 plan (2026-10-26)
+Context: Phase 6 replaces raw diffs with rules, so that choosing an option changes the text
+through rules instead of a lookup table. Rules must be data in git (rule 3), must be
+evaluated in the core (rule 7), and must be deterministic (rule 8). Each rule needs a source
+and a status (rule 4), and each one must be checkable against a register.
+Options:
+- (a) Expand rules into patch files in the Python pipeline at build time. Simple, but the
+  logic would live outside `core/`, and a free-mode edit could not re-run the rules.
+- (b) A separate rule engine in the resolver with its own way of applying changes. This
+  duplicates the patch semantics: layers, conflicts and orphans.
+- (c) Rules as patterns whose actions are patch templates, expanded in the core into ordinary
+  `Patch` values that the existing resolver applies.
+Decision: (c).
+- `mushaf-model::rules` holds the data types and their checks: `RuleFile`, `Rule`, `Step`,
+  `ClusterMatch`, `Boundary`, `Scope`, `Exception`, `Action` and `Register`.
+- `mushaf-rules::expand` matches on the spine and returns a `PatchFile`. Each patch gets the
+  id `<rule>@<target>.<op>`, the source `{kind: rule, ref: <rule>}`, `rule_id`,
+  `status: rule-derived`, and the rule's `when`. An action's payload is checked by the same
+  parser as patch files.
+- A profile lists its rule files in `rule_stack`. `resolve_profile` expands them before the
+  patch stack. An option group's `affects` may name a rule id (§3.3).
+- In data mode, a rule that matches nowhere and an exception that is never met are errors.
+  In free mode they are lint notes.
+- The register (`data/rules/register.yaml`) is checked in Rust (`DataSet` validation) and in
+  Python (`pipeline/rules_register.py`, run by `just data-verify`). Its rules are:
+  - every rule has exactly one entry, and every entry a rule;
+  - owner and option agree with the rule file;
+  - an uncited rule is a `hypothesis`;
+  - `cross-checked` and `muqri-verified` are never allowed (rule 4).
+- `mushaf.db` schema v4 adds the `rule_files` and `rule_register` tables. The parity tests
+  cover them.
+- Rules match the spine's own text, not the output of other rules or of farsh (G-141).
+  Matches are leftmost and non-overlapping, in spine order. Codepoints are compared exactly.
+- T6.2 addition: a rule and its register entry carry `single_source` (it must agree in both). The rule's patches inherit it (§3.5).
+Consequences: T6.2 and T6.4 add real, cited rules to `data/rules/`. T6.4 compares each
+rule's expansion with the raw patches it explains. If a rule ever needs to see another
+rule's output, G-141 is revisited with a new ADR.
+
+## D39: Owner corrections to the Ḥafṣ spine text (G-142)
+Status: accepted (owner decision, 2026-10-26)
+Context: at 52:37:7:4 (المصيطرون) the spine, which is KFGQPC Ḥafṣ v2.0, stores
+`U+0635 U+06DC U+064E`, a small sīn *above* the ṣād. The KFGQPC Ḥafṣ muṣḥaf's explanation of
+signs, p. و, says that in this word the sīn is placed *under* the ṣād, meaning that ṣād is
+the more common reading. The owner decided: "sīn should be below the ṣāḍ on 52:37."
+Rule 2 forbids editing the pinned source, and rule 3 makes the spine text in git
+the source of truth.
+Evidence for the codepoint, all from pinned data:
+- U+06E3 ARABIC SMALL LOW SEEN appears nowhere in the eight KFGQPC texts.
+- The pinned DigitalKhatt Madina and Old Madina texts (`quran_text_madina.ts`,
+  `quran_text_old_madinah.ts`, line 8901) write this word with `U+0635 U+06E3 U+064E`. It is
+  the only U+06E3 in each text.
+- The data-derived Ḥafṣ encoding table (D14) already maps this exact cluster to that
+  DigitalKhatt form, so the renderer drew the sīn below even before this correction
+  (`docs/font-coverage.md`, S2 counts).
+- DigitalKhatt Madina has a glyph for U+06E3 and anchors it on this ṣād. The rule-6 check
+  passes in `just golden`.
+Options:
+- (a) Edit the spine. Rejected: rule 2 and rule 3.
+- (b) Leave the text and rely on the renderer. Rejected: the stored text would still say
+  "sīn above".
+- (c) An owner correction patch on the Ḥafṣ profile.
+Decision: (c).
+- `data/patches/corrections/hafs.yaml` holds patch `hafs.g142.52.37.7.4.rep`. It replaces
+  the cluster with `U+0635 U+06E3 U+064E`, with source = p. و plus the owner decision, and
+  `single_source`.
+- The Ḥafṣ profile's patch stack lists this file (`pipeline/profiles.py`, generated).
+- The decision is recorded in `data/approvals/hafs.yaml` (`cross-checked`, owner's words
+  quoted), written on the owner's explicit instruction.
+- `pipeline/corrections.py` derives the encoding row for the corrected form: the DigitalKhatt
+  image of the spine cluster it replaces, accepted only when that image equals the corrected
+  form. The row is written to `data/encodings/hafs-v1.correction-rows.json` and loaded as
+  the Ḥafṣ render profile's `encoding_extra`.
+Effect on the other riwāyāt: none. All seven remove U+06DC at 52:37:7:4 in their own raw
+patches, because their KFGQPC texts have a plain ṣād there. The correction applies only to
+the Ḥafṣ profile, so their resolved text and `just roundtrip` are unchanged.
+Consequences: the spine and KFGQPC still differ here; the difference is listed (G-142,
+resolved). `data/approvals/` is still not joined into `mushaf.db` (G-033).
+
+## D40: Annotation channel (T6.3)
+Status: accepted (T6.3, 2026-10-26)
+Context: some features change pronunciation but no glyph: madd lengths, taqlīl, tarqīq, and
+(by D41) the idghām wajh of 69:28. Writing them into clusters would change the text and the
+rendering. Leaving them out would lose them, and they are needed for highlighting (T6.11)
+and for review.
+Decision:
+- A cluster's `attrs.annotations` (§3.1) is the channel. It is written by `set_attr` patches
+  and by rule actions (D38), and the resolver already carries it to `Resolved`.
+- Keys are `pron.<feature>`. The feature comes from a closed list of technical terms in
+  `mushaf_model::PRONUNCIATION_FEATURES` (ibdāl, idghām, ikhfāʾ, imālah, iqlāb, ishmām, iẓhār,
+  madd, naql, rawm, sakt, ṣilah, taghlīẓ, taḥqīq, taqlīl, tarqīq, tashīl).
+- Values are short ASCII tokens (`[a-z0-9_-]+`).
+- Rule validation rejects any other key or value. A new feature needs an ADR amendment.
+- Annotations never change codepoints, shaping, line fit or the draw list. A test checks
+  this: the 69:28 option pair must draw byte-identically.
+Consequences: T6.4 writes pronunciation-only rules to this channel. T6.12 exposes
+annotations in the draw output as highlight flags, without changing glyphs.
+
+## D41: The idghām wajh of مَالِيَهْ changes no glyph (G-143)
+Status: accepted (owner decision, 2026-10-26)
+Context: the KFGQPC Ḥafṣ muṣḥaf's explanation of signs (p. ح) describes the idghām wajh at 69:28
+in writing: the sukūn is removed from the first hāʾ and a shadda is placed on the hāʾ of
+هَلَكَ. T6.2 implemented that, and also removed the sakt sign. The owner said: "No, keep the
+sukun and sīn and dont have the shaddah."
+Decision: the text is the same under both choices of `hafs.maliyah`. It keeps
+`U+0647 U+06E1 U+06DC` and `U+0647 U+064E`. The rule `hafs.maliyah.idgham` writes only
+`pron.idgham` annotations: `into_next` on 69:28:4:5 and `from_previous` on 69:29:1:1 (D40).
+The golden test requires the two draw lists to be byte-identical. This departs from the
+written form on p. ح; it is an owner decision, and the register entry says so.
+Consequences: G-143 is closed. A reader who wants the idghām shown in writing has no
+option for it; that would need a new owner decision.
+
+## D42: Rule sets per riwāyah from the data (T6.4)
+Status: accepted (T6.4, 2026-10-26). Every rule is a hypothesis until the owner or a muqriʾ
+cites or rejects it.
+Context: T6.4 asks for rules that explain the raw patches, qirāʾah by qirāʾah, with the
+remainder kept as curated farsh, while `just roundtrip` stays at 100%. Rule 1 forbids
+writing uṣūl from memory. The only sources in the repository are the KFGQPC texts (already
+encoded as the raw patches) and the pinned book, whose text cannot be extracted reliably
+(T6.0 deferred).
+Options:
+- (a) Write named uṣūl rules from knowledge. Rejected: rule 1.
+- (b) Wait for cited sources for each rule. This would block T6.4 entirely.
+- (c) Induce rules from the raw patches, accept only those the data supports exactly, and
+  mark every one a hypothesis.
+Decision: (c), in `pipeline/rule_mining.py`.
+- A candidate is one cluster change, either a codepoint change (`replace`/`set_marks`) or a
+  single-cluster insert with seq 1, plus at most one context feature:
+  - the cluster's place in its word (first, last or only);
+  - the letter before it or after it in the word;
+  - the first letter of the next word, for a word-final cluster (boundary `any`).
+- It becomes a rule when at least 3 places carry exactly that change and the other places its
+  pattern matches are at most max(2, 5%) of the matches. Those other places are listed as
+  exceptions, each with its reason from the data.
+- The matcher is a port of `mushaf_rules::matches` (leftmost, non-overlapping), so each rule's
+  exceptions are exactly what the core sees.
+- Rules are written to `data/rules/<r>.yaml` and their register to
+  `data/rules/<r>.register.yaml`. Every entry is `hypothesis`, `single_source`, with no source.
+- The raw patches no rule explains are kept unchanged, with their ids, in
+  `data/patches/curated/<r>.yaml`.
+- Each riwāyah's profile now resolves `rule_stack: [rules/<r>.yaml]` and
+  `patch_stack: [patches/curated/<r>.yaml]`. The raw files stay as evidence.
+- `just roundtrip` resolves through the profiles. It, and a Rust test comparing with the raw
+  file, require the same text codepoint for codepoint.
+- Order: the plan's order of qirāʾāt (ʿĀṣim → Nāfiʿ → Ibn Kathīr → Abū ʿAmr) is kept for
+  review. The mining itself is independent per riwāyah.
+- Several register files make up one register: `rules/register.yaml` for hand-written rules
+  and `rules/*.register.yaml` for generated ones.
+Consequences:
+- These rules are patterns in the KFGQPC data, not named uṣūl. Many are encoding or spelling
+  conventions; some are coincidences of a few places. The review sheets (T6.5) show each one
+  with its places and exceptions.
+- At G4 the owner or a muqriʾ cites, renames, merges or rejects them. A rejected rule's
+  places return to the residual by rerunning the miner with that rule excluded (to be built
+  when the first rejection comes).
+- Pronunciation-only uṣūl (madd, taqlīl …) are not in the KFGQPC codepoints, so no rule
+  writes annotations yet (D40). They need cited sources.
+
+## D43: The ṭarīq layer (T6.6)
+Status: accepted (T6.6, 2026-10-26)
+Context: §3.2 has a ṭarīq layer, and `Selection` has a `tariq`, but nothing chose between
+ṭuruq. Every ṭarīq-level patch applied, whatever ṭarīq was selected. The plan asks to model
+ṭuruq as an option group where the sources distinguish them.
+Decision:
+- A riwāyah's ṭuruq form the option group `<riwāyah>.tariq`. When it is loaded:
+  - the selection's `tariq`, or a choice for the group, selects the ṭarīq; they must agree
+    (`TariqMismatch`) and must be one of the group's choices (`UnknownChoice`);
+  - without either, the group's default for the riwāyah applies;
+  - the resolved ṭarīq is also the `tariq` used for other groups' per-ṭarīq defaults;
+  - a patch (or a rule's patches) at owner level `tariq` applies only when its `owner.id` is
+    the resolved ṭarīq;
+  - patches that depend on a ṭarīq through `when {option: <r>.tariq, choice: …}` work as any
+    other option.
+- Without such a group, behaviour is unchanged.
+- Ḥafṣ: the group `hafs.tariq` has the single choice `shatibiyyah`, cited to KFGQPC Ḥafṣ muṣḥaf,
+  explanation of signs, p. ح. No second ṭarīq has a source in the repository, so none is
+  modelled (G-145). The synthetic fixture tests two ṭuruq (`r3.tariq`).
+Consequences: adding a ṭarīq means one more choice plus its cited rules or patches. The
+"no sakt" wajh (G-143) waits for a cited second ṭarīq.
+
+## D44: Display styles, conversion and availability (T6.7–T6.10)
+Status: accepted (T6.7–T6.10, 2026-10-26)
+Context: D36 wants every riwāyah shown in Ḥijāzī or Maghribi style. The KFGQPC texts encode
+style-specific mark conventions in their codepoints (G-006). A conversion is allowed only
+from owner-confirmed rows (the D21 pattern) and is applied only at render time. A combination
+the fonts cannot render correctly is reported as unavailable (rule 6), never drawn wrongly.
+Decision:
+- T6.7, the conversion layer:
+  - `pipeline/style_conversion.py` writes `data/encodings/style-conversion.json`. Each row maps
+    one codepoint of one style to one codepoint of the other, and comes from an
+    owner-confirmed `encoding` row in `data/approvals/difference_kinds.yaml` that holds for
+    every riwāyah of the target style.
+  - Today that is exactly one row, Ḥijāzī → Maghribi `U+06E1 → U+0652` (Warsh and Qālūn,
+    D21).
+  - Maghribi → Ḥijāzī has no row: Maghribi U+0652 stands for both Ḥijāzī U+06E1 and U+0652,
+    so the data does not determine the inverse.
+  - The core applies the rows as a codepoint pre-map in `EncodingTable` before the font's
+    table (`with_style_conversion`). A render profile names them with `style_conversion` and
+    `text_style`. The spine and patches are unchanged.
+- T6.8, conventions: `docs/review/phase6/style-conventions.md` (generated) lists every
+  codepoint whose use differs between the two families of KFGQPC texts by at least ten times,
+  with its counts and conversion status. 22 differences have no confirmed row (e.g. U+0671
+  alef waṣla, U+06DA, U+06ED) and stay unconverted.
+- T6.9, coverage: an audit shapes every resolved word of each riwāyah in each non-default
+  style with that style's font. Maghribi uses the KFGQPC Warsh font with the conversion rows.
+  Ḥijāzī uses DigitalKhatt Madina through the Ḥafṣ table and the approved riwāyah rows.
+  The audit counts words that cannot convert and words that fail rule 6. The result is
+  pinned in `data/render/style-availability.json`, and `just golden` recomputes it.
+  A combination is available only when both counts are zero.
+- T6.10, the style switch: `Renderer::load_style` gives a non-default style only when the
+  audit marks it available and a render profile for it exists. Otherwise the error states the
+  audit's counts. Golden pages exist for every available combination.
+Consequences: with one confirmed row, no non-default combination is available today (see
+the audit). Each further owner-confirmed row, or a font, reduces the counts. The owner
+reviews the convention report at G4.
+
+## D45: Difference highlighting (T6.11–T6.12)
+Status: accepted (T6.11–T6.12, 2026-10-26). Whether hypotheses show by default is the owner's
+choice at G4.
+Context: D37. A highlight must come from a rule application or a curated farsh entry,
+never from a raw patch. It must never mark an encoding or spelling difference, and it must
+carry a label, the Ḥafṣ form and a citation. Plain and highlighted modes draw identically.
+Decision:
+- Source: the resolver already records, for every cluster, the ids of the patches that
+  changed it (`provenance`). A rule's patches are `<rule>@…`, so the rule and its register
+  entry are known.
+  - A cluster highlights if a rule changed it, and that rule's register `difference_kind` is
+    neither `encoding` nor `spelling`, and the rule is cited (`rule-derived` with a source) or
+    the policy shows hypotheses.
+  - A curated farsh patch (`source.kind: farsh`) also highlights; none exists yet.
+  - Raw and residual patches never highlight. Nothing highlights on Ḥafṣ.
+- `difference_kind` for data-derived rules: `pipeline/rule_mining.py` gives each rule the D21
+  kind of its change when every codepoint component is an owner-confirmed row of one kind,
+  else `unclassified`. Today that is 60 Warsh and 38 Qālūn rules classed `encoding`, the
+  confirmed sukūn row.
+- Output: `DrawPage::highlights` holds, per highlighted cluster:
+  - its line;
+  - the label (rule or farsh id);
+  - the Ḥafṣ form (`U+` codepoints; empty for an inserted cluster);
+  - the citation and a `cited` flag (false means shown in a distinct style);
+  - `annotation`, true for pronunciation-only differences (D40).
+  `Renderer::render_highlighted(page, choices, HighlightPolicy)` fills it. The list is
+  serialized only when non-empty, so plain pages and their goldens are unchanged.
+- Policy: by the owner's decision (2026-10-26, "show unverified ones as well"),
+  `HighlightPolicy::default()` also shows hypotheses, flagged `cited: false` for a distinct
+  style. `HighlightPolicy::CITED_ONLY` shows cited rules only.
+- Tests (`highlight_pairs_per_riwayah`, in `just golden`), per non-Ḥafṣ riwāyah on its first
+  page with a highlight:
+  - the highlighted page minus its highlights equals the plain page byte for byte;
+  - the default policy equals plain;
+  - no highlight comes from an encoding or spelling rule (for Warsh, encoding rules are
+    applied on the page and none highlights);
+  - the highlights are pinned in `tests/golden/pages/<r>-p<NNN>-highlights.json`.
+Consequences: highlighting becomes useful by default once the owner cites rules (G4).
+Pronunciation-only uṣūl highlight through annotations once cited rules write them (D40).
+The UI toggle is Phase 8.
+
+## D46: Warsh and Qālūn in the Ḥijāzī style
+Status: accepted (owner, 2026-10-26)
+Context: at G4 the owner asked for a Ḥijāzī option for the Maghribi riwāyāt; Ḥijāzī → Maghribi
+is not wanted. The single Ḥijāzī → Maghribi row (D44) cannot be inverted: Maghribi U+0652
+stands for both Ḥijāzī U+06E1 and U+0652. The owner reviewed an example sheet
+(`build/review/phase6/sukun-examples.html`) and approved it: "the sheet looks good". The
+owner also decided: "warsh and qalun should show their own pause signs". Both decisions are
+recorded in `data/approvals/style-conventions.yaml`.
+Evidence: each Warsh and Qālūn cluster aligned to the Ḥafṣ spine shows which sign Ḥafṣ uses:
+- Warsh: 32,768 sukūn and 3,982 silent-letter signs;
+- Qālūn: 37,028 sukūn and 3,981 silent-letter signs;
+- Ḥafṣ U+0652 occurs only on alif (3,722), wāw (255) and yāʾ (11).
+A rule based only on the vowel before the letter would have got 95 Warsh and 108 Qālūn
+places wrong (e.g. yāʾ after kasra, 2:33).
+Decision: `mushaf_resolve::maghribi_to_hijazi` rewrites a resolved Maghribi text at render
+time. For each cluster, the aligned Ḥafṣ cluster decides:
+- a difference only in writing takes Ḥafṣ's form: sukūn, alif waṣla, final ے, the hamza form
+  ا+U+06DF;
+- a reading difference keeps the riwāyah's form, with only its sukūn converted (from Ḥafṣ;
+  where Ḥafṣ has neither sign, alif keeps U+0652 and any other letter takes U+06E1);
+- a word with the same letters and marks as Ḥafṣ, with a mark stored on a neighbouring
+  letter, takes Ḥafṣ's form;
+- pause signs stay the riwāyah's own.
+Cluster ids never change. The render profiles `data/render/{warsh,qalun}-hijazi.json` use
+the riwāyah's own layout and DigitalKhatt Madina through the Ḥafṣ table plus the approved
+riwāyah rows (D28). `text_style: maghribi` turns the rewrite on.
+Consequences:
+- Words that cannot convert block their pages: 1,756 Warsh and 1,290 Qālūn words, which
+  leaves 53 and 94 drawable pages. These are forms with Maghribi reading marks that have no
+  approved DigitalKhatt row (U+06EA under a letter, final ے where the reading differs,
+  U+0657, some hamza forms). They are pinned in
+  `tests/golden/shape/maghribi-hijazi-pending.json` and need rows approved as in D28 (G-148).
+- Every drawn page passes rule 6.
+- D44's availability rule changes: a combination is offered when its render profile exists,
+  and its blocked pages are listed.
+
+## D47: Approved Ḥijāzī drawings of Maghribi forms, with mark adjustments
+Status: accepted (owner, 2026-10-26)
+Context: after D46 the owner reviewed DigitalKhatt drawings of Warsh and Qālūn words against
+print photos (IMG_2514–2517 and a 12:90:2 crop) and picked one per word
+(`data/approvals/style-conventions.yaml`, `maghribi-to-hijazi.word-forms`). Three words
+(5:18:16, 12:90:2, 2:225:2) could not be drawn right by any encoding: the font places the marks
+wrongly. The owner approved placing those marks by hand.
+Options: (a) per-word owner rows (D18), one per flagged word; (b) rows per form, applied wherever
+the approved form occurs; (c) font changes (the font is a pinned third-party source: rejected).
+Choice: (b). `data/encodings/hafs-v1.hijazi-forms.json` holds the rows, generated from the picks
+(cluster or sequence rows; a row may replace a row of the table). Each row may carry adjustments in
+font units: `gap` (extra advance after a character, counted in the word's width so justification
+stays exact) and `shift` (moves the nominal glyph of one mark in its cluster; exactly one glyph
+must match, else an error). Shifts are applied in `mushaf_layout::fit` right after shaping; all
+integers, so output stays deterministic. The rows load only in the Ḥijāzī profiles of Warsh and
+Qālūn (`hijazi_forms`).
+Evidence: the picks; renders of the approved drawings; real pages of 12:90:2, 2:49:4, 20:58:14,
+20:76:12 and 2:48:8 drawn through the core.
+Consequence: Warsh draws 212 of 604 pages in the Ḥijāzī style (was 53), Qālūn 136 (was 94).
+Applying each pick to every place of its form (2,025 places) is my reading of the picks: the owner
+saw one word per form (G-149). Qālūn 12:90:2 with the standing alif was not seen by the owner as
+drawn.
+
+D45 addendum (owner, 2026-10-26, photo IMG_2513): highlighted clusters are drawn letter by letter
+in red (#cc0000) in the SVG and PNG; `cited` stays in the draw list but no longer changes the
+colour. `mushaf-render --highlight` renders a highlighted page.
+D45 addendum 2 (owner, 2026-10-26: "Highlighting is very inaccurate", "You are highlighting
+everywhere there is the ص waqf sign"): highlights no longer come from rule provenance. A word
+cluster is highlighted when it differs from its aligned Ḥafṣ cluster after ignoring pause signs
+(U+06D6–U+06DB), sukūn (present or not), the Maghribi bare lām for Ḥafṣ lām + shadda + fatḥa (1,674 places), the shapes of final yāʾ, hamza on alif written as plain alif with the same vowel, the shadda of idghām with ghunna, and the disjoined letters (owner: "Highlights should only be for Usul and furush differences"), and, for Warsh and Qālūn, the D46 writing conventions.
+Āyah markers are never highlighted. The rule or patch that made the cluster is kept as the label;
+differences with no rule (residual patches) are highlighted too, which closes that part of G-147.

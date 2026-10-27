@@ -17,13 +17,14 @@ mod options;
 mod overlay;
 mod patch;
 mod profile;
+mod rules;
 mod spine;
 
 pub use ayah_map::{AyahMap, AyahMapEntry};
 pub use cps::{Cp, Cps};
 pub use dataset::{
     BodyRow, ClusterRow, DATA_DIRS, DataFiles, DataSet, DbRows, Input, ItemRow, LayoutRow, LineRow,
-    SpineRow, classify,
+    REGISTER_PATH, SpineRow, classify,
 };
 pub use ids::{ClusterRef, ItemRef, MarkRef, Ref};
 pub use layout::{FitTag, Layout, Line, LineKind};
@@ -34,6 +35,10 @@ pub use patch::{
     Owner, OwnerLevel, Patch, PatchFile, Side, Source, Status, When,
 };
 pub use profile::{RiwayahProfile, SurahHeader};
+pub use rules::{
+    Action, At, Boundary, Citation, ClusterMatch, Exception, PRONUNCIATION_FEATURES,
+    PRONUNCIATION_PREFIX, Register, RegisterEntry, Rule, RuleFile, RuleStatus, Scope, Step,
+};
 pub use spine::{Attrs, Cluster, ClusterKind, Item, ItemKind, Spine};
 
 /// A model error: malformed data or a broken invariant, with a readable message.

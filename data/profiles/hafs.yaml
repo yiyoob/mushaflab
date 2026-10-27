@@ -4,7 +4,8 @@ riwayah: "hafs"
 spine: "hafs/v1"
 script_id: "uthmani"
 text_source: "kfgqpc-official-hafs"
-patch_stack: []
+patch_stack: ["patches/corrections/hafs.yaml"]
+rule_stack: ["rules/hafs.yaml"]
 surah_headers:
   - {surah: 1, page: 1, name_line: 1}
   - {surah: 2, page: 2, name_line: 1, basmalah_line: 2}

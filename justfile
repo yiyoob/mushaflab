@@ -27,12 +27,15 @@ data-build:
     {{uv}} run python -m pipeline.spine build
     {{uv}} run python -m pipeline.ingest_layout build
     {{uv}} run python -m pipeline.dk_encoding build
+    {{uv}} run python -m pipeline.corrections write
+    {{uv}} run python -m pipeline.style_conversion write
     {{uv}} run python -m pipeline.dk_riwayat write
     {{uv}} run python -m pipeline.line_widths build
     {{uv}} run python -m pipeline.surah_names build
     {{uv}} run python -m pipeline.ingest_riwayah write
     {{uv}} run python -m pipeline.align write
     {{uv}} run python -m pipeline.emit_patches write
+    {{uv}} run python -m pipeline.rule_mining write
     {{uv}} run python -m pipeline.ayah_maps write
     {{uv}} run python -m pipeline.profiles write
     {{uv}} run python -m pipeline.ayah_lines write
@@ -89,6 +92,11 @@ review-phase5:
 contact-sheets *RIWAYAT:
     cargo run --release -q {{manifest}} -p mushaf-render-cli --bin mushaf-contact -- {{RIWAYAT}}
     {{uv}} run python -m pipeline.phase5_readme write
+
+# T6.5: rule review sheets, build/review/phase6/rules-<name>.html (not tracked), and the
+# tracked summary docs/review/phase6/rules.md
+review-rules *NAMES:
+    {{uv}} run python -m pipeline.rule_sheets {{NAMES}}
 
 # SVG + PNG via reference renderer, e.g. just render PAGE=1 RIWAYAH=hafs
 render *ARGS:

@@ -1,0 +1,19 @@
+# Rules for Hafs on the Hafs spine (T6.2). Every rule is cited in rules/register.yaml.
+spine: "hafs/v1"
+rules:
+  # 69:28-29, the idgham wajh (KFGQPC Hafs mushaf, explanation of signs, p. ha). Owner
+  # decision 2026-10-26 (D41, G-143): the text keeps the sukun and the sakt sin on the ha of
+  # 69:28:4 and gets no shadda on 69:29:1, so both wujuh draw identically. The difference is
+  # pronunciation only and goes to the annotation channel (D40): idgham into the next word.
+  - id: "hafs.maliyah.idgham"
+    owner: {level: "riwayah", id: "hafs"}
+    when: {option: "hafs.maliyah", choice: "idgham"}
+    single_source: true
+    pattern:
+      - {base: ["U+0647"], marks_all: ["U+06E1", "U+06DC"], at: "last", capture: "first_ha"}
+      - {boundary: "ayah_end"}
+      - {base: ["U+0647"], at: "first", capture: "second_ha"}
+    scope: [{surah: 69, from: 28, to: 28}]
+    actions:
+      - {op: "set_attr", target: "first_ha", payload: {annotations: {"pron.idgham": "into_next"}}}
+      - {op: "set_attr", target: "second_ha", payload: {annotations: {"pron.idgham": "from_previous"}}}

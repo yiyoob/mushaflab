@@ -1,0 +1,227 @@
+[
+  {
+    "line": 1,
+    "cluster": "2:6:5:5",
+    "label": "warsh.d0040",
+    "hafs": "U+0645 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 1,
+    "cluster": "2:6:5:5+ins.1",
+    "label": "warsh.d0042",
+    "hafs": "",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 1,
+    "cluster": "2:6:6:2",
+    "label": "warsh.2.6.6.2.rep",
+    "hafs": "U+0623 U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 1,
+    "cluster": "2:6:6:8",
+    "label": "warsh.2.6.6.8.marks",
+    "hafs": "U+0645 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 1,
+    "cluster": "2:6:6:8+ins.1",
+    "label": "warsh.2.6.6.8+ins.1.ins",
+    "hafs": "",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 2,
+    "cluster": "2:6:11:2",
+    "label": "warsh.d0056",
+    "hafs": "U+0624 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 3,
+    "cluster": "2:7:8:3",
+    "label": "warsh.2.7.8.3.marks",
+    "hafs": "U+0635 U+064E U+0670",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 4,
+    "cluster": "2:8:8:2",
+    "label": "warsh.2.8.8.2.marks",
+    "hafs": "U+0644 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 4,
+    "cluster": "2:8:11:3",
+    "label": "warsh.d0056",
+    "hafs": "U+0624 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 5,
+    "cluster": "2:9:6:1",
+    "label": "warsh.2.9.6.1.marks",
+    "hafs": "U+064A U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 5,
+    "cluster": "2:9:6:2",
+    "label": "warsh.2.9.6.2.marks",
+    "hafs": "U+062E U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 5,
+    "cluster": "2:9:6:3",
+    "label": "warsh.2.9.6.3.marks",
+    "hafs": "U+062F U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 7,
+    "cluster": "2:10:12:1",
+    "label": "warsh.2.10.12.1.marks",
+    "hafs": "U+064A U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 7,
+    "cluster": "2:10:12:2",
+    "label": "warsh.2.10.12.2.marks",
+    "hafs": "U+0643 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 7,
+    "cluster": "2:10:12:3",
+    "label": "warsh.2.10.12.3.marks",
+    "hafs": "U+0630 U+0650",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 8,
+    "cluster": "2:11:7:2",
+    "label": "warsh.2.11.7.2.marks",
+    "hafs": "U+0644 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 9,
+    "cluster": "2:13:3:3",
+    "label": "warsh.d0040",
+    "hafs": "U+0645 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 9,
+    "cluster": "2:13:3:3+ins.1",
+    "label": "warsh.d0042",
+    "hafs": "",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 10,
+    "cluster": "2:13:9:3",
+    "label": "warsh.d0056",
+    "hafs": "U+0624 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 11,
+    "cluster": "2:13:13:1",
+    "label": "warsh.2.13.13.1.rep",
+    "hafs": "U+0623 U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 12,
+    "cluster": "2:14:8:3",
+    "label": "warsh.2.14.8.3.marks",
+    "hafs": "U+0648 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 13,
+    "cluster": "2:14:13:4",
+    "label": "warsh.d0039",
+    "hafs": "U+0645 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 13,
+    "cluster": "2:14:13:4+ins.1",
+    "label": "warsh.d0041",
+    "hafs": "",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 13,
+    "cluster": "2:15:2:6",
+    "label": "warsh.d0301",
+    "hafs": "U+0626 U+064F",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 15,
+    "cluster": "2:16:5:5",
+    "label": "warsh.2.16.5.5.marks",
+    "hafs": "U+062F U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  }
+]

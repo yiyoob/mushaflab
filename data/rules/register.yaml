@@ -1,0 +1,12 @@
+# Rule register (T6.1, ADR D38): one entry per rule in data/rules/*.yaml. Tests fail if the
+# register and the rule files disagree (owner, option, single_source, missing or extra
+# entries), and a rule without a cited source can only be a `hypothesis`. `cross-checked`
+# and `muqri-verified` never appear here: they live in data/approvals/ (CLAUDE.md rule 4).
+rules:
+  - id: "hafs.maliyah.idgham"
+    owner: {level: "riwayah", id: "hafs"}
+    description: "69:28 مَالِيَهْ, wajh of idgham into هَلَكَ (69:29). Pronunciation only (annotation channel, D40): by the owner's decision (D41) the text keeps the sukun and the sakt sin and gets no shadda, unlike the written form p. ح describes."
+    option: "hafs.maliyah"
+    source: {book: "KFGQPC Hafs mushaf, explanation of signs", page: "ح"}
+    status: "rule-derived"
+    single_source: true
