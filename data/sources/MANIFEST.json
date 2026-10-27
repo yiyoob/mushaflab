@@ -573,6 +573,19 @@
       "sha256": "511307401597355afa71cf2044f213b368ab20399d25600da9b10598f5cf6f84",
       "size": 13231677,
       "url": ""
+    },
+    {
+      "acquire": "manual",
+      "file": "books/al-budur-al-zahirah/al-budur.epub",
+      "group": "books",
+      "id": "book-al-budur-al-zahirah",
+      "note": "al-Budur al-Zahirah fi al-Qira'at al-'Ashr al-Mutawatira min Tariqay al-Shatibiyyah wa-al-Durrah, 'Abd al-Fattah al-Qadi (Dar al-Kitab al-'Arabi, Beirut, 1st ed. 1401/1981). EPUB supplied by the owner (2026-10-26), built by turath.io from https://app.turath.io/book/57 (urn:shamela:57, release 1.0, 2026-07-20); page numbering matches the print (info.xhtml). Rules reference for citing and cross-checking riwayat (EPUB page id plus printed page). Quranic words are quoted almost without harakat: use them for locating places only, never as Quranic text (rule 1).",
+      "optional": true,
+      "pinned_on": "2026-10-27",
+      "role": "rules-reference",
+      "sha256": "d2043ac9796a6725fe0a07253b10b8d060a60f6f1c2435b3d3f3d7d837dbae7b",
+      "size": 528516,
+      "url": ""
     }
   ]
 }

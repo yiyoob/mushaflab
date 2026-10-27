@@ -14,4 +14,4 @@ is done. The "Terms seen" column only records wording observed incidentally whil
 | `digitalkhatt` | yes | owner-declared (2026-10-21) | font repos: OFL-1.1; `digitalkhatt-js`: MIT (GitHub license field) |
 | `qcf4` | yes | owner-declared (2026-10-21) | npm: "SEE LICENSE IN LICENSE.md" |
 | `tanzil` | yes | owner-declared (2026-10-21) | file header: CC BY 3.0; verbatim copies only, text may not be changed; cite Tanzil and link tanzil.net |
-| `books` | no | owner-supplied PDF of al-Futuh al-Bahira (2026-10-26); kept only in `data/sources/raw/` and the private archive; cited by page and row, never copied into tracked files | - |
+| `books` | no | owner-supplied PDF of al-Futuh al-Bahira and EPUB of al-Budur al-Zahirah (turath.io, 2026-10-26); kept only in `data/sources/raw/` and the private archive; cited by page and row, never copied into tracked files | - |
