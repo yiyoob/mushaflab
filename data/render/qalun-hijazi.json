@@ -8,6 +8,7 @@
   "font": "fonts/digitalkhatt/hb-madina.otf",
   "encoding": "data/encodings/hafs-v1.kfgqpc-to-dk-madina.json",
   "encoding_extra": "data/encodings/hafs-v1.riwayat-rows.json",
+  "hijazi_forms": "data/encodings/hafs-v1.hijazi-forms.json",
   "text_style": "maghribi",
   "line_widths": "data/render/uthmani-qalun-kfgqpc.line-widths.json",
   "surah_names": "data/render/surah-names.json",

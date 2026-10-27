@@ -1,0 +1,1926 @@
+{
+ "schema": 1,
+ "spine": "hafs/v1",
+ "from": "kfgqpc",
+ "to": "digitalkhatt-madina",
+ "note": "D47: owner-approved Hijazi drawings of Maghribi forms (data/approvals/style-conventions.yaml, maghribi-to-hijazi.word-forms), applied wherever the approved form occurs in Warsh or Qalun after the D46 conventions. Generated from the approved picks; offsets and gaps in font units of DigitalKhatt hb-madina.otf.",
+ "rows": [
+  {
+   "src": [
+    "U+0642 U+064E U+06D6"
+   ],
+   "dst": "U+0642 U+064E U+06D6",
+   "adjust": [
+    {
+     "kind": "shift",
+     "at": 2,
+     "cp": "U+06D6",
+     "dx": -350,
+     "dy": -60
+    }
+   ],
+   "decision": "maghribi-to-hijazi.word-forms A",
+   "note": "30 places, e.g. warsh/5:18:16, warsh/11:71:5, warsh/12:6:21"
+  },
+  {
+   "src": [
+    "U+0623 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0623 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/53:18:2"
+  },
+  {
+   "src": [
+    "U+0623 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0623 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/30:10:6"
+  },
+  {
+   "src": [
+    "U+0623 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0623 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/53:11:5"
+  },
+  {
+   "src": [
+    "U+0628 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0628 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "15 places, e.g. warsh/2:34:9, warsh/2:83:13, warsh/2:177:24"
+  },
+  {
+   "src": [
+    "U+0628 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0628 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "4 places, e.g. warsh/15:31:3, warsh/17:89:10, warsh/25:50:5"
+  },
+  {
+   "src": [
+    "U+0628 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0628 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/35:18:18"
+  },
+  {
+   "src": [
+    "U+0628 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0628 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "6 places, e.g. warsh/5:106:43, warsh/6:152:27, warsh/16:90:8"
+  },
+  {
+   "src": [
+    "U+0628 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0628 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/16:121:3, warsh/22:78:7"
+  },
+  {
+   "src": [
+    "U+062A U+0651 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+062A U+0651 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "3 places, e.g. warsh/20:53:19, warsh/59:14:18, warsh/92:4:3"
+  },
+  {
+   "src": [
+    "U+062A U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+062A U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "25 places, e.g. warsh/2:73:7, warsh/2:214:23, warsh/3:49:28"
+  },
+  {
+   "src": [
+    "U+062A U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+062A U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "4 places, e.g. warsh/3:73:13, warsh/5:31:13, warsh/11:72:2"
+  },
+  {
+   "src": [
+    "U+062A U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+062A U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/41:39:17"
+  },
+  {
+   "src": [
+    "U+062A U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+062A U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "7 places, e.g. warsh/2:260:8, warsh/13:31:14, warsh/20:60:6"
+  },
+  {
+   "src": [
+    "U+062A U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+062A U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "54 places, e.g. warsh/2:251:7, warsh/2:258:10, warsh/3:148:1"
+  },
+  {
+   "src": [
+    "U+062B U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+062B U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "11 places, e.g. warsh/2:178:13, warsh/3:36:7, warsh/4:124:8"
+  },
+  {
+   "src": [
+    "U+062B U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+062B U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/92:3:4"
+  },
+  {
+   "src": [
+    "U+062B U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+062B U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/75:39:5"
+  },
+  {
+   "src": [
+    "U+062B U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+062B U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "5 places, e.g. warsh/2:178:14, warsh/3:36:14, warsh/3:195:13"
+  },
+  {
+   "src": [
+    "U+062C U+0651 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+062C U+0651 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "5 places, e.g. warsh/7:89:12, warsh/17:67:12, warsh/23:28:12"
+  },
+  {
+   "src": [
+    "U+062C U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+062C U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/93:2:3"
+  },
+  {
+   "src": [
+    "U+062C U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+062C U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "4 places, e.g. warsh/10:23:2, warsh/12:88:12, warsh/14:6:10"
+  },
+  {
+   "src": [
+    "U+062D U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+062D U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "4 places, e.g. warsh/16:68:1, warsh/41:12:6, warsh/93:1:1"
+  },
+  {
+   "src": [
+    "U+062D U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+062D U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "21 places, e.g. warsh/6:50:20, warsh/7:203:12, warsh/10:15:30"
+  },
+  {
+   "src": [
+    "U+062D U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+062D U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "3 places, e.g. warsh/20:119:6, warsh/53:4:5, warsh/53:10:5"
+  },
+  {
+   "src": [
+    "U+062F U+0651 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+062F U+0651 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/80:6:3"
+  },
+  {
+   "src": [
+    "U+062F U+0651 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+062F U+0651 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/92:11:6"
+  },
+  {
+   "src": [
+    "U+062F U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+062F U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "54 places, e.g. warsh/2:16:5, warsh/2:159:8, warsh/2:175:5"
+  },
+  {
+   "src": [
+    "U+062F U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+062F U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "8 places, e.g. warsh/7:44:1, warsh/7:48:1, warsh/7:50:1"
+  },
+  {
+   "src": [
+    "U+062F U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+062F U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/20:47:21, warsh/53:23:25"
+  },
+  {
+   "src": [
+    "U+062F U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+062F U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "10 places, e.g. warsh/2:120:15, warsh/6:35:24, warsh/7:30:2"
+  },
+  {
+   "src": [
+    "U+062F U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+062F U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "32 places, e.g. warsh/2:185:42, warsh/2:198:20, warsh/2:272:3"
+  },
+  {
+   "src": [
+    "U+0630 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0630 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/2:264:8"
+  },
+  {
+   "src": [
+    "U+0630 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0630 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/33:48:6"
+  },
+  {
+   "src": [
+    "U+0631 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0631 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "98 places, e.g. warsh/2:62:6, warsh/2:85:17, warsh/2:97:17"
+  },
+  {
+   "src": [
+    "U+0631 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0631 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "21 places, e.g. warsh/4:48:18, warsh/5:14:5, warsh/5:51:7"
+  },
+  {
+   "src": [
+    "U+0631 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0631 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "5 places, e.g. warsh/12:109:11, warsh/44:16:4, warsh/53:18:6"
+  },
+  {
+   "src": [
+    "U+0631 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0631 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "32 places, e.g. warsh/2:111:10, warsh/2:140:12, warsh/2:282:71"
+  },
+  {
+   "src": [
+    "U+0631 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0631 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "79 places, e.g. warsh/2:102:60, warsh/3:3:10, warsh/3:48:4"
+  },
+  {
+   "src": [
+    "U+0632 U+0651 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0632 U+0651 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/53:19:3"
+  },
+  {
+   "src": [
+    "U+0632 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0632 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "4 places, e.g. warsh/20:15:6, warsh/40:17:2, warsh/41:16:16"
+  },
+  {
+   "src": [
+    "U+0632 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0632 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "4 places, e.g. warsh/6:160:11, warsh/34:17:6, warsh/40:40:5"
+  },
+  {
+   "src": [
+    "U+0632 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0632 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/53:22:4"
+  },
+  {
+   "src": [
+    "U+0632 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0632 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/20:134:19"
+  },
+  {
+   "src": [
+    "U+0632 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0632 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/53:41:2, warsh/76:12:1"
+  },
+  {
+   "src": [
+    "U+0633 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0633 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "85 places, e.g. warsh/2:54:3, warsh/2:55:3, warsh/2:60:3"
+  },
+  {
+   "src": [
+    "U+0633 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0633 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "56 places, e.g. warsh/2:51:3, warsh/2:216:7, warsh/2:216:14"
+  },
+  {
+   "src": [
+    "U+0633 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0633 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/28:48:12"
+  },
+  {
+   "src": [
+    "U+0633 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0633 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "12 places, e.g. warsh/20:17:4, warsh/20:19:3, warsh/20:36:5"
+  },
+  {
+   "src": [
+    "U+0633 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0633 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "8 places, e.g. warsh/7:51:10, warsh/7:187:5, warsh/11:41:7"
+  },
+  {
+   "src": [
+    "U+0634 U+0651 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0634 U+0651 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/53:54:3"
+  },
+  {
+   "src": [
+    "U+0634 U+0651 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0634 U+0651 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/7:189:13, warsh/53:54:1"
+  },
+  {
+   "src": [
+    "U+0634 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0634 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "6 places, e.g. warsh/3:154:9, warsh/14:50:4, warsh/33:19:12"
+  },
+  {
+   "src": [
+    "U+0634 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0634 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/5:52:9"
+  },
+  {
+   "src": [
+    "U+0634 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0634 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/79:26:6"
+  },
+  {
+   "src": [
+    "U+0634 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0634 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "5 places, e.g. warsh/20:3:4, warsh/20:44:8, warsh/20:77:18"
+  },
+  {
+   "src": [
+    "U+0634 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0634 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "3 places, e.g. warsh/24:40:6, warsh/29:55:2, warsh/33:37:25"
+  },
+  {
+   "src": [
+    "U+0635 U+0651 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0635 U+0651 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/42:13:6"
+  },
+  {
+   "src": [
+    "U+0635 U+0651 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0635 U+0651 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "4 places, e.g. warsh/6:144:21, warsh/6:151:39, warsh/6:152:32"
+  },
+  {
+   "src": [
+    "U+0635 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0635 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "5 places, e.g. warsh/2:132:1, warsh/18:12:6, warsh/72:28:10"
+  },
+  {
+   "src": [
+    "U+0635 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0635 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/20:121:12"
+  },
+  {
+   "src": [
+    "U+0635 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0635 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "3 places, e.g. warsh/18:49:19, warsh/19:94:2, warsh/58:6:8"
+  },
+  {
+   "src": [
+    "U+0636 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0636 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "18 places, e.g. warsh/2:120:2, warsh/4:21:4, warsh/4:108:14"
+  },
+  {
+   "src": [
+    "U+0636 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0636 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "10 places, e.g. warsh/2:117:5, warsh/3:47:17, warsh/4:43:22"
+  },
+  {
+   "src": [
+    "U+0636 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0636 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/53:26:18, warsh/93:5:4"
+  },
+  {
+   "src": [
+    "U+0636 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0636 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "3 places, e.g. warsh/20:84:9, warsh/20:130:20, warsh/92:21:2"
+  },
+  {
+   "src": [
+    "U+0636 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0636 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "5 places, e.g. warsh/2:144:9, warsh/12:68:20, warsh/27:19:19"
+  },
+  {
+   "src": [
+    "U+0637 U+0651 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0637 U+0651 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/75:33:5"
+  },
+  {
+   "src": [
+    "U+0637 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0637 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "5 places, e.g. warsh/2:238:5, warsh/20:50:4, warsh/53:34:1"
+  },
+  {
+   "src": [
+    "U+0638 U+0651 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0638 U+0651 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/92:14:3"
+  },
+  {
+   "src": [
+    "U+0638 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0638 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/70:15:3"
+  },
+  {
+   "src": [
+    "U+0639 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0639 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "10 places, e.g. warsh/2:114:11, warsh/2:205:3, warsh/17:19:4"
+  },
+  {
+   "src": [
+    "U+0639 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0639 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/45:28:7, warsh/61:7:9"
+  },
+  {
+   "src": [
+    "U+0639 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0639 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/70:18:2, warsh/96:8:4"
+  },
+  {
+   "src": [
+    "U+0639 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0639 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "6 places, e.g. warsh/20:15:10, warsh/20:20:5, warsh/20:66:12"
+  },
+  {
+   "src": [
+    "U+063A U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+063A U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "7 places, e.g. warsh/20:43:5, warsh/23:7:2, warsh/28:76:7"
+  },
+  {
+   "src": [
+    "U+063A U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+063A U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/6:113:1, warsh/96:6:4"
+  },
+  {
+   "src": [
+    "U+063A U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+063A U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "4 places, e.g. warsh/20:24:5, warsh/20:45:10, warsh/53:17:5"
+  },
+  {
+   "src": [
+    "U+0641 U+0651 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0641 U+0651 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "5 places, e.g. warsh/2:281:8, warsh/3:161:14, warsh/16:111:8"
+  },
+  {
+   "src": [
+    "U+0641 U+0651 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0641 U+0651 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/53:37:3"
+  },
+  {
+   "src": [
+    "U+0641 U+0651 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0641 U+0651 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "9 places, e.g. warsh/4:15:16, warsh/4:97:3, warsh/6:60:3"
+  },
+  {
+   "src": [
+    "U+0641 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0641 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "39 places, e.g. warsh/2:132:9, warsh/3:5:4, warsh/3:76:3"
+  },
+  {
+   "src": [
+    "U+0641 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0641 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/3:33:3, warsh/34:37:8"
+  },
+  {
+   "src": [
+    "U+0641 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0641 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/27:59:8, warsh/39:3:16"
+  },
+  {
+   "src": [
+    "U+0641 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0641 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/53:41:4, warsh/87:7:9"
+  },
+  {
+   "src": [
+    "U+0641 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0641 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "5 places, e.g. warsh/2:247:29, warsh/3:42:7, warsh/3:42:9"
+  },
+  {
+   "src": [
+    "U+0642 U+0651 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0642 U+0651 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/2:37:1"
+  },
+  {
+   "src": [
+    "U+0642 U+0651 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0642 U+0651 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "5 places, e.g. warsh/21:103:5, warsh/28:80:14, warsh/41:35:2"
+  },
+  {
+   "src": [
+    "U+0642 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0642 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "21 places, e.g. warsh/2:60:2, warsh/2:256:18, warsh/3:76:5"
+  },
+  {
+   "src": [
+    "U+0642 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0642 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "4 places, e.g. warsh/4:94:13, warsh/20:2:5, warsh/25:8:2"
+  },
+  {
+   "src": [
+    "U+0642 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0642 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "6 places, e.g. warsh/20:73:14, warsh/20:117:12, warsh/20:127:12"
+  },
+  {
+   "src": [
+    "U+0642 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0642 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "8 places, e.g. warsh/2:189:19, warsh/2:203:19, warsh/4:77:45"
+  },
+  {
+   "src": [
+    "U+0642 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0642 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "13 places, e.g. warsh/3:28:21, warsh/4:171:21, warsh/7:160:10"
+  },
+  {
+   "src": [
+    "U+0643 U+0651 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0643 U+0651 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "4 places, e.g. warsh/35:18:28, warsh/35:18:30, warsh/79:18:6"
+  },
+  {
+   "src": [
+    "U+0643 U+0651 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0643 U+0651 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/80:3:4"
+  },
+  {
+   "src": [
+    "U+0643 U+0651 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0643 U+0651 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "3 places, e.g. warsh/20:76:12, warsh/80:7:4, warsh/92:18:4"
+  },
+  {
+   "src": [
+    "U+0643 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0643 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "4 places, e.g. warsh/2:232:26, warsh/18:19:29, warsh/24:28:17"
+  },
+  {
+   "src": [
+    "U+0643 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0643 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/53:43:4"
+  },
+  {
+   "src": [
+    "U+0644 U+0651 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0644 U+0651 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "22 places, e.g. warsh/2:205:2, warsh/3:23:16, warsh/3:82:2"
+  },
+  {
+   "src": [
+    "U+0644 U+0651 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0644 U+0651 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "3 places, e.g. warsh/28:24:4, warsh/80:1:2, warsh/96:13:4"
+  },
+  {
+   "src": [
+    "U+0644 U+0651 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0644 U+0651 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/96:10:3"
+  },
+  {
+   "src": [
+    "U+0644 U+0651 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0644 U+0651 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "5 places, e.g. warsh/20:48:10, warsh/75:31:4, warsh/75:32:3"
+  },
+  {
+   "src": [
+    "U+0644 U+0651 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0644 U+0651 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/2:142:6, warsh/7:22:1"
+  },
+  {
+   "src": [
+    "U+0644 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0644 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "73 places, e.g. warsh/2:81:1, warsh/2:112:1, warsh/2:260:13"
+  },
+  {
+   "src": [
+    "U+0644 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0644 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "3 places, e.g. warsh/2:124:2, warsh/3:125:1, warsh/38:69:7"
+  },
+  {
+   "src": [
+    "U+0644 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0644 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "6 places, e.g. warsh/16:28:13, warsh/46:33:17, warsh/53:56:5"
+  },
+  {
+   "src": [
+    "U+0644 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0644 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "24 places, e.g. warsh/7:172:16, warsh/8:40:8, warsh/9:40:36"
+  },
+  {
+   "src": [
+    "U+0644 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0644 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "16 places, e.g. warsh/2:286:45, warsh/3:150:3, warsh/6:62:5"
+  },
+  {
+   "src": [
+    "U+0645 U+0651 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0645 U+0651 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/76:18:3"
+  },
+  {
+   "src": [
+    "U+0645 U+0651 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0645 U+0651 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/22:78:19"
+  },
+  {
+   "src": [
+    "U+0645 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0645 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "25 places, e.g. warsh/2:83:14, warsh/2:177:25, warsh/2:215:11"
+  },
+  {
+   "src": [
+    "U+0645 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0645 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/4:2:2, warsh/47:23:6"
+  },
+  {
+   "src": [
+    "U+0645 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0645 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/13:19:11"
+  },
+  {
+   "src": [
+    "U+0645 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0645 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "3 places, e.g. warsh/8:17:12, warsh/20:124:12, warsh/80:2:3"
+  },
+  {
+   "src": [
+    "U+0645 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0645 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/7:46:8, warsh/7:48:6"
+  },
+  {
+   "src": [
+    "U+0646 U+0651 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0646 U+0651 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "28 places, e.g. warsh/2:223:6, warsh/2:247:12, warsh/2:259:11"
+  },
+  {
+   "src": [
+    "U+0646 U+0651 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0646 U+0651 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/22:52:11"
+  },
+  {
+   "src": [
+    "U+0646 U+0651 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0646 U+0651 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/53:24:4"
+  },
+  {
+   "src": [
+    "U+0646 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0646 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "25 places, e.g. warsh/2:61:27, warsh/4:3:13, warsh/7:48:9"
+  },
+  {
+   "src": [
+    "U+0646 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0646 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "7 places, e.g. warsh/2:282:93, warsh/4:3:26, warsh/5:108:2"
+  },
+  {
+   "src": [
+    "U+0646 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0646 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/96:7:3"
+  },
+  {
+   "src": [
+    "U+0646 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0646 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "14 places, e.g. warsh/4:95:26, warsh/9:107:20, warsh/13:18:4"
+  },
+  {
+   "src": [
+    "U+0646 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0646 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/9:74:20, warsh/33:53:16"
+  },
+  {
+   "src": [
+    "U+0647 U+0651 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0647 U+0651 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/80:10:3"
+  },
+  {
+   "src": [
+    "U+0647 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0647 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "6 places, e.g. warsh/2:275:31, warsh/16:90:9, warsh/29:45:11"
+  },
+  {
+   "src": [
+    "U+0647 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0647 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "3 places, e.g. warsh/20:54:9, warsh/20:128:17, warsh/53:42:4"
+  },
+  {
+   "src": [
+    "U+0647 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0647 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "9 places, e.g. warsh/5:63:2, warsh/7:20:13, warsh/7:157:15"
+  },
+  {
+   "src": [
+    "U+0648 U+0651 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0648 U+0651 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "3 places, e.g. warsh/4:42:8, warsh/75:38:5, warsh/87:2:3"
+  },
+  {
+   "src": [
+    "U+0648 U+0651 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0648 U+0651 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "4 places, e.g. warsh/2:29:13, warsh/18:37:15, warsh/32:9:2"
+  },
+  {
+   "src": [
+    "U+0648 U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+0648 U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "27 places, e.g. warsh/7:54:12, warsh/8:42:7, warsh/9:35:7"
+  },
+  {
+   "src": [
+    "U+0648 U+06EA",
+    "U+0649 U+0670 U+0653"
+   ],
+   "dst": "U+0648 U+0649 U+0670 U+0653 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "11 places, e.g. warsh/2:29:10, warsh/2:87:22, warsh/4:135:25"
+  },
+  {
+   "src": [
+    "U+0648 U+06EA",
+    "U+0649 U+0670 U+0653 U+06D6"
+   ],
+   "dst": "U+0648 U+0649 U+0670 U+0653 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "1 places, e.g. warsh/96:12:3"
+  },
+  {
+   "src": [
+    "U+0648 U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+0648 U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "21 places, e.g. warsh/2:57:7, warsh/2:197:26, warsh/2:237:26"
+  },
+  {
+   "src": [
+    "U+0648 U+06EA",
+    "U+064A U+0670"
+   ],
+   "dst": "U+0648 U+064A U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "38 places, e.g. warsh/3:151:15, warsh/3:162:10, warsh/3:197:4"
+  },
+  {
+   "src": [
+    "U+064A U+06EA",
+    "U+0649 U+0670"
+   ],
+   "dst": "U+064A U+0649 U+0670 U+065C",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "6 places, e.g. warsh/3:39:11, warsh/6:85:2, warsh/8:42:27"
+  },
+  {
+   "src": [
+    "U+064A U+06EA",
+    "U+0649 U+0670 U+06D6"
+   ],
+   "dst": "U+064A U+0649 U+0670 U+065C U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms B3",
+   "note": "2 places, e.g. warsh/20:74:13, warsh/87:13:6"
+  },
+  {
+   "src": [
+    "U+0624",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0624 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "6 places, e.g. warsh/5:57:9, warsh/5:58:6, warsh/45:35:6"
+  },
+  {
+   "src": [
+    "U+0624",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+0624 U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "6 places, e.g. warsh/2:67:13, warsh/2:231:25, warsh/18:56:18"
+  },
+  {
+   "src": [
+    "U+0628",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0628 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "4 places, e.g. warsh/3:64:22, warsh/56:37:2, warsh/78:19:4"
+  },
+  {
+   "src": [
+    "U+0628",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+0628 U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "8 places, e.g. warsh/12:47:5, warsh/18:44:9, warsh/78:35:6"
+  },
+  {
+   "src": [
+    "U+062A",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+062A U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "9 places, e.g. warsh/6:122:3, warsh/49:12:24, qalun/6:122:3"
+  },
+  {
+   "src": [
+    "U+062A",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+062A U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/24:61:57, qalun/7:74:17"
+  },
+  {
+   "src": [
+    "U+062B",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+062B U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "3 places, e.g. warsh/16:92:9, warsh/42:49:11, qalun/42:49:11"
+  },
+  {
+   "src": [
+    "U+062C",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+062C U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/6:125:16, qalun/6:125:16"
+  },
+  {
+   "src": [
+    "U+062C",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+062C U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/18:1:11, qalun/18:1:11"
+  },
+  {
+   "src": [
+    "U+062F",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+062F U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "24 places, e.g. warsh/11:68:7, warsh/17:107:18, warsh/19:58:28"
+  },
+  {
+   "src": [
+    "U+062F",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+062F U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "6 places, e.g. warsh/18:20:13, warsh/18:57:30, warsh/18:110:24"
+  },
+  {
+   "src": [
+    "U+062F U+0651",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+062F U+0651 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "7 places, e.g. warsh/19:89:4, warsh/36:9:5, warsh/36:9:8"
+  },
+  {
+   "src": [
+    "U+062F U+0651",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+062F U+0651 U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/18:94:19, qalun/18:94:19"
+  },
+  {
+   "src": [
+    "U+0630",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0630 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/17:75:1, warsh/23:91:11"
+  },
+  {
+   "src": [
+    "U+0631",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0631 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "7 places, e.g. warsh/44:5:1, warsh/61:14:5, warsh/65:8:14"
+  },
+  {
+   "src": [
+    "U+0631",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+0631 U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "11 places, e.g. warsh/18:71:15, warsh/18:74:16, warsh/18:87:13"
+  },
+  {
+   "src": [
+    "U+0632",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+0632 U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "1 places, e.g. warsh/19:98:14"
+  },
+  {
+   "src": [
+    "U+0635",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0635 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/19:51:7, qalun/19:51:7"
+  },
+  {
+   "src": [
+    "U+0636",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0636 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "1 places, e.g. warsh/4:128:8"
+  },
+  {
+   "src": [
+    "U+0638",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+0638 U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/12:64:14, qalun/12:64:14"
+  },
+  {
+   "src": [
+    "U+0639",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0639 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/38:24:31, qalun/38:24:31"
+  },
+  {
+   "src": [
+    "U+0640 U+0654",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0640 U+0654 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "8 places, e.g. warsh/3:39:18, warsh/19:30:8, warsh/19:54:11"
+  },
+  {
+   "src": [
+    "U+0640 U+0654",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+0640 U+0654 U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "8 places, e.g. warsh/19:49:14, warsh/19:51:10, warsh/19:53:7"
+  },
+  {
+   "src": [
+    "U+0641",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0641 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "6 places, e.g. warsh/26:187:3, warsh/30:54:17, warsh/34:9:20"
+  },
+  {
+   "src": [
+    "U+0641",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+0641 U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/8:66:8, qalun/8:66:8"
+  },
+  {
+   "src": [
+    "U+0642",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0642 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/78:25:3, qalun/78:25:3"
+  },
+  {
+   "src": [
+    "U+0643",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0643 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "6 places, e.g. warsh/3:96:8, warsh/7:190:6, warsh/23:29:5"
+  },
+  {
+   "src": [
+    "U+0643 U+0651",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0643 U+0651 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/18:98:11, qalun/18:98:11"
+  },
+  {
+   "src": [
+    "U+0644",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0644 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "8 places, e.g. warsh/4:31:11, warsh/6:111:12, warsh/22:59:2"
+  },
+  {
+   "src": [
+    "U+0644",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+0644 U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "5 places, e.g. warsh/3:145:10, warsh/17:35:11, warsh/18:46:13"
+  },
+  {
+   "src": [
+    "U+0644 U+0651",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0644 U+0651 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "1 places, e.g. warsh/9:10:5"
+  },
+  {
+   "src": [
+    "U+0645",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0645 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "9 places, e.g. warsh/2:182:7, warsh/4:111:3, warsh/4:112:5"
+  },
+  {
+   "src": [
+    "U+0645",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+0645 U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "14 places, e.g. warsh/4:5:9, warsh/4:18:24, warsh/4:107:14"
+  },
+  {
+   "src": [
+    "U+0646",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0646 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "12 places, e.g. warsh/2:83:11, warsh/2:126:8, warsh/4:93:3"
+  },
+  {
+   "src": [
+    "U+0646",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+0646 U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/6:96:8, qalun/6:96:8"
+  },
+  {
+   "src": [
+    "U+0647",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+0647 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/46:15:7, qalun/46:15:7"
+  },
+  {
+   "src": [
+    "U+0647",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+0647 U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/46:15:9, qalun/46:15:9"
+  },
+  {
+   "src": [
+    "U+0648",
+    "U+0649 U+0657 U+06D6"
+   ],
+   "dst": "U+0648 U+08F0 U+0649 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/20:58:14, qalun/20:58:14"
+  },
+  {
+   "src": [
+    "U+064A",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+064A U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "2 places, e.g. warsh/19:23:12, qalun/19:23:12"
+  },
+  {
+   "src": [
+    "U+064A U+0651",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+064A U+0651 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "1 places, e.g. warsh/41:44:4"
+  },
+  {
+   "src": [
+    "U+064A U+0651",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+064A U+0651 U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "12 places, e.g. warsh/19:8:14, warsh/19:61:11, warsh/19:68:8"
+  },
+  {
+   "src": [
+    "U+064A U+0654",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+064A U+0654 U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms C1",
+   "note": "4 places, e.g. warsh/9:120:33, warsh/67:4:8, qalun/9:120:33"
+  },
+  {
+   "src": [
+    "U+064A U+06E1 U+0654",
+    "U+0627 U+0657"
+   ],
+   "dst": "U+064A U+0652 U+0640 U+0654 U+034F U+08F0 U+0627",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms D1",
+   "note": "60 places, e.g. warsh/2:48:8, warsh/2:123:8, warsh/2:170:20"
+  },
+  {
+   "src": [
+    "U+064A U+06E1 U+0654",
+    "U+0627 U+0657 U+06D6"
+   ],
+   "dst": "U+064A U+0652 U+0640 U+0654 U+034F U+08F0 U+0627 U+06D6",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms D1",
+   "note": "54 places, e.g. warsh/2:282:34, warsh/3:10:12, warsh/3:116:12"
+  },
+  {
+   "src": [
+    "U+0627 U+0670"
+   ],
+   "dst": "U+0640 U+0627",
+   "adjust": [
+    {
+     "kind": "gap",
+     "at": 0,
+     "fu": 100
+    }
+   ],
+   "decision": "maghribi-to-hijazi.word-forms E2",
+   "note": "172 places, e.g. warsh/2:49:4, warsh/2:53:2, warsh/2:62:9"
+  },
+  {
+   "src": [
+    "U+0627 U+0670 U+0653"
+   ],
+   "dst": "U+0640 U+0622",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms F1",
+   "note": "5 places, e.g. warsh/2:140:14, warsh/6:143:10, warsh/6:144:8"
+  },
+  {
+   "src": [
+    "U+0623 U+064E U+06DF"
+   ],
+   "dst": "U+0623 U+064E U+06EC",
+   "adjust": [
+    {
+     "kind": "gap",
+     "at": 1,
+     "fu": 280
+    },
+    {
+     "kind": "shift",
+     "at": 2,
+     "cp": "U+06EC",
+     "dx": 120,
+     "dy": -720
+    }
+   ],
+   "decision": "maghribi-to-hijazi.word-forms G",
+   "note": "14 places, e.g. warsh/12:90:2, warsh/13:5:5, warsh/17:49:2"
+  },
+  {
+   "src": [
+    "U+0623 U+064E U+0670 U+06DF"
+   ],
+   "dst": "U+0623 U+064E U+0670 U+06EC",
+   "adjust": [
+    {
+     "kind": "gap",
+     "at": 2,
+     "fu": 330
+    },
+    {
+     "kind": "shift",
+     "at": 3,
+     "cp": "U+06EC",
+     "dx": 130,
+     "dy": -330
+    }
+   ],
+   "decision": "maghribi-to-hijazi.word-forms G (qalun, standing alif)",
+   "note": "20 places, e.g. qalun/12:90:2, qalun/13:5:5, qalun/17:49:2"
+  },
+  {
+   "src": [
+    "U+0640 U+0655 U+0650"
+   ],
+   "dst": "U+0640 U+034F U+0654 U+034F U+0650",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms H2",
+   "note": "48 places, e.g. warsh/2:65:12, warsh/6:110:2, warsh/6:113:3"
+  },
+  {
+   "src": [
+    "U+0640 U+0655 U+0650 U+06E7"
+   ],
+   "dst": "U+0640 U+034F U+0654 U+034F U+0650 U+06E7",
+   "adjust": [],
+   "decision": "maghribi-to-hijazi.word-forms H2",
+   "note": "26 places, e.g. warsh/2:61:52, warsh/2:177:18, warsh/2:213:7"
+  },
+  {
+   "src": [
+    "U+0648 U+06EC U+064E"
+   ],
+   "dst": "U+0648 U+06EC U+064E",
+   "adjust": [
+    {
+     "kind": "shift",
+     "at": 1,
+     "cp": "U+06EC",
+     "dx": -30,
+     "dy": 450
+    },
+    {
+     "kind": "shift",
+     "at": 2,
+     "cp": "U+064E",
+     "dx": -20,
+     "dy": 560
+    }
+   ],
+   "decision": "maghribi-to-hijazi.word-forms I",
+   "note": "27 places, e.g. warsh/2:225:2, warsh/2:225:8, warsh/2:283:14"
+  }
+ ]
+}

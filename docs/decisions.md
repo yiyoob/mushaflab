@@ -1431,3 +1431,26 @@ Consequences:
 - Every drawn page passes rule 6.
 - D44's availability rule changes: a combination is offered when its render profile exists,
   and its blocked pages are listed.
+
+## D47: Approved Ḥijāzī drawings of Maghribi forms, with mark adjustments
+Status: accepted (owner, 2026-10-26)
+Context: after D46 the owner reviewed DigitalKhatt drawings of Warsh and Qālūn words against
+print photos (IMG_2514–2517 and a 12:90:2 crop) and picked one per word
+(`data/approvals/style-conventions.yaml`, `maghribi-to-hijazi.word-forms`). Three words
+(5:18:16, 12:90:2, 2:225:2) could not be drawn right by any encoding: the font places the marks
+wrongly. The owner approved placing those marks by hand.
+Options: (a) per-word owner rows (D18), one per flagged word; (b) rows per form, applied wherever
+the approved form occurs; (c) font changes (the font is a pinned third-party source: rejected).
+Choice: (b). `data/encodings/hafs-v1.hijazi-forms.json` holds the rows, generated from the picks
+(cluster or sequence rows; a row may replace a row of the table). Each row may carry adjustments in
+font units: `gap` (extra advance after a character, counted in the word's width so justification
+stays exact) and `shift` (moves the nominal glyph of one mark in its cluster; exactly one glyph
+must match, else an error). Shifts are applied in `mushaf_layout::fit` right after shaping; all
+integers, so output stays deterministic. The rows load only in the Ḥijāzī profiles of Warsh and
+Qālūn (`hijazi_forms`).
+Evidence: the picks; renders of the approved drawings; real pages of 12:90:2, 2:49:4, 20:58:14,
+20:76:12 and 2:48:8 drawn through the core.
+Consequence: Warsh draws 212 of 604 pages in the Ḥijāzī style (was 53), Qālūn 136 (was 94).
+Applying each pick to every place of its form (2,025 places) is my reading of the picks: the owner
+saw one word per form (G-149). Qālūn 12:90:2 with the standing alif was not seen by the owner as
+drawn.
