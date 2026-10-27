@@ -251,3 +251,86 @@ fn undo_and_redo_restore_byte_identical_output() {
     s.undo();
     assert_eq!(&to_json(&cur(&s)).unwrap(), &states[3]);
 }
+
+mod export {
+    use super::*;
+
+    fn edited() -> EditSession {
+        let mut s = session();
+        s.set_width(&cur(&s), r("1:2:1"), Some(250)).unwrap();
+        s.replace_cluster(&cur(&s), c("1:1:1:1"), letter("x"))
+            .unwrap();
+        s.set_stretch(&cur(&s), c("1:1:1:1"), Some(40)).unwrap();
+        s.insert(
+            &cur(&s),
+            r("1:1:2:1"),
+            Side::Before,
+            NewNode::Cluster(letter("y")),
+        )
+        .unwrap();
+        s.delete(&cur(&s), r("1:1:3")).unwrap();
+        s
+    }
+
+    #[test]
+    fn export_import_export_is_byte_stable() {
+        let s = edited();
+        let text = s.export().unwrap();
+        let t = EditSession::import(&spine().id, "other", &text).unwrap();
+        assert_eq!(t.export().unwrap(), text);
+        assert_eq!(to_json(&cur(&t)).unwrap(), to_json(&cur(&s)).unwrap());
+        assert!(
+            !t.can_undo() && !t.can_redo(),
+            "an import starts a new history"
+        );
+        // it is an ordinary patch file
+        let f: mushaf_model::PatchFile = mushaf_model::from_yaml(&text).unwrap();
+        assert_eq!(f.patches.len(), 5);
+    }
+
+    #[test]
+    fn the_same_edits_in_another_order_export_the_same_bytes_but_ids() {
+        let mut s = session();
+        s.set_width(&cur(&s), r("1:2:1"), Some(250)).unwrap();
+        s.delete(&cur(&s), r("1:1:3")).unwrap();
+        let mut t = session();
+        t.delete(&cur(&t), r("1:1:3")).unwrap();
+        t.set_width(&cur(&t), r("1:2:1"), Some(250)).unwrap();
+        let (a, b) = (s.export().unwrap(), t.export().unwrap());
+        let order = |x: &str| {
+            x.lines()
+                .filter(|l| l.contains("target:"))
+                .map(String::from)
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(order(&a), order(&b));
+    }
+
+    #[test]
+    fn new_ids_continue_after_the_imported_ones() {
+        let s = edited();
+        let mut t = EditSession::import(&spine().id, "me", &s.export().unwrap()).unwrap();
+        t.delete(&cur(&t), r("1:2:2")).unwrap();
+        let ids: Vec<&str> = t.overlay().patches.iter().map(|p| p.id.as_str()).collect();
+        assert!(ids.contains(&"u6"), "{ids:?}");
+        assert!(t.undo());
+        assert_eq!(t.export().unwrap(), s.export().unwrap());
+    }
+
+    #[test]
+    fn wrong_spine_and_non_overlay_files_are_rejected() {
+        let text = edited().export().unwrap();
+        assert!(matches!(
+            EditSession::import("other/v9", "me", &text),
+            Err(EditError::Import(_))
+        ));
+        let data = text
+            .replacen("level: 'user'", "level: 'riwayah'", 1)
+            .replacen("'user-edit'", "'raw-derived'", 1);
+        assert_ne!(data, text);
+        assert!(matches!(
+            EditSession::import(&spine().id, "me", &data),
+            Err(EditError::Import(_))
+        ));
+    }
+}

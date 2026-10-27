@@ -387,3 +387,41 @@ impl EditSession {
         self.set_attr(cur, Ref::Cluster(target), |c| c.stretch = value)
     }
 }
+
+/// T7.2: overlays as patch files (D53).
+impl EditSession {
+    /// The overlay as a patch file (YAML, every string quoted), patches in slot order so the
+    /// same edits always give the same bytes, whatever order they were made in.
+    pub fn export(&self) -> Result<String, EditError> {
+        let mut o = self.overlay.clone();
+        o.patches.sort_by_key(Patch::slot);
+        mushaf_model::to_yaml(&o).map_err(|e| EditError::Invalid(e.to_string()))
+    }
+
+    /// A session over an exported overlay for the spine `spine`, with no history. The file
+    /// must be an overlay (user patches only, one content and one attribute patch per target).
+    /// New patch ids continue after the highest `u<n>` in the file.
+    pub fn import(spine: &str, author: impl Into<String>, text: &str) -> Result<Self, EditError> {
+        let overlay: EditOverlay =
+            mushaf_model::from_yaml(text).map_err(|e| EditError::Import(e.to_string()))?;
+        if overlay.spine != spine {
+            return Err(EditError::Import(format!(
+                "overlay for spine {:?}, not {spine:?}",
+                overlay.spine
+            )));
+        }
+        let next = overlay
+            .patches
+            .iter()
+            .filter_map(|p| p.id.strip_prefix('u')?.parse::<u64>().ok())
+            .max()
+            .map_or(1, |n| n + 1);
+        Ok(EditSession {
+            overlay,
+            author: author.into(),
+            undo: Vec::new(),
+            redo: Vec::new(),
+            next,
+        })
+    }
+}
