@@ -35,3 +35,9 @@ decisions:
       - {words: ["12:90:2"], pick: "G (offset)", detail: "hamza-alif, a gap with the dot U+06EC on the line, then the rest; alif side moved 180, dot 90 left, down 60", quote: "it is a hamza, then the next space is just a dot, then just a nun and then kaf"}
       - {words: ["2:65:12", "2:61:52"], pick: "H2", detail: "hamza written CGJ U+0654 CGJ on a kashida"}
       - {words: ["2:225:2"], pick: "I (offset)", detail: "dot U+06EC raised onto the waw (x -30, y +450), fatha above it (x -20, y +560)", quote: "The dot should be on top of the waw and the fatha on top of the dot"}
+  - id: "maghribi-to-hijazi.remaining-forms"
+    by: "Yusuf"
+    date: "2026-10-27"
+    quote: "the remainig forms look good. just on some of them the waqf sign is touching the harakah so just move it a little to the left. otherwise looks good."
+    scope: ["warsh", "qalun"]
+    note: "Review sheet build/review/phase6/remaining-forms.html. Approved: group 'pause sign on a form that converts' (form, then the pause sign; pause sign moved left as in pick A of maghribi-to-hijazi.word-forms where it sits over a vowel) and group 'final ya written as Hafs does'. The forms with no proposal stay blocked."
