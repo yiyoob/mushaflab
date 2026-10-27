@@ -189,3 +189,21 @@ test("a page the core cannot draw in a converted style shows a notice, and pagin
   await page.keyboard.press("ArrowLeft");
   await expect(page.locator("#pageview")).toHaveAttribute("data-page", String(blocked! + 1));
 });
+
+test("editing: a tap on the page reaches the page, and a word can be picked from the list", async ({ page }) => {
+  await page.setViewportSize({ width: 800, height: 900 });
+  await open(page, "hafs/hijazi", 3);
+  await page.locator("#btn-edit").click();
+  await expect(page.locator("#word-list .w-btn").first()).toBeVisible();
+  // the panel does not cover the page: the topmost element at the page's top is the page
+  const hit = await page.evaluate(() => {
+    const c = document.querySelector("#pageview canvas")!.getBoundingClientRect();
+    return document.elementFromPoint(c.left + c.width / 2, c.top + c.height * 0.15)?.closest("#pageview") !== null;
+  });
+  expect(hit).toBe(true);
+  await page.locator("#word-list .w-btn").nth(3).click();
+  await expect(page.locator("#sel")).toBeVisible();
+  await expect(page.locator("#word-list .c-btn").first()).toBeVisible();
+  await page.locator("#word-list .c-btn").first().click();
+  await expect(page.locator("#pageview use.selected").first()).toBeAttached();
+});

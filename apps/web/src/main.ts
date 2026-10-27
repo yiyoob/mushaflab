@@ -311,12 +311,13 @@ function openPanel(kind: typeof state.panel, title: string) {
   ui.panel.hidden = false;
   ui.panelTitle.textContent = title;
   document.body.classList.toggle("editing", kind === "edit");
+  document.body.classList.add("panel-open");
   markSelection();
 }
 function closePanel() {
   state.panel = "";
   ui.panel.hidden = true;
-  document.body.classList.remove("editing");
+  document.body.classList.remove("editing", "panel-open");
   markSelection();
 }
 $("panel-close").onclick = closePanel;
@@ -357,7 +358,10 @@ async function showEditor() {
   const lint = await callJson<{ item: string; change: string; matches: string[] }[]>("lint");
   const sel = state.selected;
   ui.panelBody.innerHTML = `
-    <p>${sel ? `Selected cluster <code id="sel">${esc(sel)}</code>` : "Tap a letter on the page to select its cluster."}</p>
+    <p>${sel ? `Selected cluster <code id="sel">${esc(sel)}</code>` : "Tap a letter on the page, or pick a word below."}</p>
+    <div class="ops"><label>Cluster or word id <input id="pick-id" placeholder="2:5:3:1 or 2:5:3" size="16"/></label>
+      <button id="pick-go">Select</button></div>
+    <details id="words" open><summary>Words on this page</summary><div id="word-list">loading…</div></details>
     <div class="ops" ${sel ? "" : "hidden"}>
       <button data-op="delete-cluster">Delete cluster</button>
       <button data-op="delete-word">Delete word</button>
@@ -383,6 +387,44 @@ async function showEditor() {
     <div id="edit-error" class="error"></div>
     ${lint.length ? `<h3>Lint (advisory)</h3><ul>${lint.map((l) => `<li><code>${esc(String(l.item))}</code> ${esc(l.change)}${l.matches.length ? ` — matches ${esc(l.matches.join(", "))}` : ""}</li>`).join("")}</ul>` : ""}`;
   ui.panelBody.querySelectorAll<HTMLButtonElement>("button[data-op]").forEach((b) => (b.onclick = () => applyEdit(b.dataset.op!)));
+  const pick = (id: string) => {
+    state.selected = id;
+    markSelection();
+    void showEditor();
+  };
+  $("pick-go").onclick = () => {
+    const v = $<HTMLInputElement>("pick-id").value.trim();
+    if (!v) return;
+    // a word id (s:a:w) selects its first cluster
+    pick(v.split(":").length === 3 ? `${v}:1` : v);
+  };
+  // The page's words, from the core's inspector: line by line, each word's clusters. The
+  // labels are the core's codepoints shown as characters, only to help pick one.
+  const insp = await callJson<{ clusters: { line: number; id: string; text: string }[] }>("inspect", state.page);
+  const chars = (u: string) => u.split(" ").map((x) => String.fromCodePoint(parseInt(x.slice(2), 16))).join("");
+  const byWord = new Map<string, { line: number; clusters: { id: string; text: string }[] }>();
+  for (const c of insp.clusters) {
+    const w = c.id.replace(/:\d+(\+ins\.\d+)*$/, "");
+    if (!byWord.has(w)) byWord.set(w, { line: c.line, clusters: [] });
+    byWord.get(w)!.clusters.push({ id: c.id, text: c.text });
+  }
+  const lines = new Map<number, string[]>();
+  for (const [w, x] of byWord) lines.set(x.line, [...(lines.get(x.line) ?? []), w]);
+  $("word-list").innerHTML = [...lines]
+    .map(
+      ([l, ws]) => `<div class="wl"><span class="wl-n">${l}</span>${ws
+        .map((w) => {
+          const x = byWord.get(w)!;
+          const open = sel !== null && x.clusters.some((c) => c.id === sel);
+          return `<span class="w${open ? " open" : ""}"><button class="w-btn" data-w="${esc(w)}" title="${esc(w)}" dir="rtl">${esc(x.clusters.map((c) => chars(c.text)).join(""))}</button>${
+            open ? x.clusters.map((c) => `<button class="c-btn${c.id === sel ? " on" : ""}" data-c="${esc(c.id)}" title="${esc(c.id)} ${esc(c.text)}">${esc(chars(c.text))}</button>`).join("") : ""
+          }</span>`;
+        })
+        .join("")}</div>`,
+    )
+    .join("");
+  $("word-list").querySelectorAll<HTMLButtonElement>(".w-btn").forEach((b) => (b.onclick = () => pick(byWord.get(b.dataset.w!)!.clusters[0].id)));
+  $("word-list").querySelectorAll<HTMLButtonElement>(".c-btn").forEach((b) => (b.onclick = () => pick(b.dataset.c!)));
   $("exp-yaml").onclick = async () => download(`edits-${state.mushaf.replace("/", "-")}.yaml`, await call<string>("export_edits"), "text/yaml");
   $<HTMLInputElement>("imp-yaml").onchange = async (e) => {
     const f = (e.target as HTMLInputElement).files?.[0];

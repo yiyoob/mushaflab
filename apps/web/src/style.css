@@ -68,3 +68,17 @@ code { font-size: 12px; }
   .note.open .note-body { display: block; }
 }
 .blocked { padding: 48px 24px; border: 1px dashed var(--line); background: var(--panel); color: var(--muted); direction: ltr; }
+/* Panels sit beside the page on wide screens and below it on narrow ones, never over it. */
+@media (min-width: 1000px) {
+  body.panel-open #main { margin-right: min(560px, 100vw); }
+}
+@media (max-width: 999px) {
+  #panel { top: auto; left: 0; width: 100vw; height: 50vh; border-left: 0; border-top: 1px solid var(--line); box-shadow: 0 -4px 14px #0003; }
+  body.panel-open #main { padding-bottom: 52vh; }
+}
+#word-list .wl { display: flex; flex-wrap: wrap; flex-direction: row-reverse; gap: 4px; align-items: center; margin: 3px 0; }
+#word-list .wl-n { color: var(--muted); font-size: 11px; width: 2em; text-align: center; }
+#word-list .w { display: inline-flex; flex-direction: row-reverse; gap: 2px; }
+#word-list .w.open { outline: 1px solid #1f5fbf; border-radius: 4px; }
+#word-list button { font-size: 18px; padding: 1px 6px; }
+#word-list .c-btn.on { background: #1f5fbf; color: #fff; }
