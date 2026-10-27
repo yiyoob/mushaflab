@@ -1,0 +1,21 @@
+# Owner decisions on Maghribi -> Hijazi writing conventions (D46). Written on the owner's
+# explicit instruction (CLAUDE.md rule 4) after review of the example sheet
+# build/review/phase6/sukun-examples.html (Warsh and Qalun), 2026-10-26.
+decisions:
+  - id: "maghribi-to-hijazi.conventions"
+    by: "Yusuf"
+    date: "2026-10-26"
+    quote: "the sheet looks good"
+    scope: ["warsh", "qalun"]
+    conventions:
+      - "sukun: Maghribi U+0652 takes the sign Hafs has on the aligned letter (U+06E1 sukun or U+0652 silent-letter circle); where Hafs has neither, alif keeps U+0652 and any other letter takes U+06E1"
+      - "alif wasla: Maghribi alif + vowel + U+06EC/U+06EA/U+06DF where Hafs has U+0671 is written as Hafs writes it"
+      - "final ya: U+06D2 where Hafs has U+064A/U+0649 with the same marks is written as Hafs writes it"
+      - "hamza: Maghribi U+0627 U+06DF where Hafs has U+0623 U+064F is written as Hafs writes it"
+      - "marks stored on a neighbouring letter: a word with the same letters and the same marks as Hafs is written as Hafs writes it"
+      - "reading differences (naql, taqlil, ibdal, silah, other vowels) keep the riwayah's own form"
+  - id: "maghribi-to-hijazi.pause-signs"
+    by: "Yusuf"
+    date: "2026-10-26"
+    quote: "warsh and qalun should show their own pause signs"
+    scope: ["warsh", "qalun"]

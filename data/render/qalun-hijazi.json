@@ -1,0 +1,32 @@
+{
+  "profile": "qalun-hijazi",
+  "riwayah": "qalun",
+  "style": "hijazi",
+  "script_id": "uthmani",
+  "layout_id": "uthmani-qalun-kfgqpc",
+  "spine": "hafs/v1",
+  "font": "fonts/digitalkhatt/hb-madina.otf",
+  "encoding": "data/encodings/hafs-v1.kfgqpc-to-dk-madina.json",
+  "encoding_extra": "data/encodings/hafs-v1.riwayat-rows.json",
+  "text_style": "maghribi",
+  "line_widths": "data/render/uthmani-qalun-kfgqpc.line-widths.json",
+  "surah_names": "data/render/surah-names.json",
+  "note": "T6.10 / D46: qalun in the Hijazi style. The riwayah's own native layout (D1, D29) drawn with DigitalKhatt Madina as for the Mashriqi riwayat (bazzi profile geometry, D15), after the owner-approved Maghribi -> Hijazi writing conventions (data/approvals/style-conventions.yaml), converted through the Hafs table plus the approved riwayah rows (D28). The riwayah's own pause signs are kept. Words with a form that has no approved row cannot convert: their pages are blocked and listed (G-148).",
+  "overline_marks": [
+    "U+06E4"
+  ],
+  "geometry": {
+    "line_width": 17800,
+    "line_pitch": 1900,
+    "margin_x": 900,
+    "margin_top": 1500,
+    "margin_bottom": 900,
+    "page_scale_floor": 900,
+    "overline_thickness": 44,
+    "overline_clearance": 70
+  },
+  "justify": {
+    "space_stretch": 1000,
+    "min_space": 600
+  }
+}

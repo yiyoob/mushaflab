@@ -14,9 +14,11 @@ use serde::Serialize;
 
 mod engine;
 mod options;
+mod style;
 
 pub use engine::resolve_patches;
 pub use options::{LintNote, Selection, resolve, resolve_profile};
+pub use style::maghribi_to_hijazi;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Mode {

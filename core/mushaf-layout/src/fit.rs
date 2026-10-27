@@ -47,7 +47,9 @@ pub struct Profile {
     #[serde(default)]
     pub encoding_extra: Option<String>,
     /// Style conversion rows (T6.7, D44) and the style of the riwāyah's text: the rows from
-    /// `text_style` to this profile's `style` are applied before the encoding table.
+    /// `text_style` to this profile's `style` are applied before the encoding table. A
+    /// Maghribi text in a Hijazi profile is also rewritten with the owner-approved
+    /// conventions (D46, `mushaf_resolve::maghribi_to_hijazi`) when resolved.
     #[serde(default)]
     pub style_conversion: Option<String>,
     #[serde(default)]
@@ -179,11 +181,11 @@ impl Profile {
         read: &impl Fn(&str) -> Result<String, Error>,
     ) -> Result<EncodingTable, Error> {
         match (&self.style_conversion, &self.text_style) {
-            (None, None) => Ok(table),
+            (None, _) => Ok(table),
             (Some(path), Some(from)) => {
                 table.with_style_conversion(&read(path)?, from, &self.style)
             }
-            _ => Err(Error::new("style_conversion and text_style go together")),
+            (Some(_), None) => Err(Error::new("style_conversion needs text_style")),
         }
     }
 

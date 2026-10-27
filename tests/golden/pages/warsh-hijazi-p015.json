@@ -1,0 +1,236 @@
+{
+  "canonical": true,
+  "draw_sha256": "66307d65ed955fd47523cf222a8f74f010a2af77281de04db542a7a634bd29b7",
+  "layout_id": "uthmani-warsh-kfgqpc",
+  "lines": [
+    {
+      "baseline": 171392,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 141312,
+      "line": 1,
+      "natural": 929024,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 292992,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 92480,
+      "line": 2,
+      "natural": 969344,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 414592,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 45888,
+      "line": 3,
+      "natural": 1022272,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 536192,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 78464,
+      "line": 4,
+      "natural": 1009664,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 657792,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 99584,
+      "line": 5,
+      "natural": 976576,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 779392,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 105344,
+      "line": 6,
+      "natural": 959168,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 900992,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 250048,
+      "line": 7,
+      "natural": 821184,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 1022592,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 115904,
+      "line": 8,
+      "natural": 959104,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 1144192,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 207424,
+      "line": 9,
+      "natural": 834304,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 1265792,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 176064,
+      "line": 10,
+      "natural": 902720,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 1387392,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 140608,
+      "line": 11,
+      "natural": 931456,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 1508992,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 177600,
+      "line": 12,
+      "natural": 906624,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 1630592,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 60032,
+      "line": 13,
+      "natural": 998400,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 1752192,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 306048,
+      "line": 14,
+      "natural": 778816,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    },
+    {
+      "baseline": 1873792,
+      "kind": {
+        "kind": "text"
+      },
+      "left": 57600,
+      "letter_gain": 215616,
+      "line": 15,
+      "natural": 824896,
+      "right": 1196800,
+      "short_ppm": null,
+      "squeeze": null,
+      "target": 1139200,
+      "width": 1139200
+    }
+  ],
+  "notes": [],
+  "page": 15,
+  "riwayah": "warsh",
+  "scale": 65536
+}

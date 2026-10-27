@@ -56,7 +56,8 @@ Consequences: what follows, what it rules out
 | D42 | T6.4: data-derived rules (hypotheses) plus residual patches per riwāyah | accepted (T6.4, 2026-10-26); every rule awaits a citation |
 | D43 | Ṭarīq as the option group `<riwāyah>.tariq`; ṭarīq-level patches apply under their ṭarīq only | accepted (T6.6, 2026-10-26) |
 | D44 | Display styles: render-time conversion from owner-confirmed rows; per-(riwāyah, style) audit decides availability | accepted (T6.7–T6.10, 2026-10-26) |
-| D45 | Difference highlighting from rule provenance; cited rules by default, hypotheses opt-in and flagged | accepted (T6.11–T6.12, 2026-10-26); default for hypotheses is the owner's choice at G4 |
+| D45 | Difference highlighting from rule provenance; cited rules by default, hypotheses opt-in and flagged | accepted (T6.11–T6.12, 2026-10-26); the owner chose to show hypotheses (2026-10-26) |
+| D46 | Warsh and Qālūn in the Ḥijāzī style: owner-approved writing conventions, own pause signs, blocked pages listed | accepted (owner, 2026-10-26) |
 
 ---
 
@@ -1381,8 +1382,9 @@ Decision:
   - `annotation`, true for pronunciation-only differences (D40).
   `Renderer::render_highlighted(page, choices, HighlightPolicy)` fills it. The list is
   serialized only when non-empty, so plain pages and their goldens are unchanged.
-- Policy: `HighlightPolicy::default()` shows only cited rules. Since no data-derived rule is
-  cited yet, the default highlights nothing. `hypotheses: true` shows them, flagged uncited.
+- Policy: by the owner's decision (2026-10-26, "show unverified ones as well"),
+  `HighlightPolicy::default()` also shows hypotheses, flagged `cited: false` for a distinct
+  style. `HighlightPolicy::CITED_ONLY` shows cited rules only.
 - Tests (`highlight_pairs_per_riwayah`, in `just golden`), per non-Ḥafṣ riwāyah on its first
   page with a highlight:
   - the highlighted page minus its highlights equals the plain page byte for byte;
@@ -1393,3 +1395,39 @@ Decision:
 Consequences: highlighting becomes useful by default once the owner cites rules (G4).
 Pronunciation-only uṣūl highlight through annotations once cited rules write them (D40).
 The UI toggle is Phase 8.
+
+## D46: Warsh and Qālūn in the Ḥijāzī style
+Status: accepted (owner, 2026-10-26)
+Context: at G4 the owner asked for a Ḥijāzī option for the Maghribi riwāyāt; Ḥijāzī → Maghribi
+is not wanted. The single Ḥijāzī → Maghribi row (D44) cannot be inverted: Maghribi U+0652
+stands for both Ḥijāzī U+06E1 and U+0652. The owner reviewed an example sheet
+(`build/review/phase6/sukun-examples.html`) and approved it: "the sheet looks good". The
+owner also decided: "warsh and qalun should show their own pause signs". Both decisions are
+recorded in `data/approvals/style-conventions.yaml`.
+Evidence: each Warsh and Qālūn cluster aligned to the Ḥafṣ spine shows which sign Ḥafṣ uses:
+- Warsh: 32,768 sukūn and 3,982 silent-letter signs;
+- Qālūn: 37,028 sukūn and 3,981 silent-letter signs;
+- Ḥafṣ U+0652 occurs only on alif (3,722), wāw (255) and yāʾ (11).
+A rule based only on the vowel before the letter would have got 95 Warsh and 108 Qālūn
+places wrong (e.g. yāʾ after kasra, 2:33).
+Decision: `mushaf_resolve::maghribi_to_hijazi` rewrites a resolved Maghribi text at render
+time. For each cluster, the aligned Ḥafṣ cluster decides:
+- a difference only in writing takes Ḥafṣ's form: sukūn, alif waṣla, final ے, the hamza form
+  ا+U+06DF;
+- a reading difference keeps the riwāyah's form, with only its sukūn converted (from Ḥafṣ;
+  where Ḥafṣ has neither sign, alif keeps U+0652 and any other letter takes U+06E1);
+- a word with the same letters and marks as Ḥafṣ, with a mark stored on a neighbouring
+  letter, takes Ḥafṣ's form;
+- pause signs stay the riwāyah's own.
+Cluster ids never change. The render profiles `data/render/{warsh,qalun}-hijazi.json` use
+the riwāyah's own layout and DigitalKhatt Madina through the Ḥafṣ table plus the approved
+riwāyah rows (D28). `text_style: maghribi` turns the rewrite on.
+Consequences:
+- Words that cannot convert block their pages: 1,756 Warsh and 1,290 Qālūn words, which
+  leaves 53 and 94 drawable pages. These are forms with Maghribi reading marks that have no
+  approved DigitalKhatt row (U+06EA under a letter, final ے where the reading differs,
+  U+0657, some hamza forms). They are pinned in
+  `tests/golden/shape/maghribi-hijazi-pending.json` and need rows approved as in D28 (G-148).
+- Every drawn page passes rule 6.
+- D44's availability rule changes: a combination is offered when its render profile exists,
+  and its blocked pages are listed.

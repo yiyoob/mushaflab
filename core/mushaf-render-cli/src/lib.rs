@@ -44,6 +44,10 @@ pub fn profile_path(riwayah: &str, style: &str) -> Result<String, Error> {
     })
 }
 
+fn hijazi_from_maghribi(p: &Profile) -> bool {
+    p.style == "hijazi" && p.text_style.as_deref() == Some("maghribi")
+}
+
 /// The T6.9 audit of every (riwāyah, non-default style) (D44).
 pub const STYLE_AVAILABILITY: &str = "data/render/style-availability.json";
 
@@ -136,8 +140,11 @@ impl Renderer {
             riwayah: profile.riwayah.clone(),
             ..Selection::default()
         };
-        let base = resolve_profile(&data, &sel, None, Mode::Data)
+        let mut base = resolve_profile(&data, &sel, None, Mode::Data)
             .map_err(|e| Error::new(format!("resolve: {e:?}")))?;
+        if hijazi_from_maghribi(&profile) {
+            base = mushaf_resolve::maghribi_to_hijazi(&base, spine);
+        }
         let basmalah = basmalah_words(&base, &table)?;
         let bytes = fs::read(repo.join(&profile.font))
             .map_err(|e| Error::new(format!("{}: {e}", profile.font)))?;
@@ -179,8 +186,18 @@ impl Renderer {
         } else {
             Mode::Data
         };
-        resolve_profile(&self.data, &sel, overlay, mode)
-            .map_err(|e| Error::new(format!("resolve: {e:?}")))
+        let r = resolve_profile(&self.data, &sel, overlay, mode)
+            .map_err(|e| Error::new(format!("resolve: {e:?}")))?;
+        Ok(self.restyle(r))
+    }
+
+    /// D46: a Maghribi riwāyah in a Hijazi profile is written in Hijazi conventions.
+    fn restyle(&self, r: Resolved) -> Resolved {
+        if hijazi_from_maghribi(&self.profile) {
+            mushaf_resolve::maghribi_to_hijazi(&r, &self.data.spines[&self.profile.spine])
+        } else {
+            r
+        }
     }
 
     pub fn map(&self, resolved: &Resolved) -> Result<Mapping, Error> {
@@ -313,11 +330,22 @@ pub fn svg(page: &DrawPage) -> String {
 }
 
 /// Which differences from Ḥafṣ to highlight (T6.11, D37, D45).
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct HighlightPolicy {
     /// Also highlight uncited rules (hypotheses), flagged `cited: false` for a distinct style.
-    /// The owner chooses the default at G4; off here, so only cited rules highlight.
+    /// On by default: the owner chose to show them (2026-10-26, D45).
     pub hypotheses: bool,
+}
+
+impl Default for HighlightPolicy {
+    fn default() -> Self {
+        HighlightPolicy { hypotheses: true }
+    }
+}
+
+impl HighlightPolicy {
+    /// Only cited rules and curated farsh.
+    pub const CITED_ONLY: HighlightPolicy = HighlightPolicy { hypotheses: false };
 }
 
 /// The highlights of a drawn page (T6.11–T6.12, D45). A highlight is an application of a
