@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Muṣḥaf</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header id="bar" dir="ltr">
+      <select id="mushaf" aria-label="Riwāyah and style"></select>
+      <button id="prev" title="Previous page (→)" aria-label="Previous page">→</button>
+      <input id="page" type="number" min="1" value="1" aria-label="Page" />
+      <span id="of"></span>
+      <button id="next" title="Next page (←)" aria-label="Next page">←</button>
+      <label class="toggle"><input id="hl" type="checkbox" /> Highlight</label>
+      <button id="btn-options" hidden>Options</button>
+      <button id="btn-edit">Edit</button>
+      <button id="btn-inspect">Inspector</button>
+      <button id="btn-prov">Provenance</button>
+      <select id="export" aria-label="Export">
+        <option value="">Export…</option>
+        <option value="svg">SVG</option>
+        <option value="png">PNG</option>
+        <option value="json">Draw list (JSON)</option>
+      </select>
+      <span id="status" role="status"></span>
+    </header>
+    <main id="main">
+      <aside id="margin" aria-label="Khilaf notes"></aside>
+      <section id="pageview" aria-live="polite"></section>
+    </main>
+    <div id="popover" role="dialog" hidden></div>
+    <aside id="panel" dir="ltr" hidden>
+      <header><h2 id="panel-title"></h2><button id="panel-close" aria-label="Close">×</button></header>
+      <div id="panel-body"></div>
+    </aside>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

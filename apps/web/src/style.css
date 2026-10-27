@@ -1,0 +1,62 @@
+:root {
+  --bg: #f4f1ea;
+  --fg: #1d1b16;
+  --muted: #6b665c;
+  --line: #d8d2c4;
+  --accent: #8a1c1c;
+  --panel: #fffdf8;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #1b1a17; --fg: #ece8de; --muted: #a39d90; --line: #3a372f; --panel: #24221e; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, sans-serif; }
+#bar { position: sticky; top: 0; z-index: 3; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  padding: 8px 12px; background: var(--panel); border-bottom: 1px solid var(--line); }
+#bar input[type=number] { width: 4.5em; }
+#status { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+button, select, input { font: inherit; }
+#main { display: flex; justify-content: center; gap: 12px; padding: 12px; }
+/* The page is the core's SVG; the browser only paints it (D59). */
+#pageview { flex: 0 1 720px; min-width: 0; position: relative; }
+#pageview svg { display: block; width: 100%; height: auto; box-shadow: 0 1px 6px #0003; }
+#pageview use[data-c] { cursor: pointer; pointer-events: bounding-box; }
+body.editing #pageview use[data-c]:hover, #pageview use.peek { fill: #1f5fbf; }
+#pageview use.selected { fill: #1f5fbf; }
+/* The margin sits beside the page and never affects it (D60). */
+#margin { position: relative; flex: 0 0 180px; }
+#margin[hidden] { display: none; }
+.note { position: absolute; inset-inline: 0; transform: translateY(-60%); font-size: 12px; }
+.note-dot { display: none; border: 0; background: none; color: var(--accent); cursor: pointer; }
+.note-body { border-inline-start: 2px solid var(--accent); padding: 2px 6px; background: var(--panel); }
+.note-title { color: var(--accent); }
+.note-item + .note-item { margin-top: 4px; border-top: 1px dotted var(--line); }
+.note-word svg { height: 28px; width: auto; color: var(--fg); }
+.note-err { color: var(--muted); font-style: italic; }
+#popover { position: fixed; z-index: 5; max-width: 320px; padding: 8px 10px; background: var(--panel);
+  border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 4px 14px #0004; direction: ltr; }
+#popover .hypothesis b::after { content: " (hypothesis)"; color: var(--muted); font-weight: normal; }
+#panel { position: fixed; z-index: 4; top: 0; right: 0; bottom: 0; width: min(560px, 100vw); overflow: auto;
+  background: var(--panel); border-left: 1px solid var(--line); padding: 0 12px 24px; box-shadow: -4px 0 14px #0003; }
+#panel > header { position: sticky; top: 0; display: flex; justify-content: space-between; align-items: center; background: var(--panel); }
+#panel h2 { font-size: 16px; }
+#panel table { border-collapse: collapse; width: 100%; font-size: 12px; }
+#panel td, #panel th { border-bottom: 1px solid var(--line); padding: 3px 4px; text-align: left; vertical-align: top; }
+#panel dl { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; }
+#panel dt { color: var(--muted); }
+#panel dd { margin: 0; }
+.insp tr.changed { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.ops { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; align-items: center; }
+.error { color: var(--accent); }
+.st-hypothesis { color: #a15c00; }
+.st-cross-checked, .st-muqri-verified { color: #1e7a32; }
+code { font-size: 12px; }
+/* Phone: the margin becomes tap-to-show notes beside the page. */
+@media (max-width: 760px) {
+  #main { padding: 4px; gap: 0; }
+  #margin { flex: 0 0 22px; }
+  .note-dot { display: block; }
+  .note-body { display: none; position: absolute; inset-inline-start: 22px; width: 200px; z-index: 2; box-shadow: 0 2px 8px #0004; }
+  .note.open .note-body { display: block; }
+}
