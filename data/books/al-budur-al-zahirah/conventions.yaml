@@ -1,6 +1,7 @@
 # Candidate KFGQPC encoding conventions for the `loose` projection (budur/forms.py, ADR D50).
 #
-# Status: HYPOTHESIS, every row. None is owner-confirmed; the only confirmed convention is
+# Status: every remaining row was confirmed "typography" by the owner on 2026-10-27 in the
+# conventions review sheet (`owner` field); three rows were removed as readings. Before that, the only confirmed convention is
 # the D21 row U+06E1 <-> U+0652 for warsh and qalun (data/approvals/difference_kinds.yaml),
 # which forms.py applies in the `strict` form already. The owner confirms or removes rows;
 # Claude never moves a row into data/approvals/.
@@ -17,32 +18,32 @@
 # Actions: drop (removed), merge (replaced by `to`).
 rows:
   # Pause marks and signs (waqf signs are not readings).
-  - {cp: "U+06D7", action: drop, evidence: "family-only (Hijazi 3121, Maghribi 0)", note: "pause sign"}
-  - {cp: "U+06D8", action: drop, evidence: "family-only (Hijazi 131, Maghribi 0)", note: "pause sign"}
-  - {cp: "U+06DA", action: drop, evidence: "family-only (Hijazi 12511, Maghribi 0)", note: "pause sign"}
-  - {cp: "U+06DB", action: drop, evidence: "family-only (Hijazi 36, Maghribi 0)", note: "pause sign"}
-  - {cp: "U+06DC", action: drop, evidence: "family-only (Hijazi 15, Maghribi 0)", note: "pause sign"}
-  - {cp: "U+200F", action: drop, evidence: "family-only (Hijazi 0, Maghribi 28)", note: "right-to-left mark"}
+  - {cp: "U+06D7", action: drop, evidence: "family-only (Hijazi 3121, Maghribi 0)", note: "pause sign", owner: "typography (owner, 2026-10-27)"}
+  - {cp: "U+06D8", action: drop, evidence: "family-only (Hijazi 131, Maghribi 0)", note: "pause sign", owner: "typography (owner, 2026-10-27)"}
+  - {cp: "U+06DA", action: drop, evidence: "family-only (Hijazi 12511, Maghribi 0)", note: "pause sign", owner: "typography (owner, 2026-10-27)"}
+  - {cp: "U+06DB", action: drop, evidence: "family-only (Hijazi 36, Maghribi 0)", note: "pause sign", owner: "typography (owner, 2026-10-27)"}
+  # Removed by the owner, 2026-10-27, answer quoted: "reading (the sin in these cases are only for hafs)". Was: - {cp: "U+06DC", action: drop, evidence: "family-only (Hijazi 15, Maghribi 0)", note: "pause sign"}
+  - {cp: "U+200F", action: drop, evidence: "family-only (Hijazi 0, Maghribi 28)", note: "right-to-left mark", owner: "typography (owner, 2026-10-27)"}
   # Mark shapes that one family writes and the other does not.
-  - {cp: "U+06E1", action: merge, to: "U+0652", evidence: "family-only (Hijazi 211818, Maghribi 0); confirmed for warsh/qalun only (D21)", note: "dotless head of khah (Hijazi sukun) -> sukun"}
-  - {cp: "U+0671", action: merge, to: "U+0627", evidence: "family-only (Hijazi 53949, Maghribi 0)", note: "alef wasla -> alef"}
-  - {cp: "U+06D2", action: merge, to: "U+064A", evidence: "family-only (Hijazi 0, Maghribi 5999)", note: "yeh barree -> yeh"}
-  - {cp: "U+06E0", action: drop, evidence: "family-only (Hijazi 386, Maghribi 0)", note: "small high upright rectangular zero"}
-  - {cp: "U+06E4", action: drop, evidence: "family-only (Hijazi 156, Maghribi 0)", note: "small high madda"}
-  - {cp: "U+06ED", action: drop, evidence: "family-only (Hijazi 1618, Maghribi 0)", note: "small low meem (iqlab sign)"}
-  - {cp: "U+065C", action: drop, evidence: "family-only (Hijazi 79, Maghribi 0)", note: "vowel sign dot below"}
+  - {cp: "U+06E1", action: merge, to: "U+0652", evidence: "family-only (Hijazi 211818, Maghribi 0); confirmed for warsh/qalun only (D21)", note: "dotless head of khah (Hijazi sukun) -> sukun", owner: "typography (owner, 2026-10-27)"}
+  - {cp: "U+0671", action: merge, to: "U+0627", evidence: "family-only (Hijazi 53949, Maghribi 0)", note: "alef wasla -> alef", owner: "typography (owner, 2026-10-27)"}
+  - {cp: "U+06D2", action: merge, to: "U+064A", evidence: "family-only (Hijazi 0, Maghribi 5999)", note: "yeh barree -> yeh", owner: "typography (owner, 2026-10-27)"}
+  - {cp: "U+06E0", action: drop, evidence: "family-only (Hijazi 386, Maghribi 0)", note: "small high upright rectangular zero", owner: "typography (owner, 2026-10-27)"}
+  - {cp: "U+06E4", action: drop, evidence: "family-only (Hijazi 156, Maghribi 0)", note: "small high madda", owner: "typography (owner, 2026-10-27)"}
+  - {cp: "U+06ED", action: drop, evidence: "family-only (Hijazi 1618, Maghribi 0)", note: "small low meem (iqlab sign)", owner: "typography (owner, 2026-10-27)"}
+  # Removed by the owner, 2026-10-27, answer quoted: "reading". Was: - {cp: "U+065C", action: drop, evidence: "family-only (Hijazi 79, Maghribi 0)", note: "vowel sign dot below"}
   # Added from the pilot range (al-Fatihah, al-Baqarah 1-25); counts per riwayah are in the
   # pilot report's convention section.
-  - {cp: "U+06D6", action: drop, evidence: "pilot (qalun 31, warsh 26 words: pause sign placed differently)", note: "pause sign"}
-  - {cp: "U+0653", action: drop, evidence: "pilot (17 words each for qalun bazzi qunbul susi at madd munfasil, e.g. 2:4:3)", note: "maddah: madd length is delivery (features.yaml phonetic), compared only in strict"}
-  - {cp: "U+06EA", action: merge, to: "U+064E", evidence: "pilot (duri_abuamr 4, susi 4: in place of fathah where the book states imalah, e.g. 2:7:8)", note: "dot below as imalah sign: imalah is delivery (features.yaml phonetic)"}
+  - {cp: "U+06D6", action: drop, evidence: "pilot (qalun 31, warsh 26 words: pause sign placed differently)", note: "pause sign", owner: "typography (owner, 2026-10-27)"}
+  - {cp: "U+0653", action: drop, evidence: "pilot (17 words each for qalun bazzi qunbul susi at madd munfasil, e.g. 2:4:3)", note: "maddah: madd length is delivery (features.yaml phonetic), compared only in strict", owner: "typography (owner, 2026-10-27)"}
+  # Removed by the owner, 2026-10-27, answer quoted: "reading". Was: - {cp: "U+06EA", action: merge, to: "U+064E", evidence: "pilot (duri_abuamr 4, susi 4: in place of fathah where the book states imalah, e.g. 2:7:8)", note: "dot below as imalah sign: imalah is delivery (features.yaml phonetic)"}
 # Cluster rules, applied after the rows above.
 cluster_rules:
-  - {base: "U+0627", drop_marks: ["U+064E", "U+064F", "U+0650", "U+06EC"], evidence: "pilot (duri_abuamr susi qalun warsh: alef wasla written U+0627 with the starting vowel and U+06EC, e.g. 1:3:1, 1:2:1, 2:5:8)", note: "starting-vowel sign on alef al-wasl"}
+  - {base: "U+0627", drop_marks: ["U+064E", "U+064F", "U+0650", "U+06EC"], evidence: "pilot (duri_abuamr susi qalun warsh: alef wasla written U+0627 with the starting vowel and U+06EC, e.g. 1:3:1, 1:2:1, 2:5:8)", note: "starting-vowel sign on alef al-wasl", owner: "typography (owner, 2026-10-27)"}
 # Marks compared per word, not per letter: the letter that carries them is a convention
 # (pilot: warsh, qalun 9 words each write U+0657 on the final ya/alif maqsura where Hafs
 # writes it on the letter before, e.g. 2:2:6). U+0657 is one of KFGQPC's open-tanwin
 # codepoints (docs/known-gaps.md G-018).
-word_level_marks: ["U+0657"]
+word_level_marks: ["U+0657"]  # owner: typography (2026-10-27)
 # The order of marks within one letter is not compared (Unicode gives no order for them).
 sort_marks: true

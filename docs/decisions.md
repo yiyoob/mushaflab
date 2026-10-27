@@ -1519,7 +1519,8 @@ Decision:
   to their pages. They never change a status.
 
 ## D52: Statuses and what is applied mechanically (TB.5)
-Status: proposed (2026-10-27).
+Status: proposed (2026-10-27). The per-word merge of statements (`run.merge_overlaps`), made
+after the first pilot result, was accepted by the owner on 2026-10-27 ("Accept").
 Decision:
 - Statuses are `mentioned`, `rule-covered` and `not-mentioned` (never "confirmed"), each
   with a citation.
