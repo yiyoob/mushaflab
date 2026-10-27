@@ -67,3 +67,4 @@ code { font-size: 12px; }
   .note-body { display: none; position: absolute; inset-inline-start: 22px; width: 200px; z-index: 2; box-shadow: 0 2px 8px #0004; }
   .note.open .note-body { display: block; }
 }
+.blocked { padding: 48px 24px; border: 1px dashed var(--line); background: var(--panel); color: var(--muted); direction: ltr; }

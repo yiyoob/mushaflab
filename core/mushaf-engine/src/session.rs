@@ -550,6 +550,11 @@ impl Session {
         {
             return Ok(&self.margin.as_ref().expect("checked").1);
         }
+        // No option group, no alternative wajh: nothing to resolve (T8.4).
+        if self.option_groups().iter().all(|g| g.choices.len() < 2) {
+            self.margin = Some((self.choices.clone(), Vec::new()));
+            return Ok(&self.margin.as_ref().expect("set").1);
+        }
         let r = &self.renderer;
         let spine = &r.data.spines[&r.profile.spine];
         let current = r.resolve_with(&self.choices, None)?;

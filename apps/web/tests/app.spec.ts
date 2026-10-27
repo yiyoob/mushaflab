@@ -168,3 +168,24 @@ test("the page on screen keeps the page's proportions and matches the golden pai
   expect(Math.abs(r.h / r.w - goldenRatio)).toBeLessThan(0.002);
   expect(Math.abs(r.cssRatio - goldenRatio)).toBeLessThan(0.01);
 });
+
+test("a page the core cannot draw in a converted style shows a notice, and paging goes on", async ({ page }) => {
+  await open(page, "warsh/hijazi", 90);
+  // find, from the engine, the first page from 90 on it refuses to draw (G-102)
+  const blocked = await page.evaluate(async () => {
+    for (let p = 91; p < 200; p++) {
+      try {
+        await window.mushaf.call("render", p, false);
+      } catch {
+        return p;
+      }
+    }
+    return null;
+  });
+  expect(blocked).not.toBeNull();
+  await page.evaluate((p) => window.mushaf.go(p), blocked!);
+  await expect(page.locator("#pageview .blocked")).toContainText("cannot be drawn");
+  await expect(page.locator("#pageview")).toHaveAttribute("data-page", String(blocked));
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.locator("#pageview")).toHaveAttribute("data-page", String(blocked! + 1));
+});

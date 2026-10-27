@@ -110,7 +110,29 @@ overlay.className = "overlay";
 async function render() {
   const p = state.page;
   const t = performance.now();
-  const { view: v, bitmap, ms } = await viewOf(p);
+  let prepared: Prepared;
+  try {
+    prepared = await viewOf(p);
+  } catch (err) {
+    if (p !== state.page) return;
+    // The core cannot draw this page in this style (e.g. a word with no conversion row, G-102):
+    // say so, and keep paging around it.
+    ahead.delete(`${gen}:${p}:${ui.hl.checked}:${widthPx()}`);
+    const note = document.createElement("div");
+    note.className = "blocked";
+    note.textContent = `Page ${p} cannot be drawn in this style yet: ${(err as Error).message ?? err}`;
+    ui.view.replaceChildren(note);
+    ui.view.dataset.page = String(p);
+    ui.view.dataset.blocked = "1";
+    ui.page.value = String(p);
+    state.view = null;
+    ui.margin.replaceChildren();
+    status("page not drawn");
+    for (const q of [p + 1, p - 1]) if (q >= 1 && q <= state.pages) void viewOf(q).catch(() => undefined);
+    return;
+  }
+  delete ui.view.dataset.blocked;
+  const { view: v, bitmap, ms } = prepared;
   if (p !== state.page) return; // a later page was asked for meanwhile
   state.view = v;
   state.renderMs.push(ms);
@@ -143,7 +165,7 @@ async function render() {
   });
   delete ui.view.dataset.overlay;
   for (const k of [...ahead.keys()]) if (!k.startsWith(`${gen}:`) || Math.abs(Number(k.split(":")[1]) - p) > 2) ahead.delete(k);
-  for (const q of [p + 1, p - 1]) if (q >= 1 && q <= state.pages) void viewOf(q);
+  for (const q of [p + 1, p - 1]) if (q >= 1 && q <= state.pages) void viewOf(q).catch(() => undefined);
   await renderMargin();
   if (state.panel === "inspect") await showInspector();
   if (state.panel === "edit") await showEditor();

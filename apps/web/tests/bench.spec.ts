@@ -12,19 +12,19 @@ const BUDGET = 16;
 
 const q = (v: number[], p: number) => [...v].sort((a, b) => a - b)[Math.min(v.length - 1, Math.floor((v.length - 1) * p))];
 
-for (const [mushaf, highlighted] of [["hafs/hijazi", false], ["warsh/maghribi", false], ["warsh/maghribi", true]] as const) {
+for (const [mushaf, highlighted] of [["hafs/hijazi", false], ["warsh/maghribi", false], ["warsh/maghribi", true], ["warsh/hijazi", false]] as const) {
   test(`budget ${mushaf}${highlighted ? " highlighted" : ""}`, async ({ page }) => {
-    await open(page, mushaf, 100);
+    await open(page, mushaf, 101);
     if (highlighted) {
       await page.locator("#hl").check();
-      await expect(page.locator("#pageview")).toHaveAttribute("data-overlay", "100");
+      await expect(page.locator("#pageview")).toHaveAttribute("data-overlay", "101");
     }
     const cdp = await page.context().newCDPSession(page);
     await cdp.send("Emulation.setCPUThrottlingRate", { rate: THROTTLE });
     const r = await page.evaluate(async (n) => {
       const m = window.mushaf;
       const turn: number[] = [], engine: number[] = [];
-      for (let p = 101; p < 101 + n; p++) {
+      for (let p = 102; p < 102 + n; p++) {
         // a reader looks at a page for a while before turning
         await new Promise((ok) => setTimeout(ok, 1500));
         const [e0, t0] = [m.state.renderMs.length, m.state.turnMs.length];

@@ -1807,3 +1807,12 @@ Evidence:
   output is unchanged (session test, `just web-parity` highlight goldens). Highlighted Warsh:
   worker 39 ms median, turn p95 15.6 ms. `web-bench` now includes it. A later Ḥafṣ run gave
   p95 18 ms while another process held a CPU core at 99 %; to be re-measured on a quiet machine.
+- Addendum 2 (2026-10-27, owner: converted styles turned slowly): two causes of turns of about
+  2 s in Warsh and Qālūn Ḥijāzī. (1) The margin index resolved the whole text once (2.4 s) even
+  for a riwāyah with no option group; it is now skipped. (2) A page the core cannot draw in the
+  converted style (G-102: 102 Warsh and 128 Qālūn pages) threw in the UI, so the page stayed
+  put and its neighbours were never drawn ahead; it now shows a notice and paging goes on
+  around it. The core's own time per page is about 12 ms for the converted styles against about
+  5 ms for the Maghribi defaults (WASM, Node): DigitalKhatt with full justification against the
+  KFGQPC font's spacing only. Drawing ahead hides it. `web-bench` now includes Warsh Ḥijāzī; its
+  runs on 2026-10-27 were taken while another process held a CPU core and are not reliable.
