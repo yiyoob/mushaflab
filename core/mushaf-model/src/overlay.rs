@@ -22,8 +22,8 @@ impl EditOverlay {
         }
     }
 
-    /// Adds a user patch, replacing the overlay's patch with the same key (one patch per
-    /// target per layer). Returns the replaced patch, if any.
+    /// Adds a user patch, replacing the overlay's patch in the same slot (one content and one
+    /// attribute patch per target, D53). Returns the replaced patch, if any.
     pub fn upsert(&mut self, patch: Patch) -> Result<Option<Patch>, Error> {
         patch.validate()?;
         if patch.owner.level != OwnerLevel::User {
@@ -32,8 +32,8 @@ impl EditOverlay {
                 patch.id
             )));
         }
-        let key = patch.key();
-        if let Some(old) = self.patches.iter_mut().find(|p| p.key() == key) {
+        let slot = patch.slot();
+        if let Some(old) = self.patches.iter_mut().find(|p| p.slot() == slot) {
             return Ok(Some(std::mem::replace(old, patch)));
         }
         if self.patches.iter().any(|p| p.id == patch.id) {
@@ -57,9 +57,9 @@ impl TryFrom<PatchFile> for EditOverlay {
             )));
         }
         let mut keys = BTreeSet::new();
-        if let Some(p) = f.patches.iter().find(|p| !keys.insert(p.key())) {
+        if let Some(p) = f.patches.iter().find(|p| !keys.insert(p.slot())) {
             return Err(Error::new(format!(
-                "overlay has two patches for {} (one patch per target per layer)",
+                "overlay has two patches for {} (one content and one attribute patch per target)",
                 p.key()
             )));
         }
@@ -141,5 +141,26 @@ mod tests {
         p.owner.level = OwnerLevel::Riwayah;
         p.id = "u5".into();
         assert!(o.upsert(p).is_err());
+    }
+
+    #[test]
+    fn a_target_holds_one_content_and_one_attribute_patch() {
+        let mut o: EditOverlay = from_yaml(Y).unwrap();
+        let mut a = o.patches[0].clone();
+        a.id = "a1".into();
+        a.op = crate::Op::SetAttr(crate::AttrChange {
+            width_em_delta: Some(50),
+            ..Default::default()
+        });
+        assert!(o.upsert(a.clone()).unwrap().is_none(), "beside set_marks");
+        a.id = "a2".into();
+        assert_eq!(
+            o.upsert(a).unwrap().unwrap().id,
+            "a1",
+            "replaces the attribute patch"
+        );
+        assert_eq!(o.patches.len(), 3);
+        let yaml = to_yaml(&o).unwrap();
+        assert_eq!(from_yaml::<EditOverlay>(&yaml).unwrap(), o);
     }
 }

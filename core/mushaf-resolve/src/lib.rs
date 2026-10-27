@@ -12,10 +12,12 @@ use std::collections::BTreeMap;
 use mushaf_model::{Attrs, ClusterKind, ClusterRef, Cps, ItemKind, ItemRef, Layer, Ref};
 use serde::Serialize;
 
+mod edit;
 mod engine;
 mod options;
 mod style;
 
+pub use edit::{EditError, EditSession};
 pub use engine::resolve_patches;
 pub use options::{LintNote, Selection, resolve, resolve_profile};
 pub use style::maghribi_to_hijazi;

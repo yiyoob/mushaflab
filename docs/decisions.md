@@ -1533,3 +1533,39 @@ Decision:
 - A data difference the book does not draw is explained in two cases, and both are listed:
   - when one riwāyah of the pair is named in a phonetic clause there;
   - when it is a Maghribī-family pattern that the book does not separate.
+
+## D53: The free-edit API, and two patches per key in the user layer (T7.1, T7.2)
+Status: proposed (2026-10-27), for the owner at the end of Phase 7.
+Context: T7.1 needs editing operations (add, remove or replace a cluster; add or remove a mark;
+set a word's or a glyph's width) that write the user overlay (D12), with undo and redo that
+restore exact output (rule 8). D9 allows one patch per key per layer, so a cluster could not be
+both replaced and widened by the user.
+Options:
+1. Keep D9 everywhere. A replaced and widened cluster would have to become delete + insert,
+   which gives the user's cluster a new id, so later edits address something else.
+2. Change `replace` to carry attributes. This changes the patch file format for every layer.
+3. In the user layer only, a key holds one content patch and one `set_attr` patch.
+Decision: option 3. Data layers keep one patch per key (tested), so Phase 2 to 6 data and
+their conflict checks are unchanged.
+- `Patch::slot()` is `(key, is user set_attr)`. `check()` and `EditOverlay` use it. Within a
+  layer, the engine applies attribute patches after content patches. In data layers this
+  changes no result, because one key never has two patches there.
+- `EditSession` (`core/mushaf-resolve/src/edit.rs`):
+  - Every operation takes the current `Resolved`.
+  - A mark edit on a spine cluster becomes one `replace` holding the cluster's exact new
+    codepoints. It is never a `set_marks`, whose remove-then-append order cannot express
+    "remove a mark and put it back in place".
+  - Edits to clusters the session inserted rewrite that insert's payload.
+  - Deleting something the session inserted removes its insert, and the user's edits on and
+    inside it. Deleting an item drops the user's edits inside it, which would otherwise be an
+    overlap error.
+  - `set_width` and `set_stretch` with `None` drop the user's value, so the lower layers'
+    value applies again.
+- **Rule 11.** No edit is refused for being non-canonical. The only errors are a target that is
+  not in the current text (unknown or deleted), a mark the cluster does not carry, and an
+  empty cluster.
+- **Undo and redo** keep whole overlay snapshots. An edit that changes nothing adds no history,
+  and a new edit clears the redo stack. Patch ids are `u<n>`, never reused in a session.
+- **Consequence.** A user `replace` records absolute codepoints. Applied over another riwāyah,
+  it gives the codepoints the user saw, not "this mark added". This is deliberate: an export
+  means exactly what was on screen.
