@@ -12,9 +12,13 @@ const BUDGET = 16;
 
 const q = (v: number[], p: number) => [...v].sort((a, b) => a - b)[Math.min(v.length - 1, Math.floor((v.length - 1) * p))];
 
-for (const mushaf of ["hafs/hijazi", "warsh/maghribi"]) {
-  test(`budget ${mushaf}`, async ({ page }) => {
+for (const [mushaf, highlighted] of [["hafs/hijazi", false], ["warsh/maghribi", false], ["warsh/maghribi", true]] as const) {
+  test(`budget ${mushaf}${highlighted ? " highlighted" : ""}`, async ({ page }) => {
     await open(page, mushaf, 100);
+    if (highlighted) {
+      await page.locator("#hl").check();
+      await expect(page.locator("#pageview")).toHaveAttribute("data-overlay", "100");
+    }
     const cdp = await page.context().newCDPSession(page);
     await cdp.send("Emulation.setCPUThrottlingRate", { rate: THROTTLE });
     const r = await page.evaluate(async (n) => {
@@ -32,7 +36,7 @@ for (const mushaf of ["hafs/hijazi", "warsh/maghribi"]) {
     }, SWEEP);
     await cdp.send("Emulation.setCPUThrottlingRate", { rate: 1 });
     const line = (k: string, v: number[]) => `${k} median ${q(v, 0.5).toFixed(1)} ms, p95 ${q(v, 0.95).toFixed(1)} ms, max ${Math.max(...v).toFixed(1)} ms`;
-    console.log(`${mushaf} (CPU /${THROTTLE}, ${SWEEP} pages): ${line("turn", r.turn)}; ${line("engine", r.engine)}`);
+    console.log(`${mushaf}${highlighted ? " highlighted" : ""} (CPU /${THROTTLE}, ${SWEEP} pages): ${line("turn", r.turn)}; ${line("engine", r.engine)}`);
     expect(q(r.turn, 0.95)).toBeLessThanOrEqual(BUDGET);
   });
 }

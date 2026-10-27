@@ -1801,3 +1801,9 @@ Evidence:
 - `just web-bench` (CPU/4, 20 turns each, two runs): turn median 9.7–10.4 ms / p95 15.1–15.3 ms
   (Ḥafṣ), median 7.8–8.5 ms / p95 10.5–12.6 ms (Warsh). The budget is met. The worker's time per
   page (core plus painting) is 22–34 ms median; it runs while the reader reads.
+- Addendum (2026-10-27): with highlighting on, `highlights` compared the whole text on every
+  page (about 200 ms per page in the worker, so quick turns waited). The session now computes
+  the whole text's highlights once per text (`highlights_with`) and keeps those on the page; the
+  output is unchanged (session test, `just web-parity` highlight goldens). Highlighted Warsh:
+  worker 39 ms median, turn p95 15.6 ms. `web-bench` now includes it. A later Ḥafṣ run gave
+  p95 18 ms while another process held a CPU core at 99 %; to be re-measured on a quiet machine.

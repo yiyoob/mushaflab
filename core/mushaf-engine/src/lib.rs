@@ -443,10 +443,6 @@ pub fn highlights(
     page: &DrawPage,
     policy: HighlightPolicy,
 ) -> Vec<mushaf_draw::Highlight> {
-    use mushaf_model::RuleStatus;
-    if page.riwayah == "hafs" {
-        return Vec::new();
-    }
     let mut line_of: BTreeMap<&mushaf_model::ClusterRef, u32> = BTreeMap::new();
     for it in &page.items {
         if let mushaf_draw::DrawItem::Glyph {
@@ -458,9 +454,28 @@ pub fn highlights(
             line_of.entry(c).or_insert(*line);
         }
     }
+    highlights_with(data, spine, resolved, &page.riwayah, policy, |c| {
+        line_of.get(c).copied()
+    })
+}
+
+/// `highlights` over every cluster `line_of` places, in text order. With `|_| Some(0)` it gives
+/// the whole text's highlights once, which a session then filters per page (T8.4).
+pub fn highlights_with(
+    data: &mushaf_model::DataSet,
+    spine: &mushaf_model::Spine,
+    resolved: &Resolved,
+    riwayah: &str,
+    policy: HighlightPolicy,
+    line_of: impl Fn(&mushaf_model::ClusterRef) -> Option<u32>,
+) -> Vec<mushaf_draw::Highlight> {
+    use mushaf_model::RuleStatus;
+    if riwayah == "hafs" {
+        return Vec::new();
+    }
     // Writing conventions are not differences (D46): a Maghribi text is compared in Hijazi
     // writing, and pause signs and the sukun sign's form are ignored.
-    let written = if page.riwayah == "warsh" || page.riwayah == "qalun" {
+    let written = if riwayah == "warsh" || riwayah == "qalun" {
         mushaf_resolve::maghribi_to_hijazi(resolved, spine)
     } else {
         resolved.clone()
@@ -528,7 +543,7 @@ pub fn highlights(
             if muqattaa {
                 break;
             }
-            let Some(line) = line_of.get(&c.id) else {
+            let Some(line) = line_of(&c.id) else {
                 continue;
             };
             let hafs_cps = spine.cluster(&c.id).map(|h| h.cps.clone());
@@ -560,7 +575,7 @@ pub fn highlights(
                 continue;
             }
             out.push(mushaf_draw::Highlight {
-                line: *line,
+                line,
                 cluster: c.id.clone(),
                 label,
                 hafs: hafs_cps

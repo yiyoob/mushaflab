@@ -15,7 +15,7 @@ use mushaf_model::{
 use mushaf_resolve::{Diagnostic, EditLint, EditSession, Origin, Resolved};
 use serde::{Deserialize, Serialize};
 
-use crate::{HighlightPolicy, Renderer, Source, highlights};
+use crate::{HighlightPolicy, Renderer, Source, highlights_with};
 
 /// The author recorded on patches made in the web editor.
 pub const AUTHOR: &str = "owner";
@@ -30,6 +30,7 @@ struct Current {
     overlay: Option<EditOverlay>,
     resolved: Resolved,
     mapping: Mapping,
+    highlights: Option<Vec<mushaf_draw::Highlight>>,
 }
 
 /// An owner approval (rule 4), read from `data/approvals/<riwāyah>.yaml`; shown, never written.
@@ -396,6 +397,7 @@ impl Session {
             overlay,
             resolved,
             mapping,
+            highlights: None,
         });
         Ok(())
     }
@@ -420,17 +422,32 @@ impl Session {
             pages,
             ..
         } = self;
-        let cur = current.as_ref().expect("ensured");
+        let cur = current.as_mut().expect("ensured");
         let fit = renderer.fit_cached(&cur.resolved, &cur.mapping, page, fit_cache)?;
         let mut d = renderer.draw(&fit)?;
         if highlighted {
-            d.highlights = highlights(
-                &renderer.data,
-                &renderer.data.spines[&renderer.profile.spine],
-                &cur.resolved,
-                &d,
-                HighlightPolicy::default(),
-            );
+            // The whole text's highlights, once per text (T8.4); `highlights` restricted to
+            // the clusters drawn on this page, in the same order.
+            let all = cur.highlights.get_or_insert_with(|| {
+                highlights_with(
+                    &renderer.data,
+                    &renderer.data.spines[&renderer.profile.spine],
+                    &cur.resolved,
+                    &renderer.profile.riwayah,
+                    HighlightPolicy::default(),
+                    |_| Some(0),
+                )
+            });
+            let on_page = lines_of(&d);
+            d.highlights = all
+                .iter()
+                .filter_map(|h| {
+                    on_page.get(&h.cluster).map(|l| mushaf_draw::Highlight {
+                        line: *l,
+                        ..h.clone()
+                    })
+                })
+                .collect();
         }
         // Keep the pages nearest this one (a reader pages back and forth around it).
         while pages.len() >= PAGE_CACHE {
