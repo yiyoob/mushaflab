@@ -1454,3 +1454,13 @@ Consequence: Warsh draws 212 of 604 pages in the Ḥijāzī style (was 53), Qāl
 Applying each pick to every place of its form (2,025 places) is my reading of the picks: the owner
 saw one word per form (G-149). Qālūn 12:90:2 with the standing alif was not seen by the owner as
 drawn.
+
+D45 addendum (owner, 2026-10-26, photo IMG_2513): highlighted clusters are drawn letter by letter
+in red (#cc0000) in the SVG and PNG; `cited` stays in the draw list but no longer changes the
+colour. `mushaf-render --highlight` renders a highlighted page.
+D45 addendum 2 (owner, 2026-10-26: "Highlighting is very inaccurate", "You are highlighting
+everywhere there is the ص waqf sign"): highlights no longer come from rule provenance. A word
+cluster is highlighted when it differs from its aligned Ḥafṣ cluster after ignoring pause signs
+(U+06D6–U+06DB), sukūn (present or not), the Maghribi bare lām for Ḥafṣ lām + shadda + fatḥa (1,674 places), the shapes of final yāʾ, hamza on alif written as plain alif with the same vowel, the shadda of idghām with ghunna, and the disjoined letters (owner: "Highlights should only be for Usul and furush differences"), and, for Warsh and Qālūn, the D46 writing conventions.
+Āyah markers are never highlighted. The rule or patch that made the cluster is kept as the label;
+differences with no rule (residual patches) are highlighted too, which closes that part of G-147.

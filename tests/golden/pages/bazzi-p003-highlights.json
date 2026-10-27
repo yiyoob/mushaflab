@@ -163,6 +163,33 @@
   },
   {
     "line": 5,
+    "cluster": "2:9:6:1",
+    "label": "bazzi.2.9.6.1.marks",
+    "hafs": "U+064A U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 5,
+    "cluster": "2:9:6:2",
+    "label": "bazzi.2.9.6.2.marks",
+    "hafs": "U+062E U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 5,
+    "cluster": "2:9:6:3",
+    "label": "bazzi.2.9.6.3.marks",
+    "hafs": "U+062F U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 5,
     "cluster": "2:9:7:3",
     "label": "bazzi.d0005",
     "hafs": "U+0627 U+0653",
@@ -207,6 +234,15 @@
     "annotation": false
   },
   {
+    "line": 6,
+    "cluster": "2:10:3:1",
+    "label": "bazzi.2.10.3.1.marks",
+    "hafs": "U+0645 U+0651 U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
     "line": 7,
     "cluster": "2:10:7:4",
     "label": "bazzi.d0001",
@@ -220,6 +256,33 @@
     "cluster": "2:10:7:4+ins.1",
     "label": "bazzi.d0003",
     "hafs": "",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 7,
+    "cluster": "2:10:12:1",
+    "label": "bazzi.2.10.12.1.marks",
+    "hafs": "U+064A U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 7,
+    "cluster": "2:10:12:2",
+    "label": "bazzi.2.10.12.2.marks",
+    "hafs": "U+0643 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 7,
+    "cluster": "2:10:12:3",
+    "label": "bazzi.2.10.12.3.marks",
+    "hafs": "U+0630 U+0650",
     "cite": null,
     "cited": false,
     "annotation": false
@@ -253,15 +316,6 @@
   },
   {
     "line": 8,
-    "cluster": "2:11:12:1+ins.1",
-    "label": "bazzi.d0030",
-    "hafs": "",
-    "cite": null,
-    "cited": false,
-    "annotation": false
-  },
-  {
-    "line": 8,
     "cluster": "2:12:1:3",
     "label": "bazzi.d0005",
     "hafs": "U+0627 U+0653",
@@ -282,15 +336,6 @@
     "line": 8,
     "cluster": "2:12:2:4+ins.1",
     "label": "bazzi.d0003",
-    "hafs": "",
-    "cite": null,
-    "cited": false,
-    "annotation": false
-  },
-  {
-    "line": 9,
-    "cluster": "2:12:8:1+ins.1",
-    "label": "bazzi.d0031",
     "hafs": "",
     "cite": null,
     "cited": false,
@@ -343,6 +388,15 @@
   },
   {
     "line": 11,
+    "cluster": "2:13:13:1",
+    "label": "bazzi.2.13.13.1.rep",
+    "hafs": "U+0623 U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 11,
     "cluster": "2:13:13:3",
     "label": "bazzi.d0005",
     "hafs": "U+0627 U+0653",
@@ -363,15 +417,6 @@
     "line": 11,
     "cluster": "2:13:14:4+ins.1",
     "label": "bazzi.d0003",
-    "hafs": "",
-    "cite": null,
-    "cited": false,
-    "annotation": false
-  },
-  {
-    "line": 11,
-    "cluster": "2:13:20:1+ins.1",
-    "label": "bazzi.d0032",
     "hafs": "",
     "cite": null,
     "cited": false,
@@ -433,15 +478,6 @@
   },
   {
     "line": 13,
-    "cluster": "2:14:17:1+ins.1",
-    "label": "bazzi.d0033",
-    "hafs": "",
-    "cite": null,
-    "cited": false,
-    "annotation": false
-  },
-  {
-    "line": 13,
     "cluster": "2:15:3:3",
     "label": "bazzi.d0001",
     "hafs": "U+0645 U+06E1",
@@ -495,15 +531,6 @@
     "annotation": false
   },
   {
-    "line": 14,
-    "cluster": "2:15:8:1+ins.1",
-    "label": "bazzi.d0034",
-    "hafs": "",
-    "cite": null,
-    "cited": false,
-    "annotation": false
-  },
-  {
     "line": 15,
     "cluster": "2:16:8:6",
     "label": "bazzi.d0001",
@@ -516,15 +543,6 @@
     "line": 15,
     "cluster": "2:16:8:6+ins.1",
     "label": "bazzi.d0003",
-    "hafs": "",
-    "cite": null,
-    "cited": false,
-    "annotation": false
-  },
-  {
-    "line": 15,
-    "cluster": "2:16:12:1+ins.1",
-    "label": "bazzi.d0035",
     "hafs": "",
     "cite": null,
     "cited": false,

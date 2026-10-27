@@ -163,6 +163,33 @@
   },
   {
     "line": 5,
+    "cluster": "2:9:6:1",
+    "label": "qunbul.2.9.6.1.marks",
+    "hafs": "U+064A U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 5,
+    "cluster": "2:9:6:2",
+    "label": "qunbul.2.9.6.2.marks",
+    "hafs": "U+062E U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 5,
+    "cluster": "2:9:6:3",
+    "label": "qunbul.2.9.6.3.marks",
+    "hafs": "U+062F U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 5,
     "cluster": "2:9:7:3",
     "label": "qunbul.d0005",
     "hafs": "U+0627 U+0653",
@@ -207,6 +234,15 @@
     "annotation": false
   },
   {
+    "line": 6,
+    "cluster": "2:10:3:1",
+    "label": "qunbul.2.10.3.1.marks",
+    "hafs": "U+0645 U+0651 U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
     "line": 7,
     "cluster": "2:10:7:4",
     "label": "qunbul.d0001",
@@ -220,6 +256,33 @@
     "cluster": "2:10:7:4+ins.1",
     "label": "qunbul.d0003",
     "hafs": "",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 7,
+    "cluster": "2:10:12:1",
+    "label": "qunbul.2.10.12.1.marks",
+    "hafs": "U+064A U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 7,
+    "cluster": "2:10:12:2",
+    "label": "qunbul.2.10.12.2.marks",
+    "hafs": "U+0643 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 7,
+    "cluster": "2:10:12:3",
+    "label": "qunbul.2.10.12.3.marks",
+    "hafs": "U+0630 U+0650",
     "cite": null,
     "cited": false,
     "annotation": false
@@ -319,6 +382,15 @@
     "cluster": "2:13:10:3",
     "label": "qunbul.d0005",
     "hafs": "U+0627 U+0653",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 11,
+    "cluster": "2:13:13:1",
+    "label": "qunbul.2.13.13.1.rep",
+    "hafs": "U+0623 U+064E",
     "cite": null,
     "cited": false,
     "annotation": false

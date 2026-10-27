@@ -1,4 +1,7 @@
-//! `mushaf-render --page N --riwayah ID [--style STYLE] [--overlay FILE] [--out DIR] [--width PX]`
+//! `mushaf-render --page N --riwayah ID [--style STYLE] [--overlay FILE] [--out DIR] [--width PX]
+//! [--highlight]`
+//!
+//! `--highlight` draws the clusters that differ from Ḥafṣ in red (D45).
 //!
 //! Writes `<out>/<riwayah>/p<NNN>.svg`, `.png` and `.json` (the draw commands, D4). The default
 //! output directory is `build/render` (untracked).
@@ -15,12 +18,14 @@ fn run() -> Result<(), String> {
     let (mut page, mut riwayah, mut overlay, mut out, mut width) =
         (None, "hafs".to_string(), None, None, 1200u32);
     let mut style: Option<String> = None;
+    let mut highlight = false;
     while let Some(a) = args.next() {
         let mut val = || args.next().ok_or_else(|| format!("{a} needs a value"));
         match a.as_str() {
             "--page" => page = Some(val()?.parse::<u32>().map_err(|e| e.to_string())?),
             "--riwayah" => riwayah = val()?,
             "--style" => style = Some(val()?),
+            "--highlight" => highlight = true,
             "--overlay" => overlay = Some(PathBuf::from(val()?)),
             "--out" => out = Some(PathBuf::from(val()?)),
             "--width" => {
@@ -48,9 +53,15 @@ fn run() -> Result<(), String> {
         }
         None => None,
     };
-    let draw = renderer
-        .render(page, overlay.as_ref())
-        .map_err(|e| e.to_string())?;
+    let draw = if highlight {
+        if overlay.is_some() {
+            return Err("--highlight does not take an overlay".into());
+        }
+        renderer.render_highlighted(page, &Default::default(), Default::default())
+    } else {
+        renderer.render(page, overlay.as_ref())
+    }
+    .map_err(|e| e.to_string())?;
     let svg = mushaf_render::svg(&draw);
     let dir = out
         .unwrap_or_else(|| repo.join("build/render"))

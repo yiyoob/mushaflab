@@ -1,7 +1,9 @@
 //! Review aid: every word of a Maghribi riwāyah after the Hijazi conventions (D46), as
 //! `id<TAB>cluster|cluster|...` with clusters written `U+XXXX U+XXXX`.
 //!
-//!     cargo run --release --example hijazi_dump -- <repo> <riwayah>
+//!     cargo run --release --example hijazi_dump -- <repo> <riwayah> [unmapped]
+//!
+//! With `unmapped`, prints instead each word that has no encoding row, with the cluster.
 
 use std::path::Path;
 
@@ -9,9 +11,13 @@ use mushaf_model::{Cps, ItemKind};
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
-    let [repo, riwayah] = args.as_slice() else {
-        eprintln!("usage: hijazi_dump <repo> <riwayah>");
-        std::process::exit(2);
+    let (repo, riwayah, unmapped) = match args.as_slice() {
+        [a, b] => (a, b, false),
+        [a, b, m] if m == "unmapped" => (a, b, true),
+        _ => {
+            eprintln!("usage: hijazi_dump <repo> <riwayah> [unmapped]");
+            std::process::exit(2);
+        }
     };
     let r = mushaf_render::Renderer::load_style(Path::new(repo), riwayah, "hijazi").unwrap();
     for it in r.base.items.iter().filter(|i| i.kind == ItemKind::Word) {
@@ -20,6 +26,13 @@ fn main() {
             .iter()
             .map(|c| Cps(c.cps.0.clone()).to_string())
             .collect();
+        if unmapped {
+            let refs: Vec<&[char]> = it.clusters.iter().map(|c| c.cps.0.as_slice()).collect();
+            if let Err(e) = r.table.convert_item(&it.id.to_string(), &refs) {
+                println!("{}\t{}\t{}", it.id, e.cps, cl.join("|"));
+            }
+            continue;
+        }
         println!("{}\t{}", it.id, cl.join("|"));
     }
 }

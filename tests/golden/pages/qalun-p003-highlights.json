@@ -1,15 +1,6 @@
 [
   {
     "line": 1,
-    "cluster": "2:6:2:2",
-    "label": "qalun.d0018",
-    "hafs": "U+0644 U+0651 U+064E",
-    "cite": null,
-    "cited": false,
-    "annotation": false
-  },
-  {
-    "line": 1,
     "cluster": "2:6:6:1",
     "label": "qalun.d0180",
     "hafs": "U+0621 U+064E",
@@ -36,55 +27,55 @@
     "annotation": false
   },
   {
-    "line": 4,
-    "cluster": "2:8:3:2",
-    "label": "qalun.d0024",
-    "hafs": "U+0646",
-    "cite": null,
-    "cited": false,
-    "annotation": false
-  },
-  {
-    "line": 4,
-    "cluster": "2:8:6:2",
-    "label": "qalun.d0008",
-    "hafs": "U+0671",
-    "cite": null,
-    "cited": false,
-    "annotation": false
-  },
-  {
-    "line": 4,
-    "cluster": "2:8:7:3",
-    "label": "qalun.d0008",
-    "hafs": "U+0671",
+    "line": 5,
+    "cluster": "2:9:6:1",
+    "label": "qalun.2.9.6.1.marks",
+    "hafs": "U+064A U+064E",
     "cite": null,
     "cited": false,
     "annotation": false
   },
   {
     "line": 5,
-    "cluster": "2:9:3:2",
-    "label": "qalun.d0007",
-    "hafs": "U+0671",
+    "cluster": "2:9:6:2",
+    "label": "qalun.2.9.6.2.marks",
+    "hafs": "U+062E U+06E1",
     "cite": null,
     "cited": false,
     "annotation": false
   },
   {
     "line": 5,
-    "cluster": "2:9:3:3",
-    "label": "qalun.d0018",
-    "hafs": "U+0644 U+0651 U+064E",
+    "cluster": "2:9:6:3",
+    "label": "qalun.2.9.6.3.marks",
+    "hafs": "U+062F U+064E",
     "cite": null,
     "cited": false,
     "annotation": false
   },
   {
-    "line": 6,
-    "cluster": "2:10:6:3",
-    "label": "qalun.d0228",
-    "hafs": "U+0636 U+0657",
+    "line": 7,
+    "cluster": "2:10:12:1",
+    "label": "qalun.2.10.12.1.marks",
+    "hafs": "U+064A U+064E",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 7,
+    "cluster": "2:10:12:2",
+    "label": "qalun.2.10.12.2.marks",
+    "hafs": "U+0643 U+06E1",
+    "cite": null,
+    "cited": false,
+    "annotation": false
+  },
+  {
+    "line": 7,
+    "cluster": "2:10:12:3",
+    "label": "qalun.2.10.12.3.marks",
+    "hafs": "U+0630 U+0650",
     "cite": null,
     "cited": false,
     "annotation": false
@@ -126,19 +117,10 @@
     "annotation": false
   },
   {
-    "line": 10,
-    "cluster": "2:13:12:7",
-    "label": "qalun.d0232",
-    "hafs": "U+0621 U+064F U+06D7",
-    "cite": null,
-    "cited": false,
-    "annotation": false
-  },
-  {
-    "line": 12,
-    "cluster": "2:14:3:2",
-    "label": "qalun.d0018",
-    "hafs": "U+0644 U+0651 U+064E",
+    "line": 11,
+    "cluster": "2:13:13:1",
+    "label": "qalun.2.13.13.1.rep",
+    "hafs": "U+0623 U+064E",
     "cite": null,
     "cited": false,
     "annotation": false
@@ -166,24 +148,6 @@
     "cluster": "2:15:2:6",
     "label": "qalun.d0236",
     "hafs": "U+0626 U+064F",
-    "cite": null,
-    "cited": false,
-    "annotation": false
-  },
-  {
-    "line": 14,
-    "cluster": "2:16:2:2",
-    "label": "qalun.d0018",
-    "hafs": "U+0644 U+0651 U+064E",
-    "cite": null,
-    "cited": false,
-    "annotation": false
-  },
-  {
-    "line": 15,
-    "cluster": "2:16:5:2",
-    "label": "qalun.d0008",
-    "hafs": "U+0671",
     "cite": null,
     "cited": false,
     "annotation": false

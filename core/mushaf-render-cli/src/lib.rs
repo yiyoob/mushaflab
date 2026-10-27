@@ -359,7 +359,7 @@ pub fn highlights(
     page: &DrawPage,
     policy: HighlightPolicy,
 ) -> Vec<mushaf_draw::Highlight> {
-    use mushaf_model::{DifferenceKind, RuleStatus};
+    use mushaf_model::RuleStatus;
     if page.riwayah == "hafs" {
         return Vec::new();
     }
@@ -374,57 +374,119 @@ pub fn highlights(
             line_of.entry(c).or_insert(*line);
         }
     }
-    let farsh: BTreeMap<&str, &mushaf_model::Patch> = data
-        .patch_files
-        .values()
-        .flat_map(|f| &f.patches)
-        .filter(|p| p.source.kind == "farsh")
-        .map(|p| (p.id.as_str(), p))
-        .collect();
+    // Writing conventions are not differences (D46): a Maghribi text is compared in Hijazi
+    // writing, and pause signs and the sukun sign's form are ignored.
+    let written = if page.riwayah == "warsh" || page.riwayah == "qalun" {
+        mushaf_resolve::maghribi_to_hijazi(resolved, spine)
+    } else {
+        resolved.clone()
+    };
+    // Sukun is ignored outright: Hafs leaves it off before an assimilated letter, the Maghribi
+    // print writes it (owner, 2026-10-26: أَنْ is not a difference).
+    let norm = |cps: &[char]| -> Vec<char> {
+        cps.iter()
+            .filter(|c| !('\u{06D6}'..='\u{06DB}').contains(*c))
+            .filter(|c| !matches!(c, '\u{0652}' | '\u{06E1}'))
+            // the three shapes of final ya are one letter (spelling, not reading)
+            .map(|c| match c {
+                '\u{0649}' | '\u{06D2}' => '\u{064A}',
+                // hamza on alif written as alif + the same vowel (spelling); a lost vowel
+                // (ibdal, tashil) still differs
+                '\u{0623}' | '\u{0625}' => '\u{0627}',
+                c => *c,
+            })
+            .collect()
+    };
+    // The Maghribi print writes a bare lam where Hafs has lam + shadda + fatha (ٱلَّذِي, لِلَّهِ;
+    // 1,674 places in both Warsh and Qalun; owner, 2026-10-26: not a difference).
+    // The Maghribi print also writes the shadda of idgham with ghunna on a word's first letter
+    // after nun or tanwin, where Hafs leaves it off (مَن يَّقُولُ / مَن يَقُولُ): same reading.
+    let same = |h: &[char], w: &[char], after_nun: bool| {
+        let (h, w) = (norm(h), norm(w));
+        let unshadda =
+            |x: &[char]| -> Vec<char> { x.iter().filter(|c| **c != '\u{0651}').copied().collect() };
+        h == w
+            || (w == ['\u{0644}'] && h == ['\u{0644}', '\u{0651}', '\u{064E}'])
+            || (after_nun && !h.contains(&'\u{0651}') && unshadda(&w) == h)
+    };
+    let ends_in_nun = |cps: &[char]| {
+        let n = norm(cps);
+        (n.first() == Some(&'\u{0646}') && n.len() == 1)
+            || n.iter()
+                .any(|c| matches!(c, '\u{064B}'..='\u{064D}' | '\u{08F0}'..='\u{08F2}'))
+    };
+    let mut prev_last: Option<Vec<char>> = None;
     let mut out = Vec::new();
-    for item in &resolved.items {
-        for c in &item.clusters {
+    for item in written
+        .items
+        .iter()
+        .filter(|i| i.kind == mushaf_model::ItemKind::Word)
+    {
+        // The disjoined letters (الٓمٓ …) carry vowels in the Maghribi print only: same reading.
+        // In Hafs they are the words with a maddah and no vowel at all.
+        let hafs_word: Vec<char> = item
+            .clusters
+            .iter()
+            .filter_map(|c| spine.cluster(&c.id))
+            .flat_map(|h| h.cps.0.iter().copied())
+            .collect();
+        let muqattaa = hafs_word.contains(&'\u{0653}')
+            && !hafs_word
+                .iter()
+                .any(|c| matches!(c, '\u{064B}'..='\u{0650}' | '\u{08F0}'..='\u{08F2}'));
+        let after_nun = prev_last.as_deref().is_some_and(ends_in_nun);
+        prev_last = item
+            .clusters
+            .last()
+            .and_then(|c| spine.cluster(&c.id))
+            .map(|h| h.cps.0.clone());
+        for (k, c) in item.clusters.iter().enumerate() {
+            if muqattaa {
+                break;
+            }
             let Some(line) = line_of.get(&c.id) else {
                 continue;
             };
             let hafs_cps = spine.cluster(&c.id).map(|h| h.cps.clone());
-            let hafs = hafs_cps
+            if hafs_cps
                 .as_ref()
-                .map(ToString::to_string)
-                .unwrap_or_default();
-            let annotation = hafs_cps.as_ref() == Some(&c.cps);
-            for pid in &c.provenance {
-                let found = match pid.split_once('@') {
-                    Some((rule, _)) => data.register.entry(rule).and_then(|e| {
-                        let kind_ok = !matches!(
-                            e.difference_kind,
-                            Some(DifferenceKind::Encoding | DifferenceKind::Spelling)
-                        );
-                        let cited = e.status == RuleStatus::RuleDerived && e.source.is_some();
-                        let cite = e.source.as_ref().map(|s| match s.volume {
-                            Some(v) => format!("{}, vol {v}, p. {}", s.book, s.page),
-                            None => format!("{}, p. {}", s.book, s.page),
-                        });
-                        (kind_ok && (cited || policy.hypotheses))
-                            .then(|| (rule.to_string(), cite, cited))
-                    }),
-                    None => farsh
-                        .get(pid.as_str())
-                        .map(|p| (p.id.clone(), Some(p.source.reference.clone()), true)),
-                };
-                if let Some((label, cite, cited)) = found {
-                    out.push(mushaf_draw::Highlight {
-                        line: *line,
-                        cluster: c.id.clone(),
-                        label,
-                        hafs: hafs.clone(),
-                        cite,
-                        cited,
-                        annotation,
-                    });
-                    break;
-                }
+                .is_some_and(|h| same(&h.0, &c.cps.0, k == 0 && after_nun))
+            {
+                continue;
             }
+            let rule = c.provenance.iter().find_map(|pid| {
+                let (rule, _) = pid.split_once('@')?;
+                let e = data.register.entry(rule)?;
+                let cited = e.status == RuleStatus::RuleDerived && e.source.is_some();
+                let cite = e.source.as_ref().map(|s| match s.volume {
+                    Some(v) => format!("{}, vol {v}, p. {}", s.book, s.page),
+                    None => format!("{}, p. {}", s.book, s.page),
+                });
+                Some((rule.to_string(), cite, cited))
+            });
+            let (label, cite, cited) = match rule {
+                Some(r) => r,
+                None => (
+                    c.provenance.first().cloned().unwrap_or_default(),
+                    None,
+                    false,
+                ),
+            };
+            if !cited && !policy.hypotheses {
+                continue;
+            }
+            out.push(mushaf_draw::Highlight {
+                line: *line,
+                cluster: c.id.clone(),
+                label,
+                hafs: hafs_cps
+                    .as_ref()
+                    .map(ToString::to_string)
+                    .unwrap_or_default(),
+                cite,
+                cited,
+                annotation: false,
+            });
         }
     }
     out

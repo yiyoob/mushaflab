@@ -1182,7 +1182,6 @@ fn style_availability_audit() {
 #[test]
 #[ignore = "run by `just golden` (release)"]
 fn highlight_pairs_per_riwayah() {
-    use mushaf_model::DifferenceKind;
     use mushaf_render::HighlightPolicy;
     use std::collections::BTreeMap;
     let update = std::env::var_os("MUSHAF_UPDATE_GOLDEN").is_some();
@@ -1220,37 +1219,11 @@ fn highlight_pairs_per_riwayah() {
             serde_json::to_string(&plain).unwrap(),
             "{riwayah}: highlighting changed the drawing"
         );
+        // D45 addendum 2: a highlight is a reading difference from Hafs, whatever made it;
+        // labelled with what made it, never cited yet.
         for h in &highlights {
-            let e = r.data.register.entry(&h.label).unwrap();
-            assert!(
-                !matches!(
-                    e.difference_kind,
-                    Some(DifferenceKind::Encoding | DifferenceKind::Spelling)
-                ),
-                "{riwayah}: {} is an encoding/spelling rule",
-                h.label
-            );
+            assert!(!h.label.is_empty(), "{riwayah}: unlabelled highlight");
             assert!(!h.cited, "{riwayah}: {} is shown as cited", h.label);
-        }
-        if riwayah == "warsh" {
-            let resolved = r.resolve(None).unwrap();
-            let encoding_rules: Vec<&str> = resolved
-                .items
-                .iter()
-                .flat_map(|i| &i.clusters)
-                .flat_map(|c| &c.provenance)
-                .filter_map(|p| p.split_once('@').map(|x| x.0))
-                .filter(|rule| {
-                    r.data.register.entry(rule).and_then(|e| e.difference_kind)
-                        == Some(DifferenceKind::Encoding)
-                })
-                .collect();
-            assert!(!encoding_rules.is_empty(), "warsh applies encoding rules");
-            assert!(
-                highlights
-                    .iter()
-                    .all(|h| !encoding_rules.contains(&h.label.as_str()))
-            );
         }
         let name = format!("{riwayah}-p{page:03}-highlights");
         let path = repo().join(format!("tests/golden/pages/{name}.json"));
