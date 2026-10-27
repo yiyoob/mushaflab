@@ -486,6 +486,8 @@ pub fn highlights_with(
         cps.iter()
             .filter(|c| !('\u{06D6}'..='\u{06DB}').contains(*c))
             .filter(|c| !matches!(c, '\u{0652}' | '\u{06E1}'))
+            // madd length (qasr, tawassut, tul) is not highlighted (owner, 2026-10-27)
+            .filter(|c| **c != '\u{0653}')
             // the three shapes of final ya are one letter (spelling, not reading)
             .map(|c| match c {
                 '\u{0649}' | '\u{06D2}' => '\u{064A}',
