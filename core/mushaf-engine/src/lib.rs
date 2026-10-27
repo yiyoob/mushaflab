@@ -585,6 +585,7 @@ pub fn highlights_with(
                 cite,
                 cited,
                 annotation: false,
+                owner: None,
             });
         }
     }

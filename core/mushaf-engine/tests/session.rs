@@ -227,3 +227,67 @@ fn styles_offer_only_audited_combinations() {
         assert_eq!(offered, e["available"] == true, "{e}");
     }
 }
+
+/// D64: the owner's highlight marks. "Not a difference" removes the core's highlight on that
+/// cluster; "should be highlighted" adds one labelled as the owner's. Only `highlights` changes,
+/// never what is drawn; plain pages are untouched; the marks export and import exactly.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn owner_highlight_marks_change_only_the_highlights() {
+    use mushaf_engine::session::HighlightMark;
+    let repo = repo();
+    let mut s = Session::new(&repo, Renderer::load(&repo, "warsh").unwrap(), "maghribi");
+    let before = s.render(3, true).unwrap();
+    let plain = json(&s.render(3, false).unwrap());
+    let core = before.highlights[0].clone();
+    // a drawn cluster the core does not highlight
+    let highlighted: std::collections::BTreeSet<_> = before
+        .highlights
+        .iter()
+        .map(|h| h.cluster.clone())
+        .collect();
+    let other = s
+        .inspect(3)
+        .unwrap()
+        .clusters
+        .into_iter()
+        .find(|c| !highlighted.contains(&c.id))
+        .unwrap()
+        .id;
+    s.set_highlight_mark(
+        core.cluster.clone(),
+        Some(HighlightMark {
+            show: false,
+            note: "test".into(),
+        }),
+    );
+    s.set_highlight_mark(
+        other.clone(),
+        Some(HighlightMark {
+            show: true,
+            note: "why".into(),
+        }),
+    );
+    let after = s.render(3, true).unwrap();
+    assert!(after.highlights.iter().all(|h| h.cluster != core.cluster));
+    let added = after
+        .highlights
+        .iter()
+        .find(|h| h.cluster == other)
+        .unwrap();
+    assert_eq!(added.owner.as_deref(), Some("why"));
+    assert_eq!(after.highlights.len(), before.highlights.len());
+    let strip = |mut d: mushaf_draw::DrawPage| {
+        d.highlights.clear();
+        json(&d)
+    };
+    assert_eq!(strip(after.clone()), strip(before.clone()));
+    assert_eq!(json(&s.render(3, false).unwrap()), plain);
+    // export, clear, import: the same highlights
+    let text = s.export_highlight_marks().unwrap();
+    s.set_highlight_mark(core.cluster.clone(), None);
+    s.set_highlight_mark(other.clone(), None);
+    assert_eq!(json(&s.render(3, true).unwrap()), json(&before));
+    s.import_highlight_marks(&text).unwrap();
+    assert_eq!(json(&s.render(3, true).unwrap()), json(&after));
+}

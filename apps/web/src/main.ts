@@ -4,7 +4,7 @@
 import { call, callJson, callTimed } from "./engine";
 
 type StyleOption = { riwayah: string; style: string; default: boolean };
-type Highlight = { line: number; cluster: string; label: string; hafs: string; cite: string | null; cited: boolean; annotation: boolean };
+type Highlight = { line: number; cluster: string; label: string; hafs: string; cite: string | null; cited: boolean; annotation: boolean; owner?: string };
 type View = { page: number; riwayah: string; canonical: boolean; height: number; baselines: [number, number][]; svg: string; highlights: Highlight[] };
 type OptionGroup = { id: string; title_ar: string; choices: string[]; default: string | null; current: string | null };
 type MarginNote = { group: string; title_ar: string; choice: string; line: number; cluster: string; text: string; current_text: string; annotations: Record<string, string>; current_annotations: Record<string, string>; word: string | null; word_error: string | null };
@@ -253,8 +253,9 @@ ui.view.addEventListener("click", (e) => {
       (h) => `<div class="hl ${h.cited ? "cited" : "hypothesis"}">
         <div><b>${esc(h.label)}</b> <code>${esc(h.cluster)}</code></div>
         <div>Ḥafṣ: <code>${h.hafs ? esc(h.hafs) : "(inserted, no Ḥafṣ cluster)"}</code></div>
-        <div>${h.cite ? `Source: ${esc(h.cite)}` : "Hypothesis: no citation yet"}</div>
+        <div>${h.owner !== undefined ? "Marked by you, not by a rule" : h.cite ? `Source: ${esc(h.cite)}` : "Hypothesis: no citation yet"}</div>
         ${h.annotation ? "<div>Pronunciation only (annotation)</div>" : ""}
+        ${h.owner !== undefined ? `<div><b>Your mark</b>${h.owner ? `: ${esc(h.owner)}` : ""}</div>` : ""}
       </div>`,
     )
     .join("");
@@ -385,6 +386,18 @@ async function showEditor() {
     </div>
     <p>${st.edits} edit(s). ${st.edits ? "The page carries the “edited” marker." : ""}</p>
     <div id="edit-error" class="error"></div>
+    <h3>Highlights</h3>
+    <div class="ops" ${sel ? "" : "hidden"}>
+      <button id="hm-off">Not a difference</button>
+      <button id="hm-on">Should be highlighted</button>
+      <button id="hm-clear">Clear my mark</button>
+      <label>Note <input id="hm-note" size="24" placeholder="why (optional)"/></label>
+    </div>
+    <div id="hm-list"></div>
+    <div class="ops">
+      <button id="hm-exp">Export highlight marks</button>
+      <label class="file">Import highlight marks <input id="hm-imp" type="file" accept=".yaml,.yml"/></label>
+    </div>
     ${lint.length ? `<h3>Lint (advisory)</h3><ul>${lint.map((l) => `<li><code>${esc(String(l.item))}</code> ${esc(l.change)}${l.matches.length ? ` — matches ${esc(l.matches.join(", "))}` : ""}</li>`).join("")}</ul>` : ""}`;
   ui.panelBody.querySelectorAll<HTMLButtonElement>("button[data-op]").forEach((b) => (b.onclick = () => applyEdit(b.dataset.op!)));
   const pick = (id: string) => {
@@ -425,6 +438,36 @@ async function showEditor() {
     .join("");
   $("word-list").querySelectorAll<HTMLButtonElement>(".w-btn").forEach((b) => (b.onclick = () => pick(byWord.get(b.dataset.w!)!.clusters[0].id)));
   $("word-list").querySelectorAll<HTMLButtonElement>(".c-btn").forEach((b) => (b.onclick = () => pick(b.dataset.c!)));
+  // The owner's highlight marks (D64): display and feedback only, computed by the core.
+  const marks = await callJson<{ cluster: string; show: boolean; note: string }[]>("highlight_marks");
+  $("hm-list").innerHTML = marks.length
+    ? `<ul>${marks.map((m) => `<li><code>${esc(m.cluster)}</code> ${m.show ? "should be highlighted" : "not a difference"}${m.note ? ` — ${esc(m.note)}` : ""}</li>`).join("")}</ul>`
+    : "<p>No highlight marks.</p>";
+  const mark = async (m: { show: boolean; note: string } | null) => {
+    await call("set_highlight_mark", sel, JSON.stringify(m));
+    if (!ui.hl.checked) {
+      ui.hl.checked = true;
+      store.set(hlKey(), "1");
+    }
+    invalidate();
+    await render();
+  };
+  const note = () => $<HTMLInputElement>("hm-note").value;
+  $("hm-off").onclick = () => mark({ show: false, note: note() });
+  $("hm-on").onclick = () => mark({ show: true, note: note() });
+  $("hm-clear").onclick = () => mark(null);
+  $("hm-exp").onclick = async () => download(`highlights-${state.mushaf.replace("/", "-")}.yaml`, await call<string>("export_highlight_marks"), "text/yaml");
+  $<HTMLInputElement>("hm-imp").onchange = async (e) => {
+    const f = (e.target as HTMLInputElement).files?.[0];
+    if (!f) return;
+    try {
+      await call("import_highlight_marks", await f.text());
+      invalidate();
+      await render();
+    } catch (err) {
+      $("edit-error").textContent = String(err);
+    }
+  };
   $("exp-yaml").onclick = async () => download(`edits-${state.mushaf.replace("/", "-")}.yaml`, await call<string>("export_edits"), "text/yaml");
   $<HTMLInputElement>("imp-yaml").onchange = async (e) => {
     const f = (e.target as HTMLInputElement).files?.[0];

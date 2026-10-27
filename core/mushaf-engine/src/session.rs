@@ -57,6 +57,8 @@ pub struct Session {
     edits: EditSession,
     current: Option<Current>,
     fit_cache: FitCache,
+    /// The owner's highlight marks by cluster (D64).
+    marks: BTreeMap<ClusterRef, HighlightMark>,
     /// The margin's differences for a set of choices (D60).
     margin: Option<(Choices, Vec<MarginDiff>)>,
     /// Pages drawn for the current choices and edits, by (page, highlighted) (T8.4).
@@ -159,6 +161,35 @@ pub struct MarginNote {
     /// to the font's encoding (reported, never guessed).
     pub word: Option<DrawWord>,
     pub word_error: Option<String>,
+}
+
+/// The owner's mark on a cluster's highlight (D64): `show: false` = "not a difference",
+/// `show: true` = "should be highlighted". Display and feedback only: it never changes the text
+/// or the drawing, and it is not data until the owner gives a source (rules 1 and 4).
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct HighlightMark {
+    pub show: bool,
+    #[serde(default)]
+    pub note: String,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct MarkFile {
+    riwayah: String,
+    style: String,
+    spine: String,
+    marks: Vec<MarkRow>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct MarkRow {
+    cluster: ClusterRef,
+    show: bool,
+    #[serde(default)]
+    note: String,
 }
 
 struct MarginDiff {
@@ -362,6 +393,7 @@ impl Session {
             fit_cache: FitCache::default(),
             margin: None,
             pages: BTreeMap::new(),
+            marks: BTreeMap::new(),
             approvals,
         }
     }
@@ -420,6 +452,7 @@ impl Session {
             current,
             fit_cache,
             pages,
+            marks,
             ..
         } = self;
         let cur = current.as_mut().expect("ensured");
@@ -448,6 +481,40 @@ impl Session {
                     })
                 })
                 .collect();
+            // The owner's marks (D64): drop the core's highlight where the owner says it is
+            // not a difference; add one, labelled as the owner's, where they say it is.
+            d.highlights
+                .retain(|h| marks.get(&h.cluster).is_none_or(|m| m.show));
+            for h in &mut d.highlights {
+                if let Some(m) = marks.get(&h.cluster) {
+                    h.owner = Some(m.note.clone());
+                }
+            }
+            let spine = &renderer.data.spines[&renderer.profile.spine];
+            let shown: std::collections::BTreeSet<ClusterRef> =
+                d.highlights.iter().map(|h| h.cluster.clone()).collect();
+            let mut added: Vec<mushaf_draw::Highlight> = on_page
+                .iter()
+                .filter(|(c, _)| !shown.contains(*c))
+                .filter_map(|(c, l)| {
+                    let m = marks.get(c).filter(|m| m.show)?;
+                    Some(mushaf_draw::Highlight {
+                        line: *l,
+                        cluster: c.clone(),
+                        label: "owner".into(),
+                        hafs: spine
+                            .cluster(c)
+                            .map(|h| h.cps.to_string())
+                            .unwrap_or_default(),
+                        cite: None,
+                        cited: false,
+                        annotation: false,
+                        owner: Some(m.note.clone()),
+                    })
+                })
+                .collect();
+            added.sort_by(|a, b| (a.line, &a.cluster).cmp(&(b.line, &b.cluster)));
+            d.highlights.extend(added);
         }
         // Keep the pages nearest this one (a reader pages back and forth around it).
         while pages.len() >= PAGE_CACHE {
@@ -905,6 +972,63 @@ impl Session {
                 Ok(())
             }
         }
+    }
+
+    /// Sets (or with `None` clears) the owner's highlight mark on a cluster (D64).
+    pub fn set_highlight_mark(&mut self, cluster: ClusterRef, mark: Option<HighlightMark>) {
+        match mark {
+            Some(m) => self.marks.insert(cluster, m),
+            None => self.marks.remove(&cluster),
+        };
+        self.pages.retain(|(_, highlighted), _| !highlighted);
+    }
+
+    pub fn highlight_marks(&self) -> &BTreeMap<ClusterRef, HighlightMark> {
+        &self.marks
+    }
+
+    /// The marks as YAML, for the owner to send (D64).
+    pub fn export_highlight_marks(&self) -> Result<String, Error> {
+        mushaf_model::to_yaml(&MarkFile {
+            riwayah: self.renderer.profile.riwayah.clone(),
+            style: self.style.clone(),
+            spine: self.renderer.profile.spine.clone(),
+            marks: self
+                .marks
+                .iter()
+                .map(|(c, m)| MarkRow {
+                    cluster: c.clone(),
+                    show: m.show,
+                    note: m.note.clone(),
+                })
+                .collect(),
+        })
+    }
+
+    /// Replaces the marks with an exported file of the same riwāyah and spine.
+    pub fn import_highlight_marks(&mut self, text: &str) -> Result<(), Error> {
+        let f: MarkFile = mushaf_model::from_yaml(text)?;
+        if f.riwayah != self.renderer.profile.riwayah || f.spine != self.renderer.profile.spine {
+            return Err(Error::new(format!(
+                "highlight marks are for {} on {}, not {} on {}",
+                f.riwayah, f.spine, self.renderer.profile.riwayah, self.renderer.profile.spine
+            )));
+        }
+        self.marks = f
+            .marks
+            .into_iter()
+            .map(|r| {
+                (
+                    r.cluster,
+                    HighlightMark {
+                        show: r.show,
+                        note: r.note,
+                    },
+                )
+            })
+            .collect();
+        self.pages.retain(|(_, highlighted), _| !highlighted);
+        Ok(())
     }
 
     /// The number of patches in the edit overlay.

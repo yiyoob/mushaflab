@@ -207,3 +207,23 @@ test("editing: a tap on the page reaches the page, and a word can be picked from
   await page.locator("#word-list .c-btn").first().click();
   await expect(page.locator("#pageview use.selected").first()).toBeAttached();
 });
+
+test("highlight marks: not a difference removes a highlight, should be highlighted adds one", async ({ page }) => {
+  await open(page, "warsh/maghribi", 3);
+  await page.locator("#hl").check();
+  await expect.poll(() => page.evaluate(() => window.mushaf.state.view?.highlights.length ?? 0)).toBeGreaterThan(0);
+  const first = (await page.evaluate(() => window.mushaf.state.view!.highlights[0]))!;
+  await page.locator("#btn-edit").click();
+  await page.locator("#pick-id").fill(first.cluster);
+  await page.locator("#pick-go").click();
+  await expect(page.locator("#sel")).toHaveText(first.cluster);
+  await page.locator("#hm-off").click();
+  await expect.poll(() => page.evaluate((c) => window.mushaf.state.view!.highlights.some((h) => h.cluster === c), first.cluster)).toBe(false);
+  await expect(page.locator("#hm-list")).toContainText("not a difference");
+  await page.locator("#hm-on").click();
+  await expect.poll(() => page.evaluate((c) => window.mushaf.state.view!.highlights.find((h) => h.cluster === c)?.owner, first.cluster)).toBe("");
+  const [dl] = await Promise.all([page.waitForEvent("download"), page.locator("#hm-exp").click()]);
+  expect((await import("node:fs")).readFileSync((await dl.path())!, "utf8")).toContain(first.cluster);
+  // marks change no text: the page is still canonical
+  await expect(page.locator("#pageview")).toHaveAttribute("data-canonical", "true");
+});

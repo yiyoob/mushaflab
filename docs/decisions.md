@@ -1816,3 +1816,20 @@ Evidence:
   5 ms for the Maghribi defaults (WASM, Node): DigitalKhatt with full justification against the
   KFGQPC font's spacing only. Drawing ahead hides it. `web-bench` now includes Warsh Ḥijāzī; its
   runs on 2026-10-27 were taken while another process held a CPU core and are not reliable.
+
+## D64: The owner's highlight marks in the web editor (T8.3)
+Status: accepted (owner, 2026-10-27: "add something where i can change highlights"; chose
+"mark a highlighted word as not a difference, or an unhighlighted word as should be
+highlighted, with an optional note")
+Decision:
+- `Session::set_highlight_mark(cluster, Some(HighlightMark { show, note }) | None)`.
+  `show: false` drops the core's highlight on that cluster. `show: true` keeps or adds one; an
+  added one has label `owner`. Either way the highlight carries `owner: Some(note)`.
+  `Highlight::owner` is omitted from JSON when `None`, so every golden is unchanged.
+- Display and feedback only: marks change no text and no drawing, so the page stays canonical
+  and has no edited marker. They are not data: a mark becomes a rule or normalisation change
+  only with a source (rules 1, 4).
+- Exported and imported as YAML (`riwayah`, `style`, `spine`, `marks`) from the editor, apart
+  from the text edits' overlay file.
+Evidence: `cargo test -p mushaf-engine --test session -- --ignored owner_highlight` (marks change
+only `highlights`; export/import round-trips); Playwright `highlight marks`; `just web-parity`.

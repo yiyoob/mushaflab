@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use mushaf_engine::bundle::Bundle;
-use mushaf_engine::session::{EditOp, Session};
+use mushaf_engine::session::{EditOp, HighlightMark, Session};
 use mushaf_engine::{Renderer, Source};
 use mushaf_model::DataSet;
 use serde::Serialize;
@@ -156,6 +156,33 @@ impl Api {
         self.s()?.import_edits(text).map_err(err)
     }
 
+    /// The owner's highlight mark on a cluster (D64): `{"show":bool,"note":"..."}`, or `null`
+    /// to clear it.
+    pub fn set_highlight_mark(&mut self, cluster: &str, mark: &str) -> Res<()> {
+        let c = cluster.parse().map_err(err)?;
+        let m: Option<HighlightMark> = serde_json::from_str(mark).map_err(err)?;
+        self.s()?.set_highlight_mark(c, m);
+        Ok(())
+    }
+
+    pub fn highlight_marks(&mut self) -> Res<String> {
+        let marks: Vec<_> = self
+            .s()?
+            .highlight_marks()
+            .iter()
+            .map(|(c, m)| serde_json::json!({"cluster": c.to_string(), "show": m.show, "note": m.note}))
+            .collect();
+        json(&marks)
+    }
+
+    pub fn export_highlight_marks(&mut self) -> Res<String> {
+        self.s()?.export_highlight_marks().map_err(err)
+    }
+
+    pub fn import_highlight_marks(&mut self, text: &str) -> Res<()> {
+        self.s()?.import_highlight_marks(text).map_err(err)
+    }
+
     pub fn lint(&mut self) -> Res<String> {
         json(&self.s()?.lint().map_err(err)?)
     }
@@ -220,6 +247,18 @@ impl Engine {
     }
     pub fn import_edits(&mut self, text: &str) -> Result<(), JsError> {
         self.0.import_edits(text).map_err(js)
+    }
+    pub fn set_highlight_mark(&mut self, cluster: &str, mark: &str) -> Result<(), JsError> {
+        self.0.set_highlight_mark(cluster, mark).map_err(js)
+    }
+    pub fn highlight_marks(&mut self) -> Result<String, JsError> {
+        self.0.highlight_marks().map_err(js)
+    }
+    pub fn export_highlight_marks(&mut self) -> Result<String, JsError> {
+        self.0.export_highlight_marks().map_err(js)
+    }
+    pub fn import_highlight_marks(&mut self, text: &str) -> Result<(), JsError> {
+        self.0.import_highlight_marks(text).map_err(js)
     }
     pub fn lint(&mut self) -> Result<String, JsError> {
         self.0.lint().map_err(js)
