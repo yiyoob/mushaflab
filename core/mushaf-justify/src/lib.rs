@@ -35,7 +35,7 @@ pub type Tag = [u8; 4];
 /// Feature values per character index of the line text.
 pub type Features = BTreeMap<usize, BTreeMap<Tag, u32>>;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Params {
     /// How far spaces grow, in 1/1000 of their normal width, before letters stretch
     /// (DigitalKhatt's reference: 1000).
@@ -66,7 +66,7 @@ pub enum SpaceKind {
 }
 
 /// A line to justify: the text in the font's encoding, words separated by U+0020.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct LineInput {
     pub text: Vec<char>,
     /// Characters the automatic justifier must not touch (manual overrides, D15).

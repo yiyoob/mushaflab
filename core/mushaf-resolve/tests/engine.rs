@@ -488,3 +488,38 @@ fn the_synthetic_fixture_stack_resolves_cleanly() {
         (Some(500), Some(-120))
     );
 }
+
+#[test]
+fn only_the_user_layer_takes_a_content_and_an_attribute_patch_on_one_key() {
+    let rep = payload("{kind: \"letter\", cps: \"U+0078\"}");
+    let wid = payload("{width_em_delta: 30}");
+    for level in ["riwayah", "tariq", "qiraah"] {
+        let ps = [
+            patch("a", level, "replace", "1:1:1:1", &rep),
+            patch("b", level, "set_attr", "1:1:1:1", &wid),
+        ];
+        assert!(
+            matches!(run(&ps, Mode::Free), Err(ResolveError::Conflict { .. })),
+            "{level}"
+        );
+    }
+    let ps = [
+        patch("b", "user", "set_attr", "1:1:1:1", &wid),
+        patch("a", "user", "replace", "1:1:1:1", &rep),
+    ];
+    let r = run(&ps, Mode::Free).unwrap();
+    let c = &r.items[0].clusters[0];
+    assert_eq!(
+        (c.cps.text(), c.attrs.width_em_delta),
+        ("x".into(), Some(30))
+    );
+    assert_eq!(c.provenance, ["a", "b"], "content first, then attributes");
+    let twice = [
+        patch("a", "user", "set_attr", "1:1:1:1", &wid),
+        patch("b", "user", "set_attr", "1:1:1:1", &wid),
+    ];
+    assert!(matches!(
+        run(&twice, Mode::Free),
+        Err(ResolveError::Conflict { .. })
+    ));
+}

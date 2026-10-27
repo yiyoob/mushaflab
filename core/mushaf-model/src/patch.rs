@@ -261,6 +261,14 @@ impl Patch {
             _ => self.target.clone(),
         }
     }
+
+    /// The slot this patch fills in its layer (D53): its key, plus whether it is a user-layer
+    /// `set_attr`. In the user layer a key holds one content patch and one attribute patch, so
+    /// a cluster can be both replaced and widened; every other layer keeps one patch per key.
+    pub fn slot(&self) -> (Ref, bool) {
+        let attr = self.layer() == Layer::User && matches!(self.op, Op::SetAttr(_));
+        (self.key(), attr)
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]

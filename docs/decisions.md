@@ -1533,3 +1533,109 @@ Decision:
 - A data difference the book does not draw is explained in two cases, and both are listed:
   - when one riwāyah of the pair is named in a phonetic clause there;
   - when it is a Maghribī-family pattern that the book does not separate.
+
+## D53: The free-edit API, and two patches per key in the user layer (T7.1, T7.2)
+Status: accepted (owner, 2026-10-27: "Approve D53, D54 and D55")
+Context: T7.1 needs editing operations (add, remove or replace a cluster; add or remove a mark;
+set a word's or a glyph's width) that write the user overlay (D12), with undo and redo that
+restore exact output (rule 8). D9 allows one patch per key per layer, so a cluster could not be
+both replaced and widened by the user.
+Options:
+1. Keep D9 everywhere. A replaced and widened cluster would have to become delete + insert,
+   which gives the user's cluster a new id, so later edits address something else.
+2. Change `replace` to carry attributes. This changes the patch file format for every layer.
+3. In the user layer only, a key holds one content patch and one `set_attr` patch.
+Decision: option 3. Data layers keep one patch per key (tested), so Phase 2 to 6 data and
+their conflict checks are unchanged.
+- `Patch::slot()` is `(key, is user set_attr)`. `check()` and `EditOverlay` use it. Within a
+  layer, the engine applies attribute patches after content patches. In data layers this
+  changes no result, because one key never has two patches there.
+- `EditSession` (`core/mushaf-resolve/src/edit.rs`):
+  - Every operation takes the current `Resolved`.
+  - A mark edit on a spine cluster becomes one `replace` holding the cluster's exact new
+    codepoints. It is never a `set_marks`, whose remove-then-append order cannot express
+    "remove a mark and put it back in place".
+  - Edits to clusters the session inserted rewrite that insert's payload.
+  - Deleting something the session inserted removes its insert, and the user's edits on and
+    inside it. Deleting an item drops the user's edits inside it, which would otherwise be an
+    overlap error.
+  - `set_width` and `set_stretch` with `None` drop the user's value, so the lower layers'
+    value applies again.
+- **Rule 11.** No edit is refused for being non-canonical. The only errors are a target that is
+  not in the current text (unknown or deleted), a mark the cluster does not carry, and an
+  empty cluster.
+- **Undo and redo** keep whole overlay snapshots. An edit that changes nothing adds no history,
+  and a new edit clears the redo stack. Patch ids are `u<n>`, never reused in a session.
+- **Consequence.** A user `replace` records absolute codepoints. Applied over another riwāyah,
+  it gives the codepoints the user saw, not "this mark added". This is deliberate: an export
+  means exactly what was on screen.
+
+## D54: The free-edit lint, and the "edited" marker stays conservative (T7.3)
+Status: accepted (owner, 2026-10-27: "Approve D53, D54 and D55")
+Context: T7.3 asks for a lint that flags non-canonical states per riwāyah and option set,
+advisory only, and an "edited" marker on every non-canonical page in every render and export.
+D16 already draws the marker whenever a user patch or a resolver report entry is present.
+Options for the marker:
+1. Keep D16: any user patch, or any report entry, marks every page rendered from that stack.
+2. Mark only pages whose items differ from the canonical text.
+Decision: option 1. Option 2 would let a page that was edited back to its canonical form show
+no marker, and it would make the marker depend on the lint, so a lint bug could hide an edit.
+Over-marking is safe; under-marking breaks rule 11. The lint therefore never removes the
+marker; it only explains it.
+- `lint_edits(base, edited, alternatives)` and `lint_overlay` are in
+  `core/mushaf-resolve/src/lint.rs`; the renderer exposes them as `Renderer::lint`.
+  - The base is the stack without the overlay, for the same riwāyah and choices.
+  - Items are compared by id, on content (kind, separators, attributes, and each cluster's id,
+    kind, codepoints and attributes), not on provenance.
+  - Each differing item is reported as `changed`, `inserted` or `deleted`.
+  - Each report lists the alternatives (`group=choice`) whose canonical text has the item
+    exactly as edited, or lacks it for a deletion. Each alternative changes one option group
+    the base depends on, one at a time.
+  - The lint never fails and never blocks an edit.
+- The golden test `edited_page_shows_the_marker_in_every_export`
+  (`tests/golden/pages/hafs-p003-lint.*`) checks the marker in:
+  - the draw list (the last two items);
+  - the SVG;
+  - the JSON export;
+  - the PNG (red pixels: none on the plain page).
+
+  It also checks:
+  - a no-op replace is not linted, yet still marks the page;
+  - undo gives byte-identical draw output.
+- Not covered (G-211): combinations of several groups, and matches against other riwāyāt.
+
+## D55: Re-justifying only the lines an edit touches (T7.4)
+Status: accepted (owner, 2026-10-27: "Approve D53, D54 and D55")
+Context: T7.4 asks that an edit re-justify only the affected lines, with the cache keyed by
+"(word, state hash)", and that undo restore the exact earlier output.
+Decision:
+- **`FitCache`** (`core/mushaf-layout/src/fit.rs`) memoises the three costly steps of
+  `fit_page`:
+  - a line's tight width;
+  - a line's justification;
+  - a word's shaping.
+
+  `fit_page_cached` uses it; `Renderer::fit_cached` keeps it across edits. `fit_page` is
+  `fit_page_cached` with a fresh cache, so there is one code path.
+- **Keys are the exact inputs, not hashes.**
+  - A line's key is its `LineInput` (the words' characters, locks, manual features and extra
+    widths) with its target and parameters.
+  - A word's key is its characters and features.
+  - Keys are compared exactly in a `BTreeMap`, so a hash collision cannot return another
+    line's result, and lookups are deterministic. This is the plan's "(word, state hash)"
+    with the hash replaced by the state itself. A word's state decides its line's key, so a
+    line whose words did not change is not justified again.
+- **What is invalidated.** Nothing is ever invalidated: an entry is a pure function of its key.
+  An edited line has a new key; undo brings back the old key, so the earlier result returns
+  from the cache, byte for byte.
+- **Limit.** The page's font scale depends on every line (G-021). If an edit changes it, every
+  line's target changes and every line is justified again. This is needed for a correct
+  result, not a cache miss to tune away.
+- **Scope.** A cache belongs to one font (shaper). It grows without bound within a session
+  (no eviction), and Phase 8 sizes it.
+- Test (`just golden`, `an_edit_rejustifies_only_its_line_and_undo_is_exact`, page 3):
+  - a repeat fit does no work;
+  - narrowing one word re-justifies exactly one line, and only that line's fit changes;
+  - cached and uncached fits are byte-identical at every step;
+  - the edited line closes;
+  - undo gives the earlier page byte for byte, with no new justification or shaping.

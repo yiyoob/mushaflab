@@ -434,19 +434,24 @@ fn apply_attrs(
 }
 
 /// Static checks that make the result independent of patch order: unique patch ids, one
-/// patch per key per layer, and no patch inside an item its own layer deletes.
+/// patch per key per layer (in the user layer, one content and one attribute patch, D53), and
+/// no patch inside an item its own layer deletes.
 fn check(patches: &[&Patch]) -> Result<(), ResolveError> {
     let mut ids = BTreeMap::new();
-    let mut by_key: BTreeMap<(Layer, Ref), Vec<&str>> = BTreeMap::new();
+    let mut by_key: BTreeMap<(Layer, Ref, bool), Vec<&str>> = BTreeMap::new();
     for p in patches {
         p.validate()
             .map_err(|e| ResolveError::InvalidPatch(e.to_string()))?;
         if ids.insert(p.id.as_str(), ()).is_some() {
             return Err(ResolveError::DuplicatePatchId(p.id.clone()));
         }
-        by_key.entry((p.layer(), p.key())).or_default().push(&p.id);
+        let (key, attr) = p.slot();
+        by_key
+            .entry((p.layer(), key, attr))
+            .or_default()
+            .push(&p.id);
     }
-    if let Some(((layer, key), ids)) = by_key.iter().find(|(_, v)| v.len() > 1) {
+    if let Some(((layer, key, _), ids)) = by_key.iter().find(|(_, v)| v.len() > 1) {
         let mut ids: Vec<String> = ids.iter().map(|s| s.to_string()).collect();
         ids.sort();
         return Err(ResolveError::Conflict {
@@ -502,7 +507,11 @@ pub fn resolve_patches(
                 tree.insert(p, *side, *seq, node, &mut report);
             }
         }
-        for p in ps.iter().filter(|p| !matches!(p.op, Op::Insert { .. })) {
+        // Attribute patches last: in the user layer a key may also hold a content patch (D53).
+        let modifies = ps.iter().filter(|p| !matches!(p.op, Op::Insert { .. }));
+        let (attrs, content): (Vec<_>, Vec<_>) =
+            modifies.partition(|p| matches!(p.op, Op::SetAttr(_)));
+        for p in content.into_iter().chain(attrs) {
             tree.modify(p, &mut report);
         }
     }

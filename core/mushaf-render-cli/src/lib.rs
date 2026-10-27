@@ -12,11 +12,12 @@ use std::path::{Path, PathBuf};
 use mushaf_draw::{DrawPage, Outlines, PageMeta, draw_page, to_svg};
 use mushaf_justify::Regexps;
 use mushaf_layout::fit::{
-    FitData, FitPage, LineWidths, Profile, SurahNames, basmalah_words, fit_page,
+    FitCache, FitData, FitPage, LineWidths, Profile, SurahNames, basmalah_words, fit_page,
+    fit_page_cached,
 };
 use mushaf_layout::{Mapping, map_lines, map_lines_on};
 use mushaf_model::{DataSet, EditOverlay, Error};
-use mushaf_resolve::{Mode, Resolved, Selection, resolve_profile};
+use mushaf_resolve::{EditLint, Mode, Resolved, Selection, lint_overlay, resolve_profile};
 use mushaf_shape::{EncodingTable, Exceptions, FontData, Violation, check_word};
 
 /// A riwāyah's default display style (D36): Maghribi for Warsh and Qālūn, Ḥijāzī for the rest.
@@ -224,6 +225,26 @@ impl Renderer {
         fit_with(self, &self.font.shaper(), resolved, mapping, page)
     }
 
+    /// `fit` reusing `cache` across calls (T7.4): after an edit only the changed lines are
+    /// justified and the changed words shaped again. The cache belongs to this renderer's font.
+    pub fn fit_cached(
+        &self,
+        resolved: &Resolved,
+        mapping: &Mapping,
+        page: u32,
+        cache: &mut FitCache,
+    ) -> Result<FitPage, Error> {
+        fit_page_cached(
+            &self.font.shaper(),
+            &self.regexps,
+            &self.fit_data(),
+            resolved,
+            mapping,
+            page,
+            cache,
+        )
+    }
+
     fn fit_data(&self) -> FitData<'_> {
         FitData {
             profile: &self.profile,
@@ -243,6 +264,21 @@ impl Renderer {
             font: &self.profile.font,
         };
         draw_page(fit, &self.profile.geometry, &self.outlines, &meta)
+    }
+
+    /// T7.3 (D54): how an overlay departs from this riwāyah's canonical text under `choices`,
+    /// item by item, with the other option choices each edited item matches. Advisory only.
+    pub fn lint(
+        &self,
+        choices: &BTreeMap<String, String>,
+        overlay: &EditOverlay,
+    ) -> Result<Vec<EditLint>, Error> {
+        lint_overlay(
+            |c, o| self.resolve_with(c, o),
+            choices,
+            &self.data.option_groups,
+            overlay,
+        )
     }
 
     /// Resolve, fit and draw one page.
