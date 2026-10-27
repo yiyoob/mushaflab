@@ -3,7 +3,8 @@
 //!
 //!     cargo run --release --example hijazi_dump -- <repo> <riwayah> [unmapped]
 //!
-//! With `unmapped`, prints instead each word that has no encoding row, with the cluster.
+//! With `unmapped`, prints instead each word that has no encoding row, with the cluster and
+//! its id.
 
 use std::path::Path;
 
@@ -29,7 +30,14 @@ fn main() {
         if unmapped {
             let refs: Vec<&[char]> = it.clusters.iter().map(|c| c.cps.0.as_slice()).collect();
             if let Err(e) = r.table.convert_item(&it.id.to_string(), &refs) {
-                println!("{}\t{}\t{}", it.id, e.cps, cl.join("|"));
+                // the cluster id of the first cluster with these codepoints
+                let at = it
+                    .clusters
+                    .iter()
+                    .find(|c| Cps(c.cps.0.clone()).to_string() == e.cps.to_string())
+                    .map(|c| c.id.to_string())
+                    .unwrap_or_default();
+                println!("{}\t{}\t{}\t{at}", it.id, e.cps, cl.join("|"));
             }
             continue;
         }
