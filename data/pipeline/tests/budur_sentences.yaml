@@ -1,0 +1,73 @@
+# Synthetic sentences for the al-Budur parser tests (test_budur_*.py). They are made up in
+# the book's style around placeholder words (كلمة, لفظ, قول, بكذا); none is quoted from the
+# book and none is a claim about any Quranic reading.
+key:
+  abi_harakat: "أَبى"
+  abi_plain: "ابي"
+  ishaq_hamza: "إسحاق"
+  ishaq_plain: "اسحاق"
+  qalun_tatweel: "قـالون"
+  qalun_plain: "قالون"
+readers:
+  qari_and_prefixes: "قرأ نافع وعاصم ولورش بكذا"
+  duri_of_abu_amr_long: "قرأ الدوري عن أبي عمرو بكذا"
+  basriyyan: "قرأ البصريان بكذا"
+  basri: "قرأ البصري بكذا"
+  kufiyyun: "قرأ الكوفيون بكذا"
+  madaniyyan: "قرأ المدنيان بكذا"
+  khulf_last: "قرأ ابن كثير وقالون بخلف عنه بكذا"
+  khulf_last_two: "قرأ ورش وقالون والدوري عن أبي عمرو بخلاف عنهما بكذا"
+  khulf_not_khalaf: "قرأ ورش بخلف عنه بكذا"
+  duri_after_basri: "قرأ البصري والدوري بكذا"
+  khulf_an_duri: "قرأ البصري بخلف عن الدوري بكذا"
+  duri_alone: "قرأ الدوري بكذا"
+  duri_word: "الدوري"
+  madani_alone: "قرأ المدني بكذا"
+  madani_word: "المدني"
+  baqun: "والباقون بكذا"
+  ghayruhum: "وقرأ غيرهم بكذا"
+  all_readers: "لجميع القراء بكذا"
+  warsh_only: "قرأ ورش بكذا"
+  duri_ali: "أمالها دوري على"
+statements:
+  two_blocks: ['" كلمة " قرأ ورش بالسين والباقون بالصاد.', "وهذا كلام يتبعه.", '" لفظ " و" قول " قرأ عاصم بضم الياء.']
+  inline_headword: ['" كلمة " قرأ ورش بفتح الياء وصلا ووقفا " لفظ " سبق نظيره.']
+  example_quote: ['" كلمة " قرأ ورش بالسين، وكذا كل ما ماثله نحو " لفظ ".']
+  simple_complement: ['" كلمة " قرأ ورش بالسين والباقون بالصاد.']
+  two_reading_complement: ['" كلمة " قرأ ابن كثير بصلة الميم، وقرأ حمزة بضم الهاء والباقون بكسرها.']
+  waqf_and_khulf: ['" كلمة " قرأ ورش بالإمالة عند الوقف، وقرأ قالون بخلف عنه بالسين.']
+  whole_quran_with_exception: ['" كلمة " قرأ ورش بالسين حيث وقع إلا " لفظ " فبالصاد.']
+  class_scope: ['" كلمة " قرأ ورش بالسين وهذا مذهبه في كل ما وقع بعد ساكن.']
+  surah_scope: ['" كلمة " قرأ ورش بالسين في هذه السورة.']
+  obvious_and_count: ['" كلمة " جلي.', '" لفظ " معا قرأ ورش بالسين.']
+  rub_sections:
+    - '" كلمة " قرأ ورش بالسين.'
+    - '" قول " آخر الربع.'
+    - "الممال"
+    - "كلمة أمالها ورش، لفظ قللها قالون بخلف عنه."
+    - "المدغم"
+    - '" الكبير " كلمة لفظ.'
+    - '" لفظ " قرأ ورش بالسين.'
+  all_readers: ['" كلمة " مده لازم لجميع القراء.']
+words: {kalima: "كلمة", lafz: "لفظ", qawl: "قول", pair: "كلمة لفظ"}
+# match.py: book spelling (left) and spine spelling (right) of made-up or ordinary words,
+# exercising one letter rule each; not Quranic text.
+match:
+  same_key:
+    - ["كاتب", "كَٰتِبٌ"]      # alif against dagger alif
+    - ["سلاة", "سَلَوٰةٌ"]     # waw carrying dagger alif, ta marbuta
+    - ["مؤمن", "مُؤۡمِنٌ"]     # hamza on waw
+    - ["هدى", "هُدٗى"]        # alif maqsura
+    - ["آمن", "ءَامَنَ"]       # alif madda against hamza + alif
+    - ["لآلي", "لـَٔالِي"]     # tatweel carrying hamza
+  tier_spine: ["كتب", "وكتب", "قلم"]
+  tier_quote: "كتب"
+  multi_spine: ["قلم", "كتب", "وقرأ", "قلم"]
+  multi_quote: "كتب قرأ"
+# index.py: a farsh paragraph with a scoped clause, and two appendix items (made up).
+index:
+  scoped: '" كلمة " قرأ ورش بالسين حيث وقع.'
+  plain: '" لفظ " قرأ ورش بالسين.'
+  correction: "٣ - ص ١٠٤ كلام"
+  correction_more: "الصواب: كلام آخر"
+  mudakhala: "١ - س: سؤال"

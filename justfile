@@ -98,6 +98,12 @@ contact-sheets *RIWAYAT:
 review-rules *NAMES:
     {{uv}} run python -m pipeline.rule_sheets {{NAMES}}
 
+# al-Budur pilot (TB.6): rule index from the whole book, statuses and two-way comparison for
+# al-Fatihah and al-Baqarah's first rub'. Writes build/budur/ (untracked: it holds book text).
+# The book lives only in the main checkout: BOOKS_DIR=<main>/data/sources/raw/books
+budur-verify:
+    {{uv}} run python -m pipeline.budur.run
+
 # SVG + PNG via reference renderer, e.g. just render PAGE=1 RIWAYAH=hafs
 render *ARGS:
     #!/usr/bin/env bash

@@ -1,0 +1,143 @@
+# Statement lexicon for al-Budur al-Zahirah (TB.3, ADR D51). Our own short terms for parsing
+# the book's prose; no passages are copied (LICENSES.md, books). Every class below is OUR
+# interpretation of a term (status: hypothesis), for the owner to confirm. Terms are matched
+# on the book-name key (budur/readers.py `name_key`), as whole words unless `prefix: true`
+# (the term starts a word, e.g. "بضم" in "بضمها").
+#
+# feature classes:
+#   textual  - a difference expected to show in the written text (harakat, letters, shadda,
+#              sukun, sila). Book-vs-data partitions of these are compared and flagged.
+#   phonetic - a difference of delivery (madd length, tarqiq, imalah, tashil, idgham, saktah,
+#              rawm/ishmam, ghunnah). Whether KFGQPC writes it is MEASURED in the pilot
+#              (reported per term), never assumed; these never raise a flag.
+# When a statement has terms of both classes it is `textual` (the stronger check), and the
+# phonetic terms are kept for the report.
+features:
+  textual:
+    - {term: "بضم", prefix: true}
+    - {term: "بفتح", prefix: true}
+    - {term: "بكسر", prefix: true}
+    - {term: "بكسرة", prefix: true}
+    - {term: "بإسكان", prefix: true}
+    - {term: "بسكون", prefix: true}
+    - {term: "بالإسكان", prefix: true}
+    - {term: "بتشديد", prefix: true}
+    - {term: "بالتشديد", prefix: true}
+    - {term: "بتخفيف", prefix: true}
+    - {term: "بالتخفيف", prefix: true}
+    - {term: "بإثبات", prefix: true}
+    - {term: "بحذف", prefix: true}
+    - {term: "بالحذف", prefix: true}
+    - {term: "بالياء", prefix: true}
+    - {term: "بالتاء", prefix: true}
+    - {term: "بالنون", prefix: true}
+    - {term: "بالسين", prefix: true}
+    - {term: "بالصاد", prefix: true}
+    - {term: "بالزاي", prefix: true}
+    - {term: "بالواو", prefix: true}
+    - {term: "بالألف", prefix: true}
+    - {term: "بالهمز", prefix: true}
+    - {term: "بهمز", prefix: true}
+    - {term: "بإبدال", prefix: true}
+    - {term: "أبدل", prefix: true}
+    - {term: "بالإبدال", prefix: true}
+    - {term: "بصلة", prefix: true}
+    - {term: "بالصلة", prefix: true}
+    - {term: "وصل", prefix: false}
+    - {term: "بنقل", prefix: true}
+    - {term: "بالنقل", prefix: true}
+    - {term: "نقل", prefix: false}
+    - {term: "بالتنوين", prefix: true}
+    - {term: "بالرفع", prefix: true}
+    - {term: "بالنصب", prefix: true}
+    - {term: "بالجر", prefix: true}
+    - {term: "بالخفض", prefix: true}
+    - {term: "بالغيب", prefix: true}
+    - {term: "بالخطاب", prefix: true}
+    - {term: "بالتوحيد", prefix: true}
+    - {term: "بالجمع", prefix: true}
+    - {term: "بالتحقيق", prefix: true}
+    - {term: "بتحقيق", prefix: true}
+    - {term: "بالإظهار", prefix: true}
+  phonetic:
+    - {term: "بالمد", prefix: true}
+    - {term: "بمد", prefix: true}
+    - {term: "بمده", prefix: true}
+    - {term: "بقصر", prefix: true}
+    - {term: "بقصره", prefix: true}
+    - {term: "بالقصر", prefix: true}
+    - {term: "بالتوسط", prefix: true}
+    - {term: "بتوسط", prefix: true}
+    - {term: "بالإشباع", prefix: true}
+    - {term: "بترقيق", prefix: true}
+    - {term: "بالترقيق", prefix: true}
+    - {term: "بتفخيم", prefix: true}
+    - {term: "بالتفخيم", prefix: true}
+    - {term: "بتغليظ", prefix: true}
+    - {term: "غلظ", prefix: true}
+    - {term: "بالروم", prefix: true}
+    - {term: "بالإشمام", prefix: true}
+    - {term: "باشمام", prefix: true}
+    - {term: "بإشمام", prefix: true}
+    - {term: "مشمة", prefix: true}
+    - {term: "بالسكت", prefix: true}
+    - {term: "بغنة", prefix: true}
+    - {term: "الغنة", prefix: true}
+    - {term: "بالإمالة", prefix: true}
+    - {term: "أمال", prefix: true}
+    - {term: "يميل", prefix: true}
+    - {term: "بالتقليل", prefix: true}
+    - {term: "قلل", prefix: true}
+    - {term: "يقلل", prefix: true}
+    - {term: "بتسهيل", prefix: true}
+    - {term: "بالتسهيل", prefix: true}
+    - {term: "بإدغام", prefix: true}
+    - {term: "بالإدغام", prefix: true}
+    - {term: "أدغم", prefix: true}
+    - {term: "إدغام", prefix: true}
+    - {term: "بإخفاء", prefix: true}
+    - {term: "مد", prefix: false}
+# Words that open a new clause (statement boundary) inside a paragraph.
+clause_verbs: ["قرأ", "وقرأ", "روى", "وروى", "أمال", "وأمال", "قلل", "وقلل", "أبدل", "وأبدل",
+               "أدغم", "وأدغم", "سهل", "وسهل", "نقل", "ونقل", "غلظ", "وغلظ", "وصل", "ووصل",
+               "حقق", "وحقق", "فتح", "وفتح", "أسكن", "وأسكن", "مد", "ومد", "قصر", "وقصر"]
+clause_verb_prefixes: ["أمال", "وأمال", "قلل", "وقلل", "أبدل", "أدغم", "وحقق", "حقق"]
+# Rule scope phrases (TB.3). `class` scopes are conditions in prose: never applied
+# mechanically, listed for the owner (scope: unclear).
+scopes:
+  whole_quran_word: ["حيث وقع", "حيث وقعا", "حيث وقعت", "حيث وقعن", "حيث جاء", "كيف وقع",
+                     "أينما وقع", "في جميع القرآن", "في كل القرآن", "في القرآن كله",
+                     "في جميع المواضع", "في جميع مواضعه"]
+  surah: ["في هذه السورة", "في هذه السورة خاصة", "في السورة"]
+  listed_places: ["في الموضعين", "في المواضع الثلاثة", "معا"]
+  class: ["وهذا مذهبه في كل", "وهذا مذهبهم في كل", "مذهبه في كل", "وكذا كل", "وكذلك كل",
+          "ما ماثله", "مما ماثله", "نظائره", "ونظائره", "نظيره", "وقس", "وأمثاله", "أمثاله",
+          "وما شابهه", "ما شابهه", "كل ما شابهه", "قاعدته", "قاعدة", "في كل"]
+exceptions: ["إلا", "ما عدا", "سوى", "واستثنى", "استثنى", "خرجت عن"]
+# A clause stated under a condition ("بشرط أن …") is a general statement, not a claim about
+# this place: it draws no split (compare.py) and is kept for the report.
+conditions: ["بشرط", "شرط", "إذا وقع", "إذا وقعت", "إن وقع", "إن وقعت", "متى وقع"]
+examples: ["نحو", "مثل", "كقوله", "قوله تعالى", "كهذا", "كالمثال"]
+waqf: ["وقفا", "عند الوقف", "حالة الوقف", "إذا وقف", "لدى الوقف", "في الوقف"]
+wasl: ["وصلا", "حالة الوصل", "عند الوصل", "في الوصل"]
+both: ["وصلا ووقفا", "مطلقا"]
+awjuh: ["وجهان", "ثلاثة أوجه", "أربعة أوجه", "خمسة أوجه", "ستة أوجه", "سبعة أوجه", "الوجهان",
+        "الأوجه"]
+restrictions: ["تعين", "يتعين", "امتنع", "يمتنع", "لا يجوز", "عليه", "وعليه", "فقط", "وحده"]
+# A headword that defers to an earlier statement (status mentioned, statements inherited from
+# the latest earlier headword with the same key; else reported unresolved).
+backrefs: ["سبق", "تقدم", "مثل الأول", "كالأول", "نظيره", "فيه ما في", "ما في"]
+# A headword whose khilaf the book calls obvious: mentioned, readers unstated.
+obvious: ["جلي", "واضح", "لا يخفى"]
+# Numbered فوائد items (" الأولى " ...), and the two parts of المدغم.
+ordinals: ["الأولى", "الثانية", "الثالثة", "الرابعة", "الخامسة", "السادسة", "السابعة", "الثامنة",
+           "التاسعة", "العاشرة"]
+mudgham_labels: {saghir: "الصغير", kabir: "الكبير"}
+# Pronouns after a waqf phrase in الممال lists ("لدى الوقف عليهما"): qualifiers, not words.
+waqf_pronouns: ["عليه", "عليها", "عليهما"]
+# Section markers (pp. 5-6: order of each rub').
+sections:
+  rub_end: ["آخر الربع", "منتهى الربع"]
+  mumal: ["الممال"]
+  mudgham: ["المدغم"]
+  fawaid: ["فوائد", "وههنا فوائد"]

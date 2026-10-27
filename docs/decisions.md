@@ -1464,3 +1464,72 @@ cluster is highlighted when it differs from its aligned Ḥafṣ cluster after i
 (U+06D6–U+06DB), sukūn (present or not), the Maghribi bare lām for Ḥafṣ lām + shadda + fatḥa (1,674 places), the shapes of final yāʾ, hamza on alif written as plain alif with the same vowel, the shadda of idghām with ghunna, and the disjoined letters (owner: "Highlights should only be for Usul and furush differences"), and, for Warsh and Qālūn, the D46 writing conventions.
 Āyah markers are never highlighted. The rule or patch that made the cluster is kept as the label;
 differences with no rule (residual patches) are highlighted too, which closes that part of G-147.
+## D50: Locating the book's words, and the convention projection (TB.4–TB.5)
+Status: proposed (TB.4–TB.6, 2026-10-27). For the owner at the pilot review.
+Context: al-Budur quotes Qurʾānic words almost without ḥarakāt and in imlāʾī spelling, and
+gives no ayah numbers. Our eight texts are KFGQPC encodings whose conventions differ by family
+(Ḥijāzī: hafs shuba bazzi qunbul duri_abuamr susi; Maghribī: warsh qalun; G-006, G-018,
+`docs/review/phase6/style-conventions.md`). Only one convention row is owner-confirmed (D21).
+Options:
+1. Compare the book's text with ours letter for letter. Rejected: the book's quotes are not
+   Qurʾānic text (rule 1) and carry no ḥarakāt.
+2. Locate by letters only, and compare *our* eight forms with each other.
+3. Locate by ayah numbers. Not possible: the book gives none.
+Decision: option 2.
+- **Letter key** (one function per side, `budur/match.py`): every alif form is dropped,
+  including a spine wāw that carries the dagger alif. Hamza in any seat becomes one letter,
+  yāʾ and alif maqṣūrah merge, tāʾ marbūṭah becomes hāʾ, and tatweel and the small letters
+  are dropped. There are three match tiers: `exact`, `prefix` (a wāw/fāʾ on one side) and
+  `no-hamza`. Below `exact` the match is marked for review, and rules never apply at
+  `no-hamza`.
+- **Placement**: farsh entries are aligned in book order by a longest-chain DP within their
+  sūrah. An entry with one candidate is placed whatever the order, and is marked when the
+  order conflicts. An entry with several candidates is placed only if every longest chain
+  uses the same candidate. List entries (al-mumāl, al-mudgham) must match exactly their stated
+  count within the rubʿ.
+- **Projection**: `strict` = our text with the owner-confirmed D21 rows mapped back;
+  `loose` = strict plus `data/books/al-budur-al-zahirah/conventions.yaml`. Every row there is
+  a hypothesis with its evidence (family-only counts, or pilot counts). Written readings are
+  compared in `loose`. A difference seen only in `strict` is never a reading and is reported.
+  Claude never moves a row into `data/approvals/`.
+Consequences: a wrong convention row could hide a real difference, so every row and every
+explained pair is listed for the owner. The pilot measures the method's noise through the
+Ḥafṣ false-flag rate (criteria file).
+
+## D51: Parsing the book's statements (TB.2–TB.3)
+Status: proposed (2026-10-27).
+Context: the book states uṣūl at their first occurrence (page_1_0001–0002, pp. 5–6) inside
+the farsh. It names readers by their names and its own group terms (مصطلح الكتاب, p. 11),
+uses "الباقون" for the rest, and "بخلف عنه" for a reader with two wajhs.
+Decision:
+- **Readers**: `readers.yaml` holds names only. Each name cites a page and is checked against
+  that page before every run. Contextual terms (unqualified الدوري) follow the book's rules on
+  p. 11. Unknown or ambiguous terms (المدني) are reported as unresolved, never guessed.
+- **Statements**: a block is a headword run plus its prose. A clause starts at a verb, a
+  complement or a full stop. Feature classes (`textual`, `phonetic`), scope phrases,
+  waqf/waṣl, exceptions, examples, awjuh and restrictions come from `features.yaml`. They are
+  our own short terms and our interpretation (hypothesis).
+- **Complement**: "الباقون" is read two ways: the complement of the previous clause, and the
+  complement of every reader named so far. A verdict stands only when both readings agree.
+  Otherwise the place is undecidable.
+- **Implicit coverage**: once a statement names any of the 8 at a place, the others are
+  covered implicitly. The book states each word's khilāf among the ten where it discusses the
+  word (p. 5).
+- Corrections (page_2, al-Sulamī, not the author) are indexed by printed page and shown next
+  to their pages. They never change a status.
+
+## D52: Statuses and what is applied mechanically (TB.5)
+Status: proposed (2026-10-27). The per-word merge of statements (`run.merge_overlaps`), made
+after the first pilot result, was accepted by the owner on 2026-10-27 ("Accept").
+Decision:
+- Statuses are `mentioned`, `rule-covered` and `not-mentioned` (never "confirmed"), each
+  with a citation.
+- A rule is applied mechanically only when its scope names the word: `حيث وقع` and the like
+  (the whole Qurʾān), or `في هذه السورة` (the sūrah). Class scopes (`وهذا مذهبه في كل …`,
+  `ما ماثله`, `وقس`) and the general chapters are listed as `scope: unclear` for the owner.
+  They are not applied.
+- Disagreements are attributed by minimum vertex cover. A riwāyah is `flagged` when it is in
+  every minimum cover, and `possible` when it is in some.
+- A data difference the book does not draw is explained in two cases, and both are listed:
+  - when one riwāyah of the pair is named in a phonetic clause there;
+  - when it is a Maghribī-family pattern that the book does not separate.

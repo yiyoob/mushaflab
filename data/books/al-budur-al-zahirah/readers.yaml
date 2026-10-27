@@ -1,0 +1,135 @@
+# Reader names in al-Budur al-Zahirah (book-al-budur-al-zahirah), resolved with the book's own
+# terms (TB.2, ADR D51). Each entry cites the EPUB page id and the printed page ("p.").
+# This file holds names only, no passages from the book (LICENSES.md, books: no redistribution).
+#
+# `ruwat`: the 20 ruwat; ids of the 8 in scope are the project riwayah ids (CLAUDE.md).
+# `forms`: surface forms -> ruwat. Matching is on whole words after the book-name key
+#   (budur/readers.py `name_key`: alif forms unified, ya and alif maqsura merged, tatweel and
+#   harakat removed). "علي" alone is never a form, since it would match the preposition
+#   "على"; al-Kisa'i's Duri is matched only as the two-word form. A form may carry one of
+#   the `name_prefixes` below in the text. `cite` pages are checked by `just budur-verify`:
+#   the form must occur on the first page cited.
+# `basis`: `defined` (the book defines the term), `usage` (the book uses it with this
+#   meaning in the cited place; our reading, for the owner to confirm), or `contextual`
+#   (meaning depends on the sentence; resolved by the rule named in `rule`, else reported
+#   unresolved). Names not listed here are reported unresolved, never guessed.
+book: "book-al-budur-al-zahirah"
+# Prefixes a name or phrase may carry in the text ("ولورش", "والباقون"); ب is not a name
+# prefix, so "بخلف" is never read as the name Khalaf.
+name_prefixes: ["ول", "فل", "و", "ف", "ل"]
+phrase_prefixes: ["و"]
+# "بخلف عن <name>": the khulf belongs to the name that follows.
+khulf_tail: "عن"
+in_scope: [hafs, shuba, warsh, qalun, bazzi, qunbul, duri_abuamr, susi]
+ruwat:
+  - {id: qalun, qari: nafi, cite: "page_1_0004 p. 8"}
+  - {id: warsh, qari: nafi, cite: "page_1_0004 p. 8"}
+  - {id: bazzi, qari: ibn_kathir, cite: "page_1_0004 p. 8"}
+  - {id: qunbul, qari: ibn_kathir, cite: "page_1_0004 p. 8"}
+  - {id: duri_abuamr, qari: abu_amr, cite: "page_1_0004 p. 8"}
+  - {id: susi, qari: abu_amr, cite: "page_1_0004 p. 8; page_1_0005 p. 9"}
+  - {id: hisham, qari: ibn_amir, cite: "page_1_0005 p. 9"}
+  - {id: ibn_dhakwan, qari: ibn_amir, cite: "page_1_0005 p. 9"}
+  - {id: shuba, qari: asim, cite: "page_1_0005 p. 9"}
+  - {id: hafs, qari: asim, cite: "page_1_0005 p. 9"}
+  - {id: khalaf_an_hamzah, qari: hamzah, cite: "page_1_0005 p. 9"}
+  - {id: khallad, qari: hamzah, cite: "page_1_0005 p. 9"}
+  - {id: abul_harith, qari: kisai, cite: "page_1_0005 p. 9"}
+  - {id: duri_kisai, qari: kisai, cite: "page_1_0005 p. 9"}
+  - {id: ibn_wardan, qari: abu_jafar, cite: "page_1_0005 p. 9"}
+  - {id: ibn_jammaz, qari: abu_jafar, cite: "page_1_0005 p. 9"}
+  - {id: ruways, qari: yaqub, cite: "page_1_0005 p. 9"}
+  - {id: rawh, qari: yaqub, cite: "page_1_0005 p. 9"}
+  - {id: ishaq, qari: khalaf_ashir, cite: "page_1_0005 p. 9"}
+  - {id: idris, qari: khalaf_ashir, cite: "page_1_0005 p. 9"}
+forms:
+  # The ten qurra' (page_1_0003-0004, pp. 7-8): a qari's name covers both his ruwat.
+  - {form: "نافع", qurra: [nafi], basis: defined, cite: "page_1_0003 p. 7"}
+  - {form: "ابن كثير", qurra: [ibn_kathir], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "المكي", qurra: [ibn_kathir], basis: defined, cite: "page_1_0004 p. 8 (Ibn Kathir introduced as al-Makki)"}
+  - {form: "أبو عمرو", qurra: [abu_amr], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "أبي عمرو", qurra: [abu_amr], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "أبا عمرو", qurra: [abu_amr], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "البصري", qurra: [abu_amr], basis: usage, cite: "page_1_0007 p. 11 (the book uses Duri al-Basri for Duri Abi 'Amr, and al-Basri with al-Duri for Abu 'Amr with al-Kisa'i's Duri)", note: "page_1_0004 p. 8 also calls Ya'qub al-Basri; the book's own usage on p. 11 is Abu 'Amr"}
+  - {form: "ابن عامر", qurra: [ibn_amir], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "الشامي", qurra: [ibn_amir], basis: defined, cite: "page_1_0004 p. 8 (Ibn 'Amir introduced as al-Shami)"}
+  - {form: "عاصم", qurra: [asim], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "حمزة", qurra: [hamzah], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "الكسائي", qurra: [kisai], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "أبو جعفر", qurra: [abu_jafar], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "أبي جعفر", qurra: [abu_jafar], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "يعقوب", qurra: [yaqub], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "خلف في اختياره", qurra: [khalaf_ashir], basis: defined, cite: "page_1_0007 p. 11"}
+  - {form: "خلف عن نفسه", qurra: [khalaf_ashir], basis: defined, cite: "page_1_0014 p. 18 (first use); defined page_1_0007 p. 11"}
+  - {form: "العاشر", qurra: [khalaf_ashir], basis: defined, cite: "page_1_0007 p. 11"}
+  - {form: "خلف", qurra: [khalaf_ashir], basis: contextual, rule: khalaf, cite: "page_1_0007 p. 11", note: "unqualified Khalaf; outside the 8 in scope either way"}
+  # The ruwat (pp. 8-9).
+  - {form: "قالون", ruwat: [qalun], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "ورش", ruwat: [warsh], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "ورشا", ruwat: [warsh], basis: defined, cite: "page_1_0013 p. 17 (first use); page_1_0004 p. 8"}
+  - {form: "البزي", ruwat: [bazzi], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "قنبل", ruwat: [qunbul], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "قنبلا", ruwat: [qunbul], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "السوسي", ruwat: [susi], basis: defined, cite: "page_1_0004 p. 8"}
+  - {form: "دوري أبي عمرو", ruwat: [duri_abuamr], basis: defined, cite: "page_1_0007 p. 11"}
+  - {form: "الدوري عن أبي عمرو", ruwat: [duri_abuamr], basis: defined, cite: "page_1_0007 p. 11"}
+  - {form: "الدوري عن أبي عمر", ruwat: [duri_abuamr], basis: usage, cite: "page_1_0013 p. 17", note: "spelled without the final waw in the EPUB"}
+  - {form: "دوري البصري", ruwat: [duri_abuamr], basis: defined, cite: "page_1_0007 p. 11"}
+  - {form: "دوري الكسائي", ruwat: [duri_kisai], basis: defined, cite: "page_1_0007 p. 11"}
+  - {form: "الدوري عن الكسائي", ruwat: [duri_kisai], basis: defined, cite: "page_1_0029 p. 33 (first use); defined page_1_0007 p. 11"}
+  - {form: "دوري علي", ruwat: [duri_kisai], basis: usage, cite: "page_1_0021 p. 25 (in al-mumal); page_1_0004 p. 8 ('Ali b. Hamzah = al-Kisa'i)"}
+  - {form: "الدوري", ruwat: [duri_abuamr], basis: contextual, rule: duri, cite: "page_1_0007 p. 11", note: "unqualified: al-Kisa'i's Duri when it follows Abu 'Amr/al-Basri in the same statement, Abu 'Amr's otherwise only when that statement is about Abu 'Amr; else unresolved"}
+  - {form: "هشام", ruwat: [hisham], basis: defined, cite: "page_1_0005 p. 9"}
+  - {form: "هشاما", ruwat: [hisham], basis: defined, cite: "page_1_0017 p. 21 (first use); page_1_0005 p. 9"}
+  - {form: "ابن ذكوان", ruwat: [ibn_dhakwan], basis: defined, cite: "page_1_0005 p. 9"}
+  - {form: "شعبة", ruwat: [shuba], basis: defined, cite: "page_1_0005 p. 9"}
+  - {form: "حفص", ruwat: [hafs], basis: defined, cite: "page_1_0005 p. 9"}
+  - {form: "خلف عن حمزة", ruwat: [khalaf_an_hamzah], basis: defined, cite: "page_1_0007 p. 11"}
+  - {form: "خلاد", ruwat: [khallad], basis: defined, cite: "page_1_0005 p. 9"}
+  - {form: "أبو الحارث", ruwat: [abul_harith], basis: defined, cite: "page_1_0005 p. 9"}
+  - {form: "ابن وردان", ruwat: [ibn_wardan], basis: defined, cite: "page_1_0005 p. 9"}
+  - {form: "ابن جماز", ruwat: [ibn_jammaz], basis: defined, cite: "page_1_0005 p. 9"}
+  - {form: "رويس", ruwat: [ruways], basis: defined, cite: "page_1_0005 p. 9"}
+  - {form: "روح", ruwat: [rawh], basis: defined, cite: "page_1_0005 p. 9"}
+  - {form: "إسحاق", ruwat: [ishaq], basis: defined, cite: "page_1_0005 p. 9"}
+  - {form: "إدريس", ruwat: [idris], basis: defined, cite: "page_1_0005 p. 9"}
+  # Group terms (مصطلح الكتاب, page_1_0007 p. 11).
+  - {form: "المدنيان", qurra: [nafi, abu_jafar], basis: defined, cite: "page_1_0007 p. 11"}
+  - {form: "البصريان", qurra: [abu_amr, yaqub], basis: defined, cite: "page_1_0007 p. 11"}
+  - {form: "البصريين", qurra: [abu_amr, yaqub], basis: defined, cite: "page_1_0010 p. 14 (first use); defined page_1_0007 p. 11"}
+  - {form: "الأخوان", qurra: [hamzah, kisai], basis: defined, cite: "page_1_0007 p. 11"}
+  - {form: "الكوفيون", qurra: [asim, hamzah, kisai, khalaf_ashir], basis: defined, cite: "page_1_0007 p. 11"}
+  - {form: "الكوفيين", qurra: [asim, hamzah, kisai, khalaf_ashir], basis: defined, cite: "page_1_0061 p. 65 (first use); defined page_1_0007 p. 11"}
+  - {form: "الأصحاب", qurra: [hamzah, kisai, khalaf_ashir], basis: defined, cite: "page_1_0007 p. 11"}
+  # Ambiguous: listed so that they are reported, not silently skipped.
+  - {form: "المدني", basis: contextual, rule: none, cite: "page_1_0003-0004 pp. 7-8 (both Nafi' and Abu Ja'far introduced as al-Madani)", note: "Nafi' or Abu Ja'far; always reported unresolved"}
+# Phrases that cover readers without naming them.
+all_readers:
+  - {form: "لجميع القراء", cite: "page_1_0002 p. 6 (first use)"}
+  - {form: "جميع القراء", cite: "page_1_0012 p. 16 (first use)"}
+  - {form: "لكل القراء", cite: "page_1_0011 p. 15 (first use)"}
+  - {form: "للجميع", cite: "page_1_0010 p. 14 (first use)"}
+  - {form: "الأئمة العشرة", cite: "page_1_0001 p. 5 (first use)"}
+  - {form: "القراء العشرة", cite: "page_1_0001 p. 5 (first use)"}
+  - {form: "اتفق", cite: "page_1_0007 p. 11 (first use)"}
+  - {form: "اتفقوا", cite: "page_1_0119 p. 123 (first use)"}
+  - {form: "أجمع", cite: "page_1_0002 p. 6 (first use)"}
+  - {form: "أجمعوا", cite: "page_1_0011 p. 15 (first use)"}
+  - {form: "بالإجماع", cite: "page_1_0021 p. 25 (first use)"}
+complement:
+  - {form: "الباقون", cite: "page_1_0011 p. 15 (first use)"}
+  - {form: "الباقين", cite: "page_1_0036 p. 40 (first use)"}
+  - {form: "غيرهم", cite: "page_1_0017 p. 21 (first use)"}
+  - {form: "غيره", cite: "page_1_0003 p. 7 (first use)"}
+khulf:
+  - {form: "بخلف عنه", attach: last, cite: "page_1_0003 p. 7 (first use)"}
+  - {form: "بخلف عنهم", attach: all, cite: "page_1_0152 p. 156 (first use)"}
+  - {form: "بخلاف عنه", attach: last, cite: "page_1_0013 p. 17 (first use)"}
+  - {form: "بخلاف عنهما", attach: last_two, cite: "page_1_0013 p. 17 (first use)"}
+  - {form: "بخلف", attach: last, cite: "page_1_0003 p. 7 (first use)"}
+  - {form: "بخلاف", attach: last, cite: "page_1_0007 p. 11 (first use)"}
+  - {form: "بالخلاف", attach: last, cite: "page_1_0021 p. 25 (first use)"}
+no_khulf:
+  - {form: "بلا خلاف", cite: "page_1_0021 p. 25 (first use)"}
+  - {form: "من غير خلاف", cite: "page_1_0013 p. 17 (first use)"}
+  - {form: "قولا واحدا", cite: "page_1_0015 p. 19 (first use)"}
