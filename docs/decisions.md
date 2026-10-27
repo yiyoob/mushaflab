@@ -1603,3 +1603,39 @@ marker; it only explains it.
   - a no-op replace is not linted, yet still marks the page;
   - undo gives byte-identical draw output.
 - Not covered (G-211): combinations of several groups, and matches against other riwāyāt.
+
+## D55: Re-justifying only the lines an edit touches (T7.4)
+Status: proposed (2026-10-27), for the owner at the end of Phase 7.
+Context: T7.4 asks that an edit re-justify only the affected lines, with the cache keyed by
+"(word, state hash)", and that undo restore the exact earlier output.
+Decision:
+- **`FitCache`** (`core/mushaf-layout/src/fit.rs`) memoises the three costly steps of
+  `fit_page`:
+  - a line's tight width;
+  - a line's justification;
+  - a word's shaping.
+
+  `fit_page_cached` uses it; `Renderer::fit_cached` keeps it across edits. `fit_page` is
+  `fit_page_cached` with a fresh cache, so there is one code path.
+- **Keys are the exact inputs, not hashes.**
+  - A line's key is its `LineInput` (the words' characters, locks, manual features and extra
+    widths) with its target and parameters.
+  - A word's key is its characters and features.
+  - Keys are compared exactly in a `BTreeMap`, so a hash collision cannot return another
+    line's result, and lookups are deterministic. This is the plan's "(word, state hash)"
+    with the hash replaced by the state itself. A word's state decides its line's key, so a
+    line whose words did not change is not justified again.
+- **What is invalidated.** Nothing is ever invalidated: an entry is a pure function of its key.
+  An edited line has a new key; undo brings back the old key, so the earlier result returns
+  from the cache, byte for byte.
+- **Limit.** The page's font scale depends on every line (G-021). If an edit changes it, every
+  line's target changes and every line is justified again. This is needed for a correct
+  result, not a cache miss to tune away.
+- **Scope.** A cache belongs to one font (shaper). It grows without bound within a session
+  (no eviction), and Phase 8 sizes it.
+- Test (`just golden`, `an_edit_rejustifies_only_its_line_and_undo_is_exact`, page 3):
+  - a repeat fit does no work;
+  - narrowing one word re-justifies exactly one line, and only that line's fit changes;
+  - cached and uncached fits are byte-identical at every step;
+  - the edited line closes;
+  - undo gives the earlier page byte for byte, with no new justification or shaping.

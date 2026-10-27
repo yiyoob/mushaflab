@@ -12,7 +12,8 @@ use std::path::{Path, PathBuf};
 use mushaf_draw::{DrawPage, Outlines, PageMeta, draw_page, to_svg};
 use mushaf_justify::Regexps;
 use mushaf_layout::fit::{
-    FitData, FitPage, LineWidths, Profile, SurahNames, basmalah_words, fit_page,
+    FitCache, FitData, FitPage, LineWidths, Profile, SurahNames, basmalah_words, fit_page,
+    fit_page_cached,
 };
 use mushaf_layout::{Mapping, map_lines, map_lines_on};
 use mushaf_model::{DataSet, EditOverlay, Error};
@@ -222,6 +223,26 @@ impl Renderer {
 
     pub fn fit(&self, resolved: &Resolved, mapping: &Mapping, page: u32) -> Result<FitPage, Error> {
         fit_with(self, &self.font.shaper(), resolved, mapping, page)
+    }
+
+    /// `fit` reusing `cache` across calls (T7.4): after an edit only the changed lines are
+    /// justified and the changed words shaped again. The cache belongs to this renderer's font.
+    pub fn fit_cached(
+        &self,
+        resolved: &Resolved,
+        mapping: &Mapping,
+        page: u32,
+        cache: &mut FitCache,
+    ) -> Result<FitPage, Error> {
+        fit_page_cached(
+            &self.font.shaper(),
+            &self.regexps,
+            &self.fit_data(),
+            resolved,
+            mapping,
+            page,
+            cache,
+        )
     }
 
     fn fit_data(&self) -> FitData<'_> {

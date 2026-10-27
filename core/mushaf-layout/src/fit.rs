@@ -16,7 +16,7 @@ use std::collections::BTreeMap;
 use std::ops::Range;
 
 use mushaf_justify::{
-    Features, LineInput, ONE, Params, Regexps, SCALE_ONE, justify_line, manual_stretch,
+    Features, Justified, LineInput, ONE, Params, Regexps, SCALE_ONE, justify_line, manual_stretch,
     natural_width, space_width, tight_width, word_ranges,
 };
 use mushaf_model::{ClusterRef, Cps, Error, ItemRef, LineKind};
@@ -562,6 +562,68 @@ fn header_input(words: &[FitWord]) -> LineInput {
     }
 }
 
+/// T7.4 (D55): results of the costly steps, keyed by their exact inputs, so a page fitted
+/// again after an edit re-justifies and re-shapes only what the edit changed. Keys are the
+/// whole inputs (a line's characters, locks, manual features and extra widths with its target
+/// and parameters; a word's characters and features), compared exactly: no hash, so no
+/// collision can return another line's result. Valid for one shaper (font) only.
+#[derive(Debug, Default)]
+pub struct FitCache {
+    tight: BTreeMap<(LineInput, Params), i64>,
+    lines: BTreeMap<(LineInput, i64, Params), Justified>,
+    words: BTreeMap<(Vec<char>, Vec<FeatureRange>), Vec<ShapedGlyph>>,
+    /// Lines justified (not found in the cache) since the cache was made.
+    pub justified: usize,
+    /// Words shaped (not found in the cache) since the cache was made.
+    pub shaped: usize,
+}
+
+impl FitCache {
+    fn tight(&mut self, shaper: &Shaper, input: &LineInput, params: Params) -> Result<i64, Error> {
+        let key = (input.clone(), params);
+        if let Some(w) = self.tight.get(&key) {
+            return Ok(*w);
+        }
+        let w = tight_width(shaper, input, params)?;
+        self.tight.insert(key, w);
+        Ok(w)
+    }
+
+    fn justify(
+        &mut self,
+        shaper: &Shaper,
+        regexps: &Regexps,
+        input: &LineInput,
+        target: i64,
+        params: Params,
+    ) -> Result<Justified, Error> {
+        let key = (input.clone(), target, params);
+        if let Some(j) = self.lines.get(&key) {
+            return Ok(j.clone());
+        }
+        let j = justify_line(shaper, regexps, input, target, params)?;
+        self.justified += 1;
+        self.lines.insert(key, j.clone());
+        Ok(j)
+    }
+
+    fn shape(
+        &mut self,
+        shaper: &Shaper,
+        chars: &[char],
+        features: &[FeatureRange],
+    ) -> Result<Vec<ShapedGlyph>, Error> {
+        let key = (chars.to_vec(), features.to_vec());
+        if let Some(g) = self.words.get(&key) {
+            return Ok(g.clone());
+        }
+        let g = shaper.shape(chars, features)?;
+        self.shaped += 1;
+        self.words.insert(key, g.clone());
+        Ok(g)
+    }
+}
+
 /// Fit one page. Deterministic and pure.
 pub fn fit_page(
     shaper: &Shaper,
@@ -570,6 +632,27 @@ pub fn fit_page(
     resolved: &Resolved,
     mapping: &Mapping,
     page: u32,
+) -> Result<FitPage, Error> {
+    fit_page_cached(
+        shaper,
+        regexps,
+        data,
+        resolved,
+        mapping,
+        page,
+        &mut FitCache::default(),
+    )
+}
+
+/// `fit_page` reusing `cache` (T7.4): the result is byte-identical to `fit_page`'s.
+pub fn fit_page_cached(
+    shaper: &Shaper,
+    regexps: &Regexps,
+    data: &FitData,
+    resolved: &Resolved,
+    mapping: &Mapping,
+    page: u32,
+    cache: &mut FitCache,
 ) -> Result<FitPage, Error> {
     let g = data.profile.geometry;
     let params = data.profile.params();
@@ -628,7 +711,7 @@ pub fn fit_page(
         .iter()
         .filter(|p| p.kind == FitKind::Text && !p.words.is_empty())
     {
-        let tight = tight_width(shaper, &p.input, params)?;
+        let tight = cache.tight(shaper, &p.input, params)?;
         if tight > 0 {
             needed = needed.min(p.target * SCALE_ONE / tight);
         }
@@ -649,7 +732,7 @@ pub fn fit_page(
         let (target, width, spaces, squeeze, letter_gain, features) =
             if p.kind == FitKind::Text && !p.words.is_empty() {
                 let target = p.target * SCALE_ONE / scale;
-                let j = justify_line(shaper, regexps, &p.input, target, params)?;
+                let j = cache.justify(shaper, regexps, &p.input, target, params)?;
                 let squeeze = (j.x_scale < SCALE_ONE).then_some((target, j.width));
                 if let Some(_sq) = squeeze {
                     notes.push(FitNote::Squeezed {
@@ -683,7 +766,7 @@ pub fn fit_page(
                     })
                 })
                 .collect();
-            w.glyphs = shaper.shape(&w.chars, &w.features)?;
+            w.glyphs = cache.shape(shaper, &w.chars, &w.features)?;
             apply_shifts(shaper, w)?;
             w.width = w.glyphs.iter().map(|g| i64::from(g.x_advance)).sum::<i64>() * ONE
                 + w.gaps.iter().map(|g| g.1).sum::<i64>();

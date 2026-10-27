@@ -1389,3 +1389,85 @@ fn edited_page_shows_the_marker_in_every_export() {
     assert_eq!(draw_json(&s), serde_json::to_string(&plain).unwrap());
     check_golden("hafs-p003-lint", &d);
 }
+
+/// T7.4 (D55): with a cache kept across edits, an edit re-justifies only the line it touches
+/// and re-shapes only the words it touches; the result is byte-identical to an uncached fit;
+/// the edited line still closes; undo gives back the exact earlier page without new work.
+/// The edit narrows one spine word by 0.05 em, so the page's font scale (here 1.0) cannot
+/// fall and every other line keeps its target.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn an_edit_rejustifies_only_its_line_and_undo_is_exact() {
+    use mushaf_layout::fit::FitCache;
+    use mushaf_model::Ref;
+    use mushaf_resolve::EditSession;
+    let r = Renderer::load(&repo(), "hafs").unwrap();
+    let page = 3;
+    let mut cache = FitCache::default();
+    let mut s = EditSession::new(r.profile.spine.clone(), "golden");
+    let fit = |s: &EditSession, cache: &mut FitCache| {
+        let res = r.resolve(Some(s.overlay())).unwrap();
+        let map = r.map(&res).unwrap();
+        let cached = r.fit_cached(&res, &map, page, cache).unwrap();
+        assert_eq!(
+            serde_json::to_string(&cached).unwrap(),
+            serde_json::to_string(&r.fit(&res, &map, page).unwrap()).unwrap(),
+            "cached and uncached fits differ"
+        );
+        (res, cached)
+    };
+    let (res, before) = fit(&s, &mut cache);
+    assert_eq!(before.scale, mushaf_justify::SCALE_ONE);
+    let text_lines = before
+        .lines
+        .iter()
+        .filter(|l| l.kind == FitKind::Text && !l.words.is_empty())
+        .count();
+    assert_eq!(cache.justified, text_lines);
+    // fitting again does no work
+    let (j0, s0) = (cache.justified, cache.shaped);
+    fit(&s, &mut cache);
+    assert_eq!((cache.justified, cache.shaped), (j0, s0));
+    // narrow the third word of the page's fourth text line
+    let line = before
+        .lines
+        .iter()
+        .filter(|l| l.kind == FitKind::Text)
+        .nth(3)
+        .unwrap();
+    let item = res.items[line.words[2].item.unwrap()].id.clone();
+    s.set_width(&res, Ref::Item(item), Some(-50)).unwrap();
+    let (_, after) = fit(&s, &mut cache);
+    assert_eq!(after.scale, before.scale);
+    assert_eq!(
+        cache.justified,
+        j0 + 1,
+        "only the edited line is justified again"
+    );
+    let changed: Vec<u32> = before
+        .lines
+        .iter()
+        .zip(&after.lines)
+        .filter(|(a, b)| a != b)
+        .map(|(a, _)| a.line)
+        .collect();
+    assert_eq!(changed, vec![line.line]);
+    // words whose characters and features did not change are not shaped again (a narrower
+    // word may be absorbed by the spaces alone)
+    let l = after.lines.iter().find(|l| l.line == line.line).unwrap();
+    let words: i64 = l.words.iter().map(|w| w.width).sum::<i64>() + l.spaces.iter().sum::<i64>();
+    assert_eq!(words, l.width);
+    assert!(
+        l.squeeze.is_none() && (l.width - l.target).abs() * 1000 <= l.target,
+        "line closes"
+    );
+    // undo: the exact earlier page, all from the cache
+    let (j1, s1) = (cache.justified, cache.shaped);
+    assert!(s.undo());
+    let (_, undone) = fit(&s, &mut cache);
+    assert_eq!(
+        serde_json::to_string(&undone).unwrap(),
+        serde_json::to_string(&before).unwrap()
+    );
+    assert_eq!((cache.justified, cache.shaped), (j1, s1));
+}
