@@ -7,26 +7,35 @@ use mushaf_model::ClusterRef;
 
 use crate::{DrawItem, DrawPage, PathOp, Role};
 
-fn fmt_fixed(v: i64, bits: u32) -> String {
-    let neg = v < 0;
+/// Appends `v / 2^bits` as an exact decimal: no trailing zeros, no `.` for an integer.
+fn push_fixed(s: &mut String, v: i64, bits: u32) {
     let a = v.unsigned_abs();
-    let int = a >> bits;
+    if v < 0 {
+        s.push('-');
+    }
+    write!(s, "{}", a >> bits).expect("string");
     let frac = a & ((1 << bits) - 1);
-    let mut s = if neg {
-        format!("-{int}")
-    } else {
-        int.to_string()
-    };
     if frac != 0 {
         // frac / 2^bits has at most `bits` decimal digits: frac * 10^bits / 2^bits is exact
-        let digits = (u128::from(frac) * 10u128.pow(bits)) >> bits;
-        let mut d = format!("{digits:0width$}", width = bits as usize);
-        while d.ends_with('0') {
-            d.pop();
+        let mut digits = (u128::from(frac) * 10u128.pow(bits)) >> bits;
+        let mut buf = [b'0'; 16];
+        let mut n = bits as usize;
+        while digits.is_multiple_of(10) {
+            digits /= 10;
+            n -= 1;
+        }
+        for i in (0..n).rev() {
+            buf[i] = b'0' + (digits % 10) as u8;
+            digits /= 10;
         }
         s.push('.');
-        s.push_str(&d);
+        s.push_str(std::str::from_utf8(&buf[..n]).expect("ascii"));
     }
+}
+
+fn fmt_fixed(v: i64, bits: u32) -> String {
+    let mut s = String::new();
+    push_fixed(&mut s, v, bits);
     s
 }
 
@@ -40,19 +49,32 @@ pub fn fmt_16_16(v: i64) -> String {
     fmt_fixed(v, 16)
 }
 
-fn path_d(path: &[PathOp]) -> String {
-    let f = |v: i32| fmt_26_6(i64::from(v));
+/// A path's `d` attribute (26.6 font or page units, exact decimals).
+pub fn path_d(path: &[PathOp]) -> String {
     let mut d = String::new();
-    for op in path {
-        if !d.is_empty() {
+    push_path_d(&mut d, path);
+    d
+}
+
+fn push_path_d(d: &mut String, path: &[PathOp]) {
+    let start = d.len();
+    let nums = |d: &mut String, cmd: char, vs: &[i32]| {
+        if d.len() > start {
             d.push(' ');
         }
-        match *op {
-            PathOp::Move { x, y } => write!(d, "M{} {}", f(x), f(y)),
-            PathOp::Line { x, y } => write!(d, "L{} {}", f(x), f(y)),
-            PathOp::Quad { x1, y1, x, y } => {
-                write!(d, "Q{} {} {} {}", f(x1), f(y1), f(x), f(y))
+        d.push(cmd);
+        for (k, v) in vs.iter().enumerate() {
+            if k > 0 {
+                d.push(' ');
             }
+            push_fixed(d, i64::from(*v), 6);
+        }
+    };
+    for op in path {
+        match *op {
+            PathOp::Move { x, y } => nums(d, 'M', &[x, y]),
+            PathOp::Line { x, y } => nums(d, 'L', &[x, y]),
+            PathOp::Quad { x1, y1, x, y } => nums(d, 'Q', &[x1, y1, x, y]),
             PathOp::Cubic {
                 x1,
                 y1,
@@ -60,26 +82,23 @@ fn path_d(path: &[PathOp]) -> String {
                 y2,
                 x,
                 y,
-            } => {
-                write!(
-                    d,
-                    "C{} {} {} {} {} {}",
-                    f(x1),
-                    f(y1),
-                    f(x2),
-                    f(y2),
-                    f(x),
-                    f(y)
-                )
-            }
-            PathOp::Close => write!(d, "Z"),
+            } => nums(d, 'C', &[x1, y1, x2, y2, x, y]),
+            PathOp::Close => nums(d, 'Z', &[]),
         }
-        .expect("writing to a String");
     }
-    d
 }
 
 pub fn to_svg(page: &DrawPage) -> String {
+    svg(page, false)
+}
+
+/// `to_svg` for the apps (D59): the same drawing, with each glyph's cluster and line as
+/// `data-c` and `data-l` attributes so a tap can name the cluster. Nothing else differs.
+pub fn to_svg_interactive(page: &DrawPage) -> String {
+    svg(page, true)
+}
+
+fn svg(page: &DrawPage, interactive: bool) -> String {
     let mut s = String::new();
     let (w, h) = (fmt_26_6(page.width), fmt_26_6(page.height));
     writeln!(
@@ -102,7 +121,9 @@ pub fn to_svg(page: &DrawPage) -> String {
     writeln!(s, "<rect width=\"{w}\" height=\"{h}\" fill=\"#ffffff\"/>").expect("string");
     s.push_str("<defs>\n");
     for (gid, path) in &page.glyphs {
-        writeln!(s, "<path id=\"g{gid}\" d=\"{}\"/>", path_d(path)).expect("string");
+        write!(s, "<path id=\"g{gid}\" d=\"").expect("string");
+        push_path_d(&mut s, path);
+        s.push_str("\"/>\n");
     }
     s.push_str("</defs>\n<g fill=\"#000000\">\n");
     // Highlighted clusters are drawn in red, as in the owner's print (D45, 2026-10-26).
@@ -122,23 +143,25 @@ pub fn to_svg(page: &DrawPage) -> String {
             cluster,
         } = item
         {
-            let fill = if cluster
+            write!(s, "<use xlink:href=\"#g{glyph}\"").expect("string");
+            if let (Some(c), true) = (cluster, interactive) {
+                write!(s, " data-c=\"{c}\" data-l=\"{line}\"").expect("string");
+            }
+            if cluster
                 .as_ref()
                 .is_some_and(|c| marked.contains(&(*line, c)))
             {
-                " fill=\"#cc0000\""
-            } else {
-                ""
-            };
-            writeln!(
-                s,
-                "<use xlink:href=\"#g{glyph}\"{fill} transform=\"matrix({} 0 0 -{} {} {})\"/>",
-                fmt_16_16(*sx),
-                fmt_16_16(*sy),
-                fmt_26_6(*x),
-                fmt_26_6(*y)
-            )
-            .expect("string");
+                s.push_str(" fill=\"#cc0000\"");
+            }
+            s.push_str(" transform=\"matrix(");
+            push_fixed(&mut s, *sx, 16);
+            s.push_str(" 0 0 -");
+            push_fixed(&mut s, *sy, 16);
+            s.push(' ');
+            push_fixed(&mut s, *x, 6);
+            s.push(' ');
+            push_fixed(&mut s, *y, 6);
+            s.push_str(")\"/>\n");
         }
     }
     for item in &page.items {
@@ -170,6 +193,46 @@ pub fn to_svg(page: &DrawPage) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The formatter before T8.4 (allocating), kept as the reference for `push_fixed`.
+    fn reference(v: i64, bits: u32) -> String {
+        let neg = v < 0;
+        let a = v.unsigned_abs();
+        let int = a >> bits;
+        let frac = a & ((1 << bits) - 1);
+        let mut s = if neg {
+            format!("-{int}")
+        } else {
+            int.to_string()
+        };
+        if frac != 0 {
+            let digits = (u128::from(frac) * 10u128.pow(bits)) >> bits;
+            let mut d = format!("{digits:0width$}", width = bits as usize);
+            while d.ends_with('0') {
+                d.pop();
+            }
+            s.push('.');
+            s.push_str(&d);
+        }
+        s
+    }
+
+    #[test]
+    fn fast_formatter_writes_the_same_bytes() {
+        let mut vals: Vec<i64> = (-70_000..70_000).collect();
+        vals.extend([
+            i64::from(i32::MAX),
+            i64::from(i32::MIN),
+            1 << 40,
+            -(1 << 40) - 7,
+        ]);
+        vals.extend((0..20_000).map(|k| k * 7919 + 65_535));
+        for v in vals {
+            for bits in [6, 16] {
+                assert_eq!(fmt_fixed(v, bits), reference(v, bits), "{v} / 2^{bits}");
+            }
+        }
+    }
 
     #[test]
     fn fixed_point_decimals_are_exact() {

@@ -486,6 +486,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "mushaf-engine"
+version = "0.0.0"
+dependencies = [
+ "mushaf-draw",
+ "mushaf-justify",
+ "mushaf-layout",
+ "mushaf-model",
+ "mushaf-resolve",
+ "mushaf-shape",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "mushaf-ffi"
 version = "0.0.0"
 dependencies = [
@@ -541,6 +555,7 @@ version = "0.0.0"
 dependencies = [
  "mushaf-db",
  "mushaf-draw",
+ "mushaf-engine",
  "mushaf-justify",
  "mushaf-layout",
  "mushaf-model",
@@ -593,6 +608,18 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+]
+
+[[package]]
+name = "mushaf-wasm"
+version = "0.0.0"
+dependencies = [
+ "mushaf-draw",
+ "mushaf-engine",
+ "mushaf-model",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
 ]
 
 [[package]]

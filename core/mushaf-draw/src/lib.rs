@@ -22,7 +22,7 @@ use mushaf_model::{ClusterRef, Error};
 use serde::Serialize;
 
 pub use outline::{Outlines, PathOp};
-pub use svg::{fmt_16_16, fmt_26_6, to_svg};
+pub use svg::{fmt_16_16, fmt_26_6, path_d as svg_path_d, to_svg, to_svg_interactive};
 
 /// 26.6 unit.
 const ONE: i64 = 64;

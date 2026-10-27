@@ -14,6 +14,10 @@ name = "mushaf-render"
 path = "src/main.rs"
 
 [[bin]]
+name = "mushaf-bundle"
+path = "src/bundle.rs"
+
+[[bin]]
 name = "mushaf-bench"
 path = "src/bench.rs"
 
@@ -28,6 +32,7 @@ path = "src/contact.rs"
 [dependencies]
 mushaf-model.workspace = true
 mushaf-db.workspace = true
+mushaf-engine.workspace = true
 mushaf-resolve.workspace = true
 mushaf-layout.workspace = true
 mushaf-shape.workspace = true
@@ -36,9 +41,8 @@ mushaf-draw.workspace = true
 resvg.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-
-[dev-dependencies]
 sha2.workspace = true
+
 
 [lints]
 workspace = true

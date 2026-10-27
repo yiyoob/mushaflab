@@ -250,6 +250,38 @@ fn an_edited_page_always_carries_the_marker_last() {
         }
     )));
     assert!(to_svg(&p).contains("#cc0000") && to_svg(&p).contains(" EDITED</desc>"));
+    // T8.3 (D59): the web app's interactive SVG is the same drawing; it only adds each
+    // glyph's cluster and line as data attributes, so the marker is in it too.
+    let web = mushaf_draw::to_svg_interactive(&p);
+    let clustered = p
+        .items
+        .iter()
+        .filter(|i| {
+            matches!(
+                i,
+                DrawItem::Glyph {
+                    cluster: Some(_),
+                    ..
+                }
+            )
+        })
+        .count();
+    assert_eq!(web.matches(" data-c=\"").count(), clustered);
+    let stripped: String = web
+        .split(" data-c=\"")
+        .enumerate()
+        .map(|(k, part)| {
+            if k == 0 {
+                part.to_string()
+            } else {
+                // drop `<cluster>" data-l="<line>"`
+                let rest = &part[part.find('"').unwrap() + 1..];
+                let rest = rest.strip_prefix(" data-l=\"").unwrap();
+                rest[rest.find('"').unwrap() + 1..].to_string()
+            }
+        })
+        .collect();
+    assert_eq!(stripped, to_svg(&p));
 }
 
 /// D18: words whose source clusters carry an overline mark (found in the data, not listed
