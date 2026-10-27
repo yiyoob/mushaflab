@@ -1535,7 +1535,7 @@ Decision:
   - when it is a Maghribī-family pattern that the book does not separate.
 
 ## D53: The free-edit API, and two patches per key in the user layer (T7.1, T7.2)
-Status: proposed (2026-10-27), for the owner at the end of Phase 7.
+Status: accepted (owner, 2026-10-27: "Approve D53, D54 and D55")
 Context: T7.1 needs editing operations (add, remove or replace a cluster; add or remove a mark;
 set a word's or a glyph's width) that write the user overlay (D12), with undo and redo that
 restore exact output (rule 8). D9 allows one patch per key per layer, so a cluster could not be
@@ -1571,7 +1571,7 @@ their conflict checks are unchanged.
   means exactly what was on screen.
 
 ## D54: The free-edit lint, and the "edited" marker stays conservative (T7.3)
-Status: proposed (2026-10-27), for the owner at the end of Phase 7.
+Status: accepted (owner, 2026-10-27: "Approve D53, D54 and D55")
 Context: T7.3 asks for a lint that flags non-canonical states per riwāyah and option set,
 advisory only, and an "edited" marker on every non-canonical page in every render and export.
 D16 already draws the marker whenever a user patch or a resolver report entry is present.
@@ -1605,7 +1605,7 @@ marker; it only explains it.
 - Not covered (G-211): combinations of several groups, and matches against other riwāyāt.
 
 ## D55: Re-justifying only the lines an edit touches (T7.4)
-Status: proposed (2026-10-27), for the owner at the end of Phase 7.
+Status: accepted (owner, 2026-10-27: "Approve D53, D54 and D55")
 Context: T7.4 asks that an edit re-justify only the affected lines, with the cache keyed by
 "(word, state hash)", and that undo restore the exact earlier output.
 Decision:
