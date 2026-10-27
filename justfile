@@ -67,9 +67,10 @@ core-test: core-fixtures
 # Check the core builds for every platform target (web now, iOS/Android later).
 # mushaf-db (bundled SQLite), the CLI and the round-trip tool are host-only (D12, D22, G-032).
 core-targets:
-    cargo check {{manifest}} --workspace --exclude mushaf-render-cli --exclude mushaf-db --exclude mushaf-roundtrip \
+    cargo check {{manifest}} --workspace --exclude mushaf-render-cli --exclude mushaf-db --exclude mushaf-roundtrip --exclude mushaf-wasm \
         --target wasm32-unknown-unknown --target aarch64-apple-ios --target aarch64-apple-ios-sim \
         --target aarch64-linux-android --target x86_64-linux-android
+    cargo check {{manifest}} -p mushaf-wasm --target wasm32-unknown-unknown
 
 # Patch round-trip vs KFGQPC for all riwayat in scope (D22): Rust resolver in data mode,
 # then a codepoint-for-codepoint comparison with the pinned texts
@@ -131,9 +132,11 @@ render *ARGS:
     done
     cargo run --release --quiet {{manifest}} -p mushaf-render-cli --bin mushaf-render -- --page "$PAGE" --riwayah "$RIWAYAH"
 
-# Golden image + line-fit + shaping-integrity tests (release; all 604 pages)
+# Golden image + line-fit + shaping-integrity tests (release; all 604 pages), the web bundle
+# (T8.2) and the engine session (T8.1)
 golden:
-    cargo test --release {{manifest}} -p mushaf-render-cli --test golden -- --ignored
+    cargo test --release {{manifest}} -p mushaf-render-cli --test golden --test bundle -- --ignored
+    cargo test --release {{manifest}} -p mushaf-engine --test session -- --ignored
 
 # Rewrite tests/golden/pages after a reviewed, intended change (then commit the diff)
 golden-update:
@@ -142,6 +145,50 @@ golden-update:
 # Page resolve+shape+justify timing (release, this machine; T3.6)
 bench:
     cargo run --release --quiet {{manifest}} -p mushaf-render-cli --bin mushaf-bench
+
+# T8.1: the core as a WebAssembly package in build/web/pkg (wasm-bindgen-cli 0.2.129, D58)
+web-wasm:
+    cargo build --release -q {{manifest}} -p mushaf-wasm --target wasm32-unknown-unknown
+    wasm-bindgen --target web --out-dir build/web/pkg "$CARGO_TARGET_DIR/wasm32-unknown-unknown/release/mushaf_wasm.wasm"
+
+# T8.2: the static data bundle build/web/data/mushaf.bundle + manifest.json (D57, untracked)
+web-data:
+    cargo run --release -q {{manifest}} -p mushaf-render-cli --bin mushaf-bundle
+
+# T8.1 acceptance: every golden page drawn by the WASM engine in Node is byte-identical
+web-parity: web-wasm web-data
+    node apps/web/tests/parity.mjs
+
+# Web app dependencies (Vite, TypeScript, Playwright with its Chromium); once per checkout
+web-setup:
+    npm --prefix apps/web ci --no-audit --no-fund
+    cd apps/web && npx playwright install chromium
+
+# The site as static files in apps/web/dist (app, WASM, data bundle); not deployed anywhere
+web-build: web-wasm web-data
+    npm --prefix apps/web run build
+
+# Local dev server on http://127.0.0.1:5173
+web-dev: web-wasm web-data
+    npm --prefix apps/web run dev
+
+# T8.3: Playwright functional tests of every screen, offline cache included
+web-test: web-wasm web-data
+    npm --prefix apps/web run typecheck
+    cd apps/web && npx playwright test tests/app.spec.ts
+
+# T8.4: page-turn budget (16 ms) in Chromium with the CPU throttled 4x
+web-bench: web-wasm web-data
+    cd apps/web && npx playwright test tests/bench.spec.ts
+
+# T8.5: the app's drawing of every core golden page against the golden PNGs
+web-golden: web-wasm web-data
+    cd apps/web && npx playwright test tests/golden.spec.ts
+
+# All web checks (part of `just gate`); the budget measurement `web-bench` is separate, like `bench`
+web-gate: web-parity
+    npm --prefix apps/web run typecheck
+    cd apps/web && npx playwright test tests/app.spec.ts tests/golden.spec.ts
 
 # rustfmt/clippy, ruff, license check
 lint:
@@ -166,7 +213,7 @@ gate:
     logs="{{justfile_directory()}}/build/gate"; mkdir -p "$logs"
     step() { local s=$SECONDS; if just "$1" >"$logs/$1.log" 2>&1; then echo "ok   $1 ($((SECONDS-s))s)"; else echo "FAIL $1 ($((SECONDS-s))s), see $logs/$1.log"; return 1; fi; }
     ( step data-test && step data-verify ) & py=$!
-    rust=0; for s in lint core-test core-targets golden roundtrip; do step "$s" || { rust=1; break; }; done
+    rust=0; for s in lint core-test core-targets golden roundtrip web-gate; do step "$s" || { rust=1; break; }; done
     wait $py || rust=1
     exit $rust
 

@@ -1639,3 +1639,139 @@ Decision:
   - cached and uncached fits are byte-identical at every step;
   - the edited line closes;
   - undo gives the earlier page byte for byte, with no new justification or shaping.
+
+## D56: One platform-neutral page engine, read through a `Source` (T8.1)
+Status: proposed
+Context: Phase 8 needs the CLI's whole page pipeline (resolve, map, fit, draw, highlight) in
+WebAssembly (D5, rule 7). It lived in `mushaf-render-cli`, which is host-only (files, resvg),
+and the CLI read data through `mushaf-db`, which is host-only (bundled SQLite, G-032).
+Options: (a) re-implement loading in `mushaf-wasm`; (b) move the pipeline into a new crate that
+reads its inputs through a trait; (c) make `mushaf-render-cli` build for wasm.
+Decision: (b).
+- `core/mushaf-engine` holds `Renderer`, `highlights`, the style rules (D36, D44) and a new
+  `session::Session`, moved without behaviour change. It reads through
+  `trait Source { read(rel); data_files() }`. A checkout on disk (`Path`) and the web bundle
+  (D57) are the two sources. It is in `just core-targets`.
+- `read_tree` moved from `mushaf-db` to `mushaf-model` (plain `std::fs`); `mushaf-db`
+  re-exports it.
+- `mushaf-render-cli` re-exports the engine and keeps only SVG/PNG output and the binaries, so
+  every existing test and golden is unchanged.
+- `Session` adds what the apps show: option groups with data defaults, margin notes (D60), the
+  engine inspector, the provenance summary and the Phase 7 edit session. It keeps the
+  resolution and mapping for the current choices and edits, and a `FitCache` (D55).
+- `mushaf-wasm` (wasm-bindgen `=0.2.129`; `wasm-bindgen-cli` the same version) wraps the
+  session as JSON strings from the same serde code as the CLI.
+Evidence: `just web-parity` — Node runs the WASM engine on the bundle: 58 of 58 golden pages
+byte-identical (draw-list SHA-256 and highlight JSON), `hafs-p003-lint` skipped (overlay built
+in the Rust test). `cargo test -p mushaf-engine --test session -- --ignored`: the session draws
+what `Renderer::render`/`render_highlighted` draw.
+
+## D57: The web app's static data is a bundle of the files the engine reads (T8.2)
+Status: proposed
+Context: The site is static (rule 9) and must use "the same content as the CLI". The CLI builds
+its `DataSet` from the data root's files, not from `mushaf.db`. Measured on this machine
+(`cargo run --release -p mushaf-engine --example load_timing`): reading the data root 0.1 s,
+parsing all of it 7.6 s; without `patches/raw/` (79 MB) 2.9 s. No riwāyah profile stacks a raw
+patch file: profiles stack `patches/curated/*` or `patches/corrections/hafs.yaml`; raw patches
+are the round-trip's input (D22).
+Options: (a) `mushaf.db` with SQLite in WASM; (b) a binary serialisation of the parsed
+`DataSet`; (c) the source files themselves in one archive.
+Decision: (c).
+- `build/web/data/mushaf.bundle` (untracked): a length-prefixed archive (`MUSHAFB1`, path,
+  bytes) of the repository files, byte for byte: the data root's data files except patch files
+  no profile stacks; `data/render/*`, `data/encodings/*`, `data/approvals/*` (read-only, for the
+  provenance screen); every font a render profile or the style audit names. Writer:
+  `mushaf-bundle` (`just web-data`), with `manifest.json` (size and SHA-256).
+- The engine loads it through the same `DataSet::from_files` as the CLI. (a) would add a second
+  loader and a C toolchain for wasm (G-032); (b) would add a second format and serde for the
+  whole model.
+- Size 81 MB; parsing in Node's WASM 4.2 s (G-213).
+Evidence: `cargo test -p mushaf-render-cli --test bundle -- --ignored`: every bundled file
+equals the checkout's bytes, only unstacked patch files are left out, and pages of Ḥafṣ, Warsh
+and Qālūn draw identically from the bundle and the checkout. `just web-parity` (D56).
+
+## D58: Web stack: Vite + TypeScript, no UI framework, the engine in a Web Worker (T8.3)
+Status: proposed
+Context: The web app must only draw what the core returns (rule 7) and run offline (rule 9).
+Options: (a) a UI framework (React, Svelte); (b) plain TypeScript with Vite as dev server and
+bundler.
+Decision: (b). The app is a handful of screens over JSON and SVG from the core; a framework
+adds dependencies and no logic the app needs. The WASM engine runs in a module Web Worker
+(`apps/web/src/worker.ts`), so a page's work never blocks the UI. Exact pins: vite 8.3.5,
+typescript 5.9.3, @playwright/test 1.64.1 (`package-lock.json`). Vite serves `build/web/pkg`
+and `build/web/data` through a middleware (`vite.config.ts`) on 127.0.0.1; `vite build` copies
+them into `dist/`, so the site is plain static files (`just web-build`). A
+service worker (`public/sw.js`) caches the data bundle by SHA-256 and everything else network
+first with the cache as fallback; no other origin is fetched.
+
+## D59: The page is the core's SVG (T8.3)
+Status: proposed
+Context: Draw commands can be painted by TypeScript (SVG or Canvas) or the core's own SVG
+backend can be shown as is.
+Decision: the core's SVG. `mushaf_draw::to_svg_interactive` is `to_svg` plus `data-c`
+(cluster) and `data-l` (line) attributes on each glyph `<use>`, so a tap names its cluster. A
+test in `mushaf-draw` checks that removing those attributes gives `to_svg`'s bytes. Exports use
+`to_svg` itself (the CLI's bytes), the draw-list JSON, and a PNG the browser rasterises from
+that SVG. The edited marker is part of the core's drawing, so it is in every view and export
+(rule 11; Playwright `free edit` test). Margin words are drawn by the core too
+(`DrawWord::to_svg`). TypeScript paints no glyph and computes no position. Canvas was not chosen:
+it would need TypeScript code to replay draw commands, which the SVG already is.
+T8.4 made the SVG writer allocation-free; a test compares it with the previous formatter on
+about 180,000 values (`fast_formatter_writes_the_same_bytes`).
+
+## D60: Margin khilāf notes are derived from option groups (T8.3)
+Status: proposed
+Context: Farsh khilāf goes in the margin where the data provides alternative awjuh. The data's
+only alternatives are option groups (`data/options/*.yaml`); there is no margin data (G-151).
+Decision: `Session::margin_notes(page)`: for each option group of the riwāyah and each choice
+other than the current one, every cluster on the page whose codepoints or annotations (D40)
+differ under that choice, with the word as the core draws it under that choice. Built once per
+set of choices; user edits are not compared. A cluster only the other wajh has is placed at the
+item it is inserted at. Notes sit beside their line, outside the page box, so line breaks never
+change; on a phone they are tap-to-show. Today this gives the `hafs.maliyah` note on the page of
+69:28 (idghām, annotation only, D41). The option sheet shows every group the riwāyah's data
+defines, with the data's default; groups are not split into uṣūl and farsh because the data does
+not say which is which (G-215). A dedicated margin data source (G-151) would add notes to the
+same `MarginNote` list.
+
+## D61: Browser screenshots are compared with a blur and a 1-pixel neighbourhood (T8.5)
+Status: proposed
+Context: The goldens are rasterised by resvg; Chromium rasterises the same SVG with Skia. On
+`hafs-p001`, 1.2 % of pixels differed by more than 32 on a channel. Every difference was on an
+edge (a diff image showed no moved or missing glyph); 1-px frame lines are grey in one image and
+crisp in the other.
+Decision: the browser paints the SVG at the golden's pixel size (a first version painted it at
+its intrinsic size and resampled, which shifted lower lines by a fraction of a pixel; the app's
+PNG export was fixed the same way). Both images are box-blurred 3×3; a pixel fails when no pixel
+within 1 px of it in the other image is within 32 on every channel, checked both ways; at most
+0.1 % may fail, as in `golden.rs`. On the 50 golden pages the worst is 0.12 per mille. A control test compares page 3 with the edit
+golden (one line moved, plus the marker) and must fail (about 22 per mille). The drawing itself is
+proven identical by bytes (D56, D59), not by pixels.
+
+## D62: The page budget is met by drawing ahead; measured in throttled Chromium (T8.4)
+Status: proposed
+Context: The budget is 16 ms per page on a mid-range phone. In WASM on this machine (Node) a
+page the reader has not seen costs about 23 ms (median) in the core: fitting (shaping and
+justification) is about 9 ms of it natively, the rest drawing and SVG. On a phone this is
+several times more.
+Decision:
+- The session keeps the resolution and mapping per set of choices and edits, a `FitCache`
+  (D55), and the last 12 drawn pages nearest the current page.
+- The UI asks the worker for the next and previous pages as soon as a page is shown, so a page
+  turn only shows a page already drawn.
+- Margin differences are indexed once per set of choices (it was about 200 ms per page).
+- The SVG writer was made about 2.4× faster with identical bytes (D59).
+- Measured by `just web-bench`: Chromium with the CPU throttled 4× as the proxy for a
+  mid-range phone, 20 page turns per muṣḥaf, with the reader's pause between turns. The budget
+  is on the turn (request to SVG on screen); the core's own time per page is reported beside it.
+  The real device is the owner's check at G5 (G-214).
+- The SVG of a page drawn ahead is parsed into a detached element when it arrives, so a turn
+  only swaps it in. A turn ends at the first frame after the swap.
+Result (this Mac, 2026-10-27, `just web-bench`): **the budget is not met.** Turn median
+42 ms / p95 59 ms for Ḥafṣ, median 28 ms / p95 34 ms for Warsh. The core's time per page in the
+worker is median 17 ms (Ḥafṣ) and 7 ms (Warsh); the worker does not appear to be slowed by
+CDP's throttle (Node, unthrottled, gives about the same), so these are desktop numbers. The turn
+is dominated by the browser styling and painting about 2,000 `<use>` elements; CSS containment
+did not help. A way to meet it would be to paint the core's draw list into an `OffscreenCanvas`
+in the worker and show a bitmap, keeping the SVG only for taps. That changes D59 and is left to
+the owner (G-214).
