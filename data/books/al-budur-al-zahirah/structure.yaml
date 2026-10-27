@@ -1,0 +1,8 @@
+# Structure of the al-Budur EPUB that its markup does not give (TB.2). Read by budur/epub.py.
+#
+# Surah 6 has no <h2> heading: the EPUB's nav.xhtml lists 113 surahs and goes from al-Ma'idah
+# to al-A'raf. The book marks the start of al-An'am only by a quoted title at the end of
+# paragraph 13 of page_1_0095 (printed p. 99). Paragraphs after it belong to surah 6. The
+# reader checks that this paragraph contains the quoted title "سورة الأنعام".
+inline_surah_starts:
+  - {surah: 6, page_id: "page_1_0095", after_para: 13, title: "سورة الأنعام", cite: "page_1_0095 p. 99"}
