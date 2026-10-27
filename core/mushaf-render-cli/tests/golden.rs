@@ -1288,3 +1288,104 @@ fn maghribi_hijazi_pages() {
         "Maghribi -> Hijazi pages changed"
     );
 }
+
+/// T7.3 (D54): an edited page carries the "edited" marker in every output: the draw list, the
+/// SVG, the PNG and the JSON export. The edit is made through the edit API (T7.1) on the
+/// cluster the T3.7 demo already showed to shape cleanly with U+06DC (taken from its pinned
+/// overlay, so no text is written here), plus a no-op replace that the lint does not flag but
+/// that still marks the page. The lint names exactly the edited word.
+#[test]
+#[ignore = "run by `just golden` (release)"]
+fn edited_page_shows_the_marker_in_every_export() {
+    use mushaf_draw::{DrawItem, Role};
+    use mushaf_model::{ClusterRef, Cp, EditOverlay, NewCluster, Ref};
+    use mushaf_resolve::{EditChange, EditSession};
+    let r = Renderer::load(&repo(), "hafs").unwrap();
+    let demo: EditOverlay = mushaf_model::from_yaml(
+        &fs::read_to_string(repo().join("tests/golden/pages/hafs-p003-edit.overlay.yaml")).unwrap(),
+    )
+    .unwrap();
+    let Ref::Cluster(seen_at) = demo.patches[0].target.clone() else {
+        panic!("the demo's first patch targets a cluster")
+    };
+    let page = 3;
+    let mut s = EditSession::new(r.profile.spine.clone(), "golden");
+    let cur = |s: &EditSession| r.resolve(Some(s.overlay())).unwrap();
+    s.add_mark(&cur(&s), seen_at.clone(), Cp('\u{06DC}'), None)
+        .unwrap();
+    let draw_json = |s: &EditSession| {
+        serde_json::to_string(&r.render(page, Some(s.overlay())).unwrap()).unwrap()
+    };
+    let first = draw_json(&s);
+    // a no-op: the first cluster of the next word, replaced by itself
+    let res = cur(&s);
+    let next = res
+        .items
+        .iter()
+        .skip_while(|i| i.id != seen_at.item)
+        .nth(1)
+        .unwrap();
+    let same: ClusterRef = next.clusters[0].id.clone();
+    let c = next.clusters[0].clone();
+    s.replace_cluster(
+        &res,
+        same,
+        NewCluster {
+            kind: c.kind,
+            cps: c.cps,
+        },
+    )
+    .unwrap();
+    let lint = r.lint(&Default::default(), s.overlay()).unwrap();
+    let got: Vec<(String, EditChange)> = lint
+        .iter()
+        .map(|l| (l.item.to_string(), l.change))
+        .collect();
+    assert_eq!(got, vec![(seen_at.item.to_string(), EditChange::Changed)]);
+    let d = r.render(page, Some(s.overlay())).unwrap();
+    assert!(!d.canonical);
+    // the draw list: frame and label, last
+    let roles: Vec<bool> = d
+        .items
+        .iter()
+        .map(|i| {
+            matches!(
+                i,
+                DrawItem::Stroke {
+                    role: Role::EditedMarker,
+                    ..
+                }
+            )
+        })
+        .collect();
+    assert_eq!(roles.iter().filter(|m| **m).count(), 2);
+    assert!(
+        roles[roles.len() - 2..].iter().all(|m| *m),
+        "marker drawn last"
+    );
+    // the SVG and the JSON export
+    let svg = mushaf_render::svg(&d);
+    assert!(svg.contains("#cc0000") && svg.contains("EDITED"));
+    let json = serde_json::to_string(&d).unwrap();
+    assert!(json.contains("\"canonical\":false") && json.contains("edited_marker"));
+    // the PNG: the red frame's pixels are there; none on the plain page
+    let red = |png: &[u8]| {
+        let p = resvg::tiny_skia::Pixmap::decode_png(png).unwrap();
+        p.data()
+            .chunks(4)
+            .filter(|c| c[0] > 180 && c[1] < 60 && c[2] < 60)
+            .count()
+    };
+    let plain = r.render(page, None).unwrap();
+    let (rp, re) = (
+        red(&mushaf_render::png(&mushaf_render::svg(&plain), PNG_WIDTH).unwrap()),
+        red(&mushaf_render::png(&svg, PNG_WIDTH).unwrap()),
+    );
+    assert!(rp == 0 && re > 1000, "red pixels: plain {rp}, edited {re}");
+    // undo: byte-identical to the page with only the first edit, then to the plain page
+    assert!(s.undo());
+    assert_eq!(draw_json(&s), first);
+    assert!(s.undo());
+    assert_eq!(draw_json(&s), serde_json::to_string(&plain).unwrap());
+    check_golden("hafs-p003-lint", &d);
+}

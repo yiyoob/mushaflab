@@ -14,11 +14,13 @@ use serde::Serialize;
 
 mod edit;
 mod engine;
+mod lint;
 mod options;
 mod style;
 
 pub use edit::{EditError, EditSession};
 pub use engine::resolve_patches;
+pub use lint::{EditChange, EditLint, lint_edits, lint_overlay};
 pub use options::{LintNote, Selection, resolve, resolve_profile};
 pub use style::maghribi_to_hijazi;
 

@@ -1569,3 +1569,37 @@ their conflict checks are unchanged.
 - **Consequence.** A user `replace` records absolute codepoints. Applied over another riwāyah,
   it gives the codepoints the user saw, not "this mark added". This is deliberate: an export
   means exactly what was on screen.
+
+## D54: The free-edit lint, and the "edited" marker stays conservative (T7.3)
+Status: proposed (2026-10-27), for the owner at the end of Phase 7.
+Context: T7.3 asks for a lint that flags non-canonical states per riwāyah and option set,
+advisory only, and an "edited" marker on every non-canonical page in every render and export.
+D16 already draws the marker whenever a user patch or a resolver report entry is present.
+Options for the marker:
+1. Keep D16: any user patch, or any report entry, marks every page rendered from that stack.
+2. Mark only pages whose items differ from the canonical text.
+Decision: option 1. Option 2 would let a page that was edited back to its canonical form show
+no marker, and it would make the marker depend on the lint, so a lint bug could hide an edit.
+Over-marking is safe; under-marking breaks rule 11. The lint therefore never removes the
+marker; it only explains it.
+- `lint_edits(base, edited, alternatives)` and `lint_overlay` are in
+  `core/mushaf-resolve/src/lint.rs`; the renderer exposes them as `Renderer::lint`.
+  - The base is the stack without the overlay, for the same riwāyah and choices.
+  - Items are compared by id, on content (kind, separators, attributes, and each cluster's id,
+    kind, codepoints and attributes), not on provenance.
+  - Each differing item is reported as `changed`, `inserted` or `deleted`.
+  - Each report lists the alternatives (`group=choice`) whose canonical text has the item
+    exactly as edited, or lacks it for a deletion. Each alternative changes one option group
+    the base depends on, one at a time.
+  - The lint never fails and never blocks an edit.
+- The golden test `edited_page_shows_the_marker_in_every_export`
+  (`tests/golden/pages/hafs-p003-lint.*`) checks the marker in:
+  - the draw list (the last two items);
+  - the SVG;
+  - the JSON export;
+  - the PNG (red pixels: none on the plain page).
+
+  It also checks:
+  - a no-op replace is not linted, yet still marks the page;
+  - undo gives byte-identical draw output.
+- Not covered (G-211): combinations of several groups, and matches against other riwāyāt.

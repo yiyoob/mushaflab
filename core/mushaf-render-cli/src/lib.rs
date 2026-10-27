@@ -16,7 +16,7 @@ use mushaf_layout::fit::{
 };
 use mushaf_layout::{Mapping, map_lines, map_lines_on};
 use mushaf_model::{DataSet, EditOverlay, Error};
-use mushaf_resolve::{Mode, Resolved, Selection, resolve_profile};
+use mushaf_resolve::{EditLint, Mode, Resolved, Selection, lint_overlay, resolve_profile};
 use mushaf_shape::{EncodingTable, Exceptions, FontData, Violation, check_word};
 
 /// A riwāyah's default display style (D36): Maghribi for Warsh and Qālūn, Ḥijāzī for the rest.
@@ -243,6 +243,21 @@ impl Renderer {
             font: &self.profile.font,
         };
         draw_page(fit, &self.profile.geometry, &self.outlines, &meta)
+    }
+
+    /// T7.3 (D54): how an overlay departs from this riwāyah's canonical text under `choices`,
+    /// item by item, with the other option choices each edited item matches. Advisory only.
+    pub fn lint(
+        &self,
+        choices: &BTreeMap<String, String>,
+        overlay: &EditOverlay,
+    ) -> Result<Vec<EditLint>, Error> {
+        lint_overlay(
+            |c, o| self.resolve_with(c, o),
+            choices,
+            &self.data.option_groups,
+            overlay,
+        )
     }
 
     /// Resolve, fit and draw one page.
