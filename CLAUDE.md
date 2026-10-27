@@ -26,6 +26,7 @@ Stage 1 covers the 8 riwāyāt for which KFGQPC publishes full text, in the **15
 ## Working method
 - Enter plan mode at the start of each phase. State the task IDs you will do and the acceptance command for each.
 - Do one task at a time. Run its acceptance command. Commit with message `T<id>: <summary>`.
+- Before each commit run `just gate-fast` (lint, Rust tests, Python tests). Before every push, merge or GATE run the full gate locally with `just gate` (all platform targets, goldens, round-trip).
 - Test first for anything in `core/` and the data pipeline.
 - Phases run in the order given in PROJECT_PLAN §5 (Phase 4 before Phase 3), not in numeric order.
 - Stop at every `GATE` in the plan and summarize results. Do not start the next phase without the owner's go-ahead.
@@ -47,6 +48,8 @@ just render PAGE=1 RIWAYAH=hafs   # SVG + PNG via reference renderer
 just golden          # golden image + line-fit tests
 just bench           # page resolve+shape+justify timing
 just lint            # rustfmt/clippy, ruff, license check
+just gate-fast       # per-commit check: lint, core-test, data-test
+just gate            # full gate before push/merge/GATE; prints step times
 ```
 
 ## Conventions

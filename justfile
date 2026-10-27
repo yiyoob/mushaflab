@@ -5,6 +5,10 @@ set shell := ["bash", "-euo", "pipefail", "-c"]
 uv := "uv --directory data"
 manifest := "--manifest-path core/Cargo.toml"
 
+# One Rust build cache shared by the main checkout and every worktree, so a new
+# worktree does not start cold. Override by setting CARGO_TARGET_DIR yourself.
+export CARGO_TARGET_DIR := env_var_or_default("CARGO_TARGET_DIR", `git rev-parse --path-format=absolute --git-common-dir | xargs dirname` + "/core/target")
+
 _default:
     @just --list --unsorted
 
@@ -63,9 +67,9 @@ core-test: core-fixtures
 # Check the core builds for every platform target (web now, iOS/Android later).
 # mushaf-db (bundled SQLite), the CLI and the round-trip tool are host-only (D12, D22, G-032).
 core-targets:
-    for t in wasm32-unknown-unknown aarch64-apple-ios aarch64-apple-ios-sim aarch64-linux-android x86_64-linux-android; do \
-        cargo check {{manifest}} --workspace --exclude mushaf-render-cli --exclude mushaf-db --exclude mushaf-roundtrip --target $t || exit 1; \
-    done
+    cargo check {{manifest}} --workspace --exclude mushaf-render-cli --exclude mushaf-db --exclude mushaf-roundtrip \
+        --target wasm32-unknown-unknown --target aarch64-apple-ios --target aarch64-apple-ios-sim \
+        --target aarch64-linux-android --target x86_64-linux-android
 
 # Patch round-trip vs KFGQPC for all riwayat in scope (D22): Rust resolver in data mode,
 # then a codepoint-for-codepoint comparison with the pinned texts
@@ -75,8 +79,17 @@ roundtrip *RIWAYAT:
     riwayat="{{RIWAYAT}}"
     riwayat="${riwayat:-shuba qalun warsh bazzi qunbul susi duri_abuamr}"
     out="{{justfile_directory()}}/build/roundtrip"
-    cargo run --release -q {{manifest}} -p mushaf-roundtrip -- "{{justfile_directory()}}/data" "$out" $riwayat
-    {{uv}} run python -m pipeline.roundtrip "$out" $riwayat
+    cargo build --release -q {{manifest}} -p mushaf-roundtrip
+    mkdir -p "$out"
+    # One process per riwayah, all at once; each writes only its own <riwayah>.jsonl
+    pids=(); for r in $riwayat; do
+        ( "$CARGO_TARGET_DIR/release/mushaf-roundtrip" "{{justfile_directory()}}/data" "$out" "$r" \
+          && {{uv}} run python -m pipeline.roundtrip "$out" "$r" ) >"$out/$r.log" 2>&1 & pids+=($!)
+    done
+    fail=0; i=0; for r in $riwayat; do
+        if wait "${pids[$i]}"; then tail -n 3 "$out/$r.log"; else echo "FAIL $r:"; cat "$out/$r.log"; fail=1; fi; i=$((i+1))
+    done
+    exit $fail
 
 # HTML review sheets for the owner (T4.8): build/review/phase4/<riwayah>.html, not tracked
 review-sheets *RIWAYAT:
@@ -141,3 +154,19 @@ lint:
 _todo task:
     @echo "not implemented yet ({{task}})" >&2
     @exit 1
+
+# Per-commit check: lint, Rust tests, Python tests
+gate-fast: lint core-test data-test
+
+# Full gate, required before a push, a merge or a GATE. The Python checks run alongside the
+# Rust chain; each step's time is printed, and logs are kept in build/gate/.
+gate:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    logs="{{justfile_directory()}}/build/gate"; mkdir -p "$logs"
+    step() { local s=$SECONDS; if just "$1" >"$logs/$1.log" 2>&1; then echo "ok   $1 ($((SECONDS-s))s)"; else echo "FAIL $1 ($((SECONDS-s))s), see $logs/$1.log"; return 1; fi; }
+    ( step data-test && step data-verify ) & py=$!
+    rust=0; for s in lint core-test core-targets golden roundtrip; do step "$s" || { rust=1; break; }; done
+    wait $py || rust=1
+    exit $rust
+
