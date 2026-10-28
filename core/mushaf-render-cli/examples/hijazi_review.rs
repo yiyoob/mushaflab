@@ -53,11 +53,11 @@ fn main() {
          :root{color-scheme:light}body{font:14px system-ui;margin:24px;max-width:1400px;background:#fff;color:#000}svg{color:#000}table{border-collapse:collapse}\
          td,th{border:1px solid #ccc;padding:4px 8px;vertical-align:middle}svg{height:56px;width:auto}\
          .bad{color:#b00}.ok{color:#070}code{font-size:12px}</style>\
-         <h1>\u{1E24}ij\u{0101}z\u{012B} style: forms that cannot be drawn yet (G-102)</h1>\
+         <h1>&#x1E24;ij&#x101;z&#x12B; style: forms that cannot be drawn yet (G-102)</h1>\
          <p>Per form: the places; the example word in its own Maghribi font (KFGQPC); the same \
          word drawn in DigitalKhatt exactly as written (clusters with a conversion row converted, \
          the blocked cluster given to the font as its own codepoints; no letter or mark \
-         replaced); and the \u{1E24}af\u{1E63} word for comparison. Rule 6: clean means no .notdef, dotted \
+         replaced); and the &#x1E24;af&#x1E63; word for comparison. Rule 6: clean means no .notdef, dotted \
          circle or unattached mark; anything else is how the font fails on it. Pages: blocked \
          pages that contain this form. Answer per form: draw it as shown, or keep blocked (or \
          describe another drawing).</p>",
@@ -114,9 +114,9 @@ fn main() {
         let _ = write!(
             html,
             "<h2>{riwayah}: {} forms, {total} places, {} blocked pages</h2><table>\
-             <tr><th>#</th><th>Form</th><th>Places</th><th>\u{1E24}af\u{1E63} at those places</th>\
-             <th>Example</th><th>Maghribi (own font)</th><th>\u{1E24}ij\u{0101}z\u{012B}: as written, in DigitalKhatt</th>\
-             <th>Rule 6</th><th>\u{1E24}ij\u{0101}z\u{012B}: \u{1E24}af\u{1E63} base + additions</th><th>Rule 6</th><th>Base: added / kept</th><th>\u{1E24}af\u{1E63} (for comparison)</th><th>Pages</th></tr>",
+             <tr><th>#</th><th>Form</th><th>Places</th><th>&#x1E24;af&#x1E63; at those places</th>\
+             <th>Example</th><th>Maghribi (own font)</th><th>&#x1E24;ij&#x101;z&#x12B;: as written, in DigitalKhatt</th>\
+             <th>Rule 6</th><th>&#x1E24;ij&#x101;z&#x12B;: &#x1E24;af&#x1E63; base + additions</th><th>Rule 6</th><th>Base: added / kept</th><th>&#x1E24;af&#x1E63; (for comparison)</th><th>Pages</th></tr>",
             forms.len(),
             blocked.len()
         );
@@ -354,8 +354,8 @@ fn main() {
             let is_mark = |c: &char| matches!(*c, '\u{064B}'..='\u{065F}' | '\u{0670}' | '\u{06D6}'..='\u{06ED}' | '\u{08D3}'..='\u{08FF}');
             let (base_svg, base_rule6, base_note) = match &ex.hafs {
                 None => (
-                    "<i>inserted: no \u{1E24}af\u{1E63} cluster here</i>".to_string(),
-                    "\u{2014}".to_string(),
+                    "<i>inserted: no &#x1E24;af&#x1E63; cluster here</i>".to_string(),
+                    "&#x2014;".to_string(),
                     String::new(),
                 ),
                 Some(h) => {
@@ -388,7 +388,7 @@ fn main() {
                     }
                     if !kept.is_empty() {
                         note += &format!(
-                            " <span class=bad>keeps from \u{1E24}af\u{1E63} {}</span>",
+                            " <span class=bad>keeps from &#x1E24;af&#x1E63; {}</span>",
                             cps(&kept)
                         );
                     }
