@@ -48,12 +48,22 @@ just render PAGE=1 RIWAYAH=hafs   # SVG + PNG via reference renderer
 just golden          # golden image + line-fit tests
 just bench           # page resolve+shape+justify timing
 just lint            # rustfmt/clippy, ruff, license check
+just web-setup       # once: npm ci for apps/web + Playwright's Chromium
+just web-wasm        # core -> WebAssembly package in build/web/pkg (wasm-bindgen-cli 0.2.129)
+just web-data        # static data bundle build/web/data/mushaf.bundle (D57)
+just web-parity      # WASM draws every golden page byte-identically (Node)
+just web-build       # static site in apps/web/dist (deployable files; do not deploy unasked)
+just web-dev         # local dev server http://127.0.0.1:5173
+just web-test        # Playwright: every screen, offline cache
+just web-bench       # page-turn budget (16 ms), Chromium CPU /4
+just web-golden      # app drawing vs core golden PNGs
+just web-gate        # all web checks (run by `just gate`)
 just gate-fast       # per-commit check: lint, core-test, data-test
 just gate            # full gate, once before a phase's final push; prints step times
 ```
 
 ## Conventions
-- Rust for `core/` (workspace crates). Python 3.12 + `uv` for `data/`. TypeScript for `apps/web` (over the core compiled to WebAssembly, D5); Swift/SwiftUI and Kotlin/Compose for the later mobile apps. Everything in `core/` must build for the web and mobile targets (`just core-targets`); no platform-specific code in `core/` outside `mushaf-wasm` and `mushaf-ffi`.
+- Rust for `core/` (workspace crates). Python 3.12 + `uv` for `data/`. TypeScript for `apps/web` (over the core compiled to WebAssembly, D5); Swift/SwiftUI and Kotlin/Compose for the later mobile apps. The web app (`apps/web`, Vite + TypeScript, no UI framework, D58) only paints the core's draw list (canvas in a worker, D63) and shows its JSON and SVG from `mushaf-wasm`; the page engine shared by the CLI and WASM is `core/mushaf-engine` (D56). Everything in `core/` must build for the web and mobile targets (`just core-targets`); no platform-specific code in `core/` outside `mushaf-wasm` and `mushaf-ffi`.
 - Cluster ID format: `surah:ayah:word:cluster`, 1-based, e.g. `3:133:1:1`. IDs refer to the **Ḥafṣ spine** of a given spine version (`spine_version` in `data/spine/`). IDs are stable within a spine version; a new spine version ships a migration map from old IDs to new.
 - Items that do not exist in the spine (inserted words, letters, ayah-end markers) get IDs of the form `<anchor-id>+ins.<n>` where `n` is an explicit integer sequence, e.g. `9:100:12:1+ins.1`. Never rely on string sorting of IDs for order.
 - Clusterization uses an explicit, tested codepoint table (`data/pipeline/codepoint_classes.*`), not Unicode general categories alone.

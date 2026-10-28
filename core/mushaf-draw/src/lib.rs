@@ -22,7 +22,7 @@ use mushaf_model::{ClusterRef, Error};
 use serde::Serialize;
 
 pub use outline::{Outlines, PathOp};
-pub use svg::{fmt_16_16, fmt_26_6, to_svg};
+pub use svg::{fmt_16_16, fmt_26_6, path_d as svg_path_d, to_svg, to_svg_interactive};
 
 /// 26.6 unit.
 const ONE: i64 = 64;
@@ -127,6 +127,12 @@ pub struct Highlight {
     pub cited: bool,
     /// True when the difference is pronunciation only (annotation channel, D40).
     pub annotation: bool,
+    /// Set when the owner marked this cluster "should be highlighted" in the web editor (D64),
+    /// with the owner's note (possibly empty). With label `owner` the highlight is the owner's
+    /// alone; otherwise the core's rule and the owner agree. Never written without a mark, so
+    /// the core's highlights' JSON is unchanged.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner: Option<String>,
 }
 
 /// Names that go into the page's metadata.

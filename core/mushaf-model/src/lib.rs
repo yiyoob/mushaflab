@@ -11,6 +11,7 @@ use serde::de::DeserializeOwned;
 mod ayah_map;
 mod cps;
 mod dataset;
+mod files;
 mod ids;
 mod layout;
 mod options;
@@ -26,6 +27,7 @@ pub use dataset::{
     BodyRow, ClusterRow, DATA_DIRS, DataFiles, DataSet, DbRows, Input, ItemRow, LayoutRow, LineRow,
     REGISTER_PATH, SpineRow, classify,
 };
+pub use files::read_tree;
 pub use ids::{ClusterRef, ItemRef, MarkRef, Ref};
 pub use layout::{FitTag, Layout, Line, LineKind};
 pub use options::{OptionDefault, OptionGroup};
