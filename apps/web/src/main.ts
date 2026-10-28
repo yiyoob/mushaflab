@@ -62,6 +62,7 @@ declare global {
 const store = {
   get: (k: string) => { try { return localStorage.getItem(k); } catch { return null; } },
   set: (k: string, v: string) => { try { localStorage.setItem(k, v); } catch { /* private mode */ } },
+  remove: (k: string) => { try { localStorage.removeItem(k); } catch { /* private mode */ } },
 };
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
@@ -199,6 +200,25 @@ ui.view.addEventListener("touchend", (e) => {
 
 const hlKey = () => `mushaf.highlight.${state.mushaf}`;
 
+// Free edits are saved in this browser per muṣḥaf (D65): the core's own export (the overlay
+// YAML), restored through its import, so a restored page is exactly the edited page, marker
+// included (rule 11). Nothing leaves the browser (rule 9).
+const editsKey = () => `mushaf.edits.${state.mushaf}`;
+async function saveEdits() {
+  const st = await callJson<{ edits: number }>("edit_state");
+  if (st.edits === 0) store.remove(editsKey());
+  else store.set(editsKey(), await call<string>("export_edits"));
+}
+async function restoreEdits() {
+  const saved = store.get(editsKey());
+  if (!saved) return;
+  try {
+    await call("import_edits", saved);
+  } catch (err) {
+    status(`saved edits not restored: ${(err as Error).message ?? err}`);
+  }
+}
+
 async function select(mushaf: string) {
   const [riwayah, style] = mushaf.split("/");
   status(`opening ${riwayah} (${style})…`);
@@ -210,6 +230,7 @@ async function select(mushaf: string) {
   store.set("mushaf.current", mushaf);
   // The toggle is kept per muṣḥaf (D37); plain by default.
   ui.hl.checked = store.get(hlKey()) === "1";
+  await restoreEdits();
   state.pages = await call<number>("pages");
   ui.page.max = String(state.pages);
   ui.of.textContent = `/ ${state.pages}`;
@@ -381,10 +402,11 @@ async function showEditor() {
       <button data-op="undo" ${st.can_undo ? "" : "disabled"}>Undo</button>
       <button data-op="redo" ${st.can_redo ? "" : "disabled"}>Redo</button>
       <button data-op="clear" ${st.edits ? "" : "disabled"}>Clear all</button>
+      <button id="clear-saved" ${st.edits || store.get(editsKey()) ? "" : "disabled"} title="Clear the edits and their copy saved in this browser">Clear saved edits</button>
       <button id="exp-yaml" ${st.edits ? "" : "disabled"}>Export edits</button>
       <label class="file">Import edits <input id="imp-yaml" type="file" accept=".yaml,.yml"/></label>
     </div>
-    <p>${st.edits} edit(s). ${st.edits ? "The page carries the “edited” marker." : ""}</p>
+    <p>${st.edits} edit(s), saved in this browser. ${st.edits ? "The page carries the “edited” marker." : ""}</p>
     <div id="edit-error" class="error"></div>
     <h3>Highlights</h3>
     <div class="ops" ${sel ? "" : "hidden"}>
@@ -474,11 +496,18 @@ async function showEditor() {
     if (!f) return;
     try {
       await call("import_edits", await f.text());
+      await saveEdits();
       invalidate();
       await render();
     } catch (err) {
       $("edit-error").textContent = String(err);
     }
+  };
+  $("clear-saved").onclick = async () => {
+    await call("edit", JSON.stringify({ op: "clear" }));
+    store.remove(editsKey());
+    invalidate();
+    await render();
   };
 }
 
@@ -511,6 +540,7 @@ async function applyEdit(kind: string) {
   };
   try {
     await call("edit", JSON.stringify(ops[kind]()));
+    await saveEdits();
     invalidate();
     await render();
   } catch (err) {

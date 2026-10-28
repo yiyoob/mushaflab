@@ -82,7 +82,22 @@ To serve that build locally at **http://127.0.0.1:4173**:
 ```bash
 npm --prefix apps/web run preview
 ```
-Nothing is deployed anywhere.
+### Test deploy on Netlify
+
+The site is plain static files, so it can be deployed as they are. Build it from an up-to-date
+`main`, then deploy the `dist` folder with the Netlify CLI. The CLI asks you to log in and to
+choose or create a site the first time:
+```bash
+just web-build
+```
+```bash
+npx netlify-cli deploy --dir=apps/web/dist --prod
+```
+Turning on password protection for a test site is recommended. It is in the Netlify site
+settings, under Access control.
+
+Free edits are saved in each browser (`localStorage`, per muṣḥaf) and restored on the next
+visit, with the "edited" marker. Nothing is sent to the server.
 
 To draw a single page with the reference renderer (writes SVG, PNG and JSON to
 `build/render/<riwayah>/`):

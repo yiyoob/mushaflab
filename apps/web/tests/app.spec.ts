@@ -227,3 +227,28 @@ test("highlight marks: not a difference removes a highlight, should be highlight
   // marks change no text: the page is still canonical
   await expect(page.locator("#pageview")).toHaveAttribute("data-canonical", "true");
 });
+
+test("free edits are saved in the browser: after a reload the edit and its marker are back (D65)", async ({ page }) => {
+  await open(page, "hafs/hijazi", 3);
+  await page.locator("#btn-edit").click();
+  await page.locator("#word-list .w-btn").nth(3).click();
+  await expect(page.locator("#sel")).toBeVisible();
+  await expect(page.locator("#word-list .c-btn").first()).toBeVisible();
+  await page.locator("#val").fill("32");
+  await page.locator('button[data-op="set_width"]').click();
+  await expect(page.locator("#pageview")).toHaveAttribute("data-canonical", "false");
+  const before = (await page.evaluate(() => window.mushaf.call("export_edits"))) as string;
+  await page.reload();
+  await page.waitForFunction(() => window.mushaf?.ready, null, { timeout: 120_000 });
+  await expect(page.locator("#pageview")).toHaveAttribute("data-page", "3");
+  await expect(page.locator("#pageview")).toHaveAttribute("data-canonical", "false");
+  expect(await canvasRed(page)).toBeGreaterThan(0);
+  expect((await page.evaluate(() => window.mushaf.call("export_edits"))) as string).toBe(before);
+  // clearing removes the saved copy too
+  await page.locator("#btn-edit").click();
+  await page.locator("#clear-saved").click();
+  await expect(page.locator("#pageview")).toHaveAttribute("data-canonical", "true");
+  await page.reload();
+  await page.waitForFunction(() => window.mushaf?.ready, null, { timeout: 120_000 });
+  await expect(page.locator("#pageview")).toHaveAttribute("data-canonical", "true");
+});
