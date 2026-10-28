@@ -1833,3 +1833,7 @@ Decision:
   from the text edits' overlay file.
 Evidence: `cargo test -p mushaf-engine --test session -- --ignored owner_highlight` (marks change
 only `highlights`; export/import round-trips); Playwright `highlight marks`; `just web-parity`.
+
+D45 addendum 3 (owner, 2026-10-27: "do not higlights difference in mudūd (qasr, tawassut, ṭūl)"):
+the maddah sign U+0653 is ignored in the highlight comparison, so differences in madd length are
+never highlighted.
