@@ -1837,3 +1837,20 @@ only `highlights`; export/import round-trips); Playwright `highlight marks`; `ju
 D45 addendum 3 (owner, 2026-10-27: "do not higlights difference in mudūd (qasr, tawassut, ṭūl)"):
 the maddah sign U+0653 is ignored in the highlight comparison, so differences in madd length are
 never highlighted.
+
+## D65: Free edits are saved in the browser (T8.3)
+Status: accepted (owner, 2026-10-28, relayed by the planning session: a Netlify test deploy
+"with edits saved")
+Decision:
+- After every edit, undo, redo, clear or import, the app stores the core's own export of the
+  edits (`export_edits`, the overlay YAML) in `localStorage` under
+  `mushaf.edits.<riwayah>/<style>`, or removes the key when there are no edits.
+- When a muṣḥaf is opened, a saved copy is restored through `import_edits`. A restored page is
+  the same edited page, so it carries the edited marker (rule 11). A copy that fails to import
+  is left in place and reported in the status line.
+- "Clear saved edits" in the editor clears the edits and the saved copy. Export and import
+  of files are unchanged.
+- Storage is per browser and per device. Nothing is sent anywhere (rule 9). Access is wrapped
+  in try/catch, so private mode simply does not save.
+Evidence: Playwright `free edits are saved in the browser` (edit, reload: the same edits and
+the marker; clear, reload: canonical).
