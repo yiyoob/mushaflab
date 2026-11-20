@@ -118,6 +118,25 @@ review-rules *NAMES:
 budur-verify:
     {{uv}} run python -m pipeline.budur.run
 
+# al-Futuh al-Bahira glyph-level extraction (D66): one volume (or a page range) to
+# build/books/al-futuh-al-bahira/ (untracked: it holds book text). Needs the pinned PDFs and the
+# owner font (MANIFEST groups books, owner-fonts); FUTUH_PDF_DIR / FUTUH_FONT point elsewhere.
+# e.g. just book-futuh --vol 1 --pages 48-55 --surah 1 --qa
+book-futuh *ARGS:
+    {{uv}} run python -m pipeline.futuh.run {{ARGS}}
+
+# Re-learn the Quran-font glyph corrections (data/books/al-futuh-al-bahira/glyphfix.json, D66)
+book-futuh-learn:
+    {{uv}} run python -m pipeline.futuh.learn
+
+# Reader labels -> ruwat on existing outputs (no re-extraction), e.g. just book-futuh-readers build/books/al-futuh-al-bahira/vol1.jsonl
+book-futuh-readers *FILES:
+    {{uv}} run python -m pipeline.futuh.readers {{FILES}}
+
+# Stage D: contact sheets of flagged words (sheets <run>.jsonl [high]) / merge verdicts (apply <run>.jsonl)
+book-futuh-review *ARGS:
+    {{uv}} run python -m pipeline.futuh.review {{ARGS}}
+
 # SVG + PNG via reference renderer, e.g. just render PAGE=1 RIWAYAH=hafs
 render *ARGS:
     #!/usr/bin/env bash

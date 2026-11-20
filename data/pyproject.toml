@@ -11,6 +11,7 @@ dependencies = [
 dev = [
     "brotli>=1.1",
     "fonttools>=4.67.0",
+    "pymupdf>=1.26",
     "pytest",
     "ruff",
     "uharfbuzz>=0.56.3",
@@ -39,3 +40,9 @@ ignore = ["S603", "S607"]  # subprocess with fixed git arguments is expected
 "pipeline/tests/*" = ["S101", "PLR2004", "ANN"]
 # Exploratory Phase 0 spikes: report-generating scripts, not pipeline code.
 "spikes/*" = ["PLR2004", "PLR0912", "PLR0915"]
+# al-Futuh glyph-level extraction (pipeline/futuh): geometry thresholds in PDF points are
+# documented where used; the page/label parsers are long by nature; heavy modules (pymupdf,
+# uharfbuzz) and the spine are imported where first needed.
+"pipeline/futuh/*" = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLC0415"]
+# the QA page is an inline HTML/CSS template
+"pipeline/futuh/emit.py" = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLC0415", "E501"]

@@ -15,3 +15,4 @@ is done. The "Terms seen" column only records wording observed incidentally whil
 | `qcf4` | yes | owner-declared (2026-10-21) | npm: "SEE LICENSE IN LICENSE.md" |
 | `tanzil` | yes | owner-declared (2026-10-21) | file header: CC BY 3.0; verbatim copies only, text may not be changed; cite Tanzil and link tanzil.net |
 | `books` | no | owner-supplied PDF of al-Futuh al-Bahira and EPUB of al-Budur al-Zahirah (turath.io, 2026-10-26); kept only in `data/sources/raw/` and the private archive; cited by page and row, never copied into tracked files | - |
+| `owner-fonts` | no | owner-supplied font files (Sakkal Majalla, 2026-11-20) used only to verify book text layers; kept only in `data/sources/raw/` | - |
