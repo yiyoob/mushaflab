@@ -1,0 +1,70 @@
+# Meaning of the colours used on Quranic text in al-Futuh al-Bahira.
+#
+# Source of the meanings: the book's own colour key, vol. 1, pdf p. 12 (paraphrased below;
+# no passages from the book are copied, LICENSES.md, books).
+# The key is printed with slightly different swatch colours (e.g. #ed1f24) from the ones the
+# text actually uses (Word's standard palette, e.g. #ff0000), so each class lists the text
+# colours we ASSIGNED to it by hue. Every assignment is status `hypothesis` until the owner
+# confirms it. Colours not listed here are reported as unmapped (out/*.summary.json), never
+# guessed. The contributor who ran the extraction accepted the hue-based assignments for human
+# readers (2026-11-20); they stay `hypothesis` until the owner confirms. Glyph counts are Quran-font glyphs across all 6 volumes (out/color_survey.json).
+#
+# `label` is the short Arabic tag used in the Shamela text: {label:letters}.
+source: "book-al-futuh-al-bahira-vol1, pdf p. 12 (colour key)"
+classes:
+  - id: farsh
+    label: فرش
+    key: "farsh differences: red"  # the book's key, paraphrased
+    key_swatch: "#ed1f24"
+    hex: ["#ff0000"]  # 246095 glyphs
+    status: hypothesis  # accepted by hue by the contributor (2026-11-20); owner to confirm
+  - id: waqf
+    label: وقف
+    key: "rulings that apply when pausing (Hisham, Hamzah and others): dark red"  # the book's key, paraphrased
+    key_swatch: "#841618"
+    hex: ["#c00000"]  # 31071
+    status: hypothesis  # accepted by hue by the contributor (2026-11-20); owner to confirm
+  - id: ibdal_ikhfa
+    label: إبدال
+    key: "ibdal, and Abu Ja'far's ikhfa' before ghayn/kha: light blue"  # the book's key, paraphrased
+    key_swatch: "#25aadf"
+    hex: ["#00b0f0"]  # 3521
+    status: hypothesis  # accepted by hue by the contributor (2026-11-20); owner to confirm
+  - id: sila_ha_idgham_bila_ghunna
+    label: صلة
+    key: "silat ha al-damir, and idgham without ghunnah into ya/waw: green"  # the book's key, paraphrased
+    key_swatch: "#06ae4f"
+    hex: ["#00b050"]  # 2572
+    status: hypothesis  # accepted by hue by the contributor (2026-11-20); owner to confirm
+  - id: imala_taqlil
+    label: إمالة
+    key: "imalah and taqlil: dark green"  # the book's key, paraphrased
+    key_swatch: "#50813b"
+    hex: ["#538135"]  # 27046
+    status: hypothesis  # accepted by hue by the contributor (2026-11-20); owner to confirm
+  - id: tarqiq_ra
+    label: ترقيق
+    key: "tarqiq of ra: orange"  # the book's key, paraphrased
+    key_swatch: "#f9be10"
+    # three oranges are used; whether they mean different things is for the owner to say
+    hex: ["#c45911", "#f4b083", "#ffc000"]  # 21844, 12176, 3722
+    status: hypothesis  # accepted by hue by the contributor (2026-11-20); owner to confirm
+  - id: sila_mim
+    label: ميم
+    key: "silat mim al-jam: purple"  # the book's key, paraphrased
+    key_swatch: "#6e3994"
+    hex: ["#7030a0"]  # 31570
+    status: hypothesis  # accepted by hue by the contributor (2026-11-20); owner to confirm
+  - id: idgham_taghliz
+    label: إدغام
+    key: "small and large idgham, and taghliz of lam: blue"  # the book's key, paraphrased
+    key_swatch: "#156fb5"
+    hex: ["#0000ff"]  # 6794
+    status: hypothesis  # accepted by hue by the contributor (2026-11-20); owner to confirm
+  - id: madd_badal_lin
+    label: بدل
+    key: "madd al-badal and al-lin: fluorescent green"  # the book's key, paraphrased
+    key_swatch: "#80c341"
+    # two greens are used; #00ff00 is closer to "fluorescent", #92d050 to the key swatch
+    hex: ["#92d050", "#00ff00"]  # 9236, 6797
+    status: hypothesis  # accepted by hue by the contributor (2026-11-20); owner to confirm

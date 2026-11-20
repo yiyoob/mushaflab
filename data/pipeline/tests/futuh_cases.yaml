@@ -1,0 +1,20 @@
+# Reader labels for pipeline/futuh/readers.py tests, as printed in al-Futuh al-Bahira (names and
+# terms only, no passages). Expected sets use the book's terms table (vol. 1 p. 11) and madd
+# schools (vol. 1 pp. 52-53). `spine` words are Hafs spine ids whose madd type selects the table.
+terms_table:
+  label: "المدنيان وابن كثير وأبو عمرو  وابن عامر وحمزة"   # vol. 1 p. 48
+  ruwat: [qalun, warsh, ibn_wardan, ibn_jammaz, bazzi, qunbul, duri_abuamr, susi, hisham, ibn_dhakwan, khalaf_an_hamzah, khallad]
+except_following:   # vol. 1 p. 48, segment on 1:6
+  labels: ["الجميع عدا من سيأتي.", "قنبل واندرج رويس:", "حمزة بالإشمام ."]
+include_previous: "قالون واندرج من اندرج:"
+madd_group: "أصحاب التوسط."
+waqf_only: "ورش واندرج حمزة وقفا"
+munfasil_segment:   # vol. 1 p. 52, segment on 2:4 (separated madd in 2:4:3-4)
+  spine: ["2:4:3", "2:4:4"]
+  labels: ["قالون واندرج دوري أبو عمرو  ويعقوب:", "أصحاب التوسط.", "إدريس:", "حمزة:", "ورش:", "قالون واندرج ابن كثير:", "أبو جعفر:", "السوسي:"]
+  tawassut_max: [hisham, ibn_dhakwan, shuba, hafs, abul_harith, duri_kisai, ishaq, idris, qalun, duri_abuamr]
+  not_certain: [qalun, duri_abuamr, idris]
+all_except_madd_group:   # vol. 1 p. 53 on 2:6 (connected madd in 2:6:4)
+  spine: ["2:6:4"]
+  label: "الجميع عدا أصحاب الإشباع."
+  excluded: [warsh, khalaf_an_hamzah, khallad]

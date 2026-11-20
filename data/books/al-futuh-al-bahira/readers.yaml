@@ -1,0 +1,123 @@
+# Reader names and phrases in al-Futuh al-Bahira (book-al-futuh-al-bahira-vol1..6). Names, terms
+# and citations only, no passages from the book (LICENSES.md, books). Used for resolving each table row's reader label
+# (the الشرح cell, text before ":") to the 20 ruwat. Ids are mushaflab's riwayah ids where they
+# exist (CLAUDE.md there), the rest follow mushaflab's al-Budur lexicon.
+#
+# Citations are to this book: "v1 p11" = volume 1, pdf page 11. `basis`:
+#   defined     the book defines the term (the terms table, v1 p11, or the biographies v1 pp19-41)
+#   usage       the book uses it with this meaning (a cited row); our reading
+#   contextual  the members depend on the passage; resolved by a rule in readers.py, else reported
+# Matching is on a normalized key (harakat/tatweel removed, alif forms unified, ى = ي); a name may
+# carry the prefix "و". Typos seen in the book are listed as their own forms (basis: usage).
+
+qurra:
+  nafi: [qalun, warsh]
+  ibn_kathir: [bazzi, qunbul]
+  abu_amr: [duri_abuamr, susi]
+  ibn_amir: [hisham, ibn_dhakwan]
+  asim: [shuba, hafs]
+  hamzah: [khalaf_an_hamzah, khallad]
+  kisai: [abul_harith, duri_kisai]
+  abu_jafar: [ibn_wardan, ibn_jammaz]
+  yaqub: [ruways, rawh]
+  khalaf_ashir: [ishaq, idris]
+
+forms:
+  # Qurra' (biographies v1 pp19-41; the terms table v1 p11 defines نافع as Qalun + Warsh).
+  - {form: "نافع", qurra: [nafi], basis: defined, cite: "v1 p11"}
+  - {form: "ابن كثير", qurra: [ibn_kathir], basis: defined, cite: "v1 p22"}
+  - {form: "أبو عمرو", qurra: [abu_amr], basis: defined, cite: "v1 pp19-41"}
+  - {form: "أبي عمرو", qurra: [abu_amr], basis: defined, cite: "v1 pp19-41"}
+  - {form: "أبوعمرو", qurra: [abu_amr], basis: usage, note: "typo, no space"}
+  - {form: "ابن عامر", qurra: [ibn_amir], basis: defined, cite: "v1 pp19-41"}
+  - {form: "عاصم", qurra: [asim], basis: defined, cite: "v1 pp19-41"}
+  - {form: "حمزة", qurra: [hamzah], basis: defined, cite: "v1 pp19-41"}
+  - {form: "الكسائي", qurra: [kisai], basis: defined, cite: "v1 pp19-41"}
+  - {form: "أبو جعفر", qurra: [abu_jafar], basis: defined, cite: "v1 pp19-41"}
+  - {form: "أبي جعفر", qurra: [abu_jafar], basis: defined, cite: "v1 pp19-41"}
+  - {form: "أبوجعفر", qurra: [abu_jafar], basis: usage, note: "typo, no space"}
+  - {form: "يعقوب", qurra: [yaqub], basis: defined, cite: "v1 pp19-41"}
+  - {form: "العاشر", qurra: [khalaf_ashir], basis: defined, cite: "v1 p40 (خلف العاشر)"}
+  - {form: "خلف العاشر", qurra: [khalaf_ashir], basis: defined, cite: "v1 p40"}
+  # Ruwat.
+  - {form: "قالون", ruwat: [qalun], basis: defined, cite: "v1 p21"}
+  - {form: "ورش", ruwat: [warsh], basis: defined, cite: "v1 p21"}
+  - {form: "البزي", ruwat: [bazzi], basis: defined, cite: "v1 pp22-24"}
+  - {form: "قنبل", ruwat: [qunbul], basis: defined, cite: "v1 pp22-24"}
+  - {form: "دوري أبو عمرو", ruwat: [duri_abuamr], basis: usage, note: "the book's usual form (nominative أبو)"}
+  - {form: "دوري أبي عمرو", ruwat: [duri_abuamr], basis: usage}
+  - {form: "دوري أبوعمرو", ruwat: [duri_abuamr], basis: usage, note: "typo, no space"}
+  - {form: "الدوري عن أبي عمرو", ruwat: [duri_abuamr], basis: usage}
+  - {form: "السوسي", ruwat: [susi], basis: defined, cite: "v1 pp19-41"}
+  - {form: "هشام", ruwat: [hisham], basis: defined, cite: "v1 pp19-41"}
+  - {form: "ابن ذكوان", ruwat: [ibn_dhakwan], basis: defined, cite: "v1 pp19-41"}
+  - {form: "شعبة", ruwat: [shuba], basis: defined, cite: "v1 pp19-41"}
+  - {form: "حفص", ruwat: [hafs], basis: defined, cite: "v1 pp19-41"}
+  - {form: "خلف حمزة", ruwat: [khalaf_an_hamzah], basis: usage, note: "Khalaf, rawi of Hamzah (the book writes خلف العاشر for the qari)"}
+  - {form: "خلف عن حمزة", ruwat: [khalaf_an_hamzah], basis: usage}
+  - {form: "خلاد", ruwat: [khallad], basis: defined, cite: "v1 pp19-41"}
+  - {form: "أبو الحارث", ruwat: [abul_harith], basis: defined, cite: "v1 pp19-41"}
+  - {form: "دوري الكسائي", ruwat: [duri_kisai], basis: usage}
+  - {form: "الدوري عن الكسائي", ruwat: [duri_kisai], basis: usage}
+  - {form: "دوري علي", ruwat: [duri_kisai], basis: usage, note: "علي = al-Kisa'i"}
+  - {form: "ابن وردان", ruwat: [ibn_wardan], basis: defined, cite: "v1 pp19-41"}
+  - {form: "ابن جماز", ruwat: [ibn_jammaz], basis: defined, cite: "v1 pp19-41"}
+  - {form: "رويس", ruwat: [ruways], basis: defined, cite: "v1 pp19-41"}
+  - {form: "روح", ruwat: [rawh], basis: defined, cite: "v1 pp19-41"}
+  - {form: "إسحاق", ruwat: [ishaq], basis: defined, cite: "v1 p40"}
+  - {form: "إدريس", ruwat: [idris], basis: defined, cite: "v1 p40"}
+  # Group terms, the book's terms table (المصطلحات التي تم استخدامها في الجمع), v1 p11.
+  - {form: "المدنيان", qurra: [nafi, abu_jafar], basis: defined, cite: "v1 p11"}
+  - {form: "البصريان", qurra: [abu_amr, yaqub], basis: defined, cite: "v1 p11"}
+  - {form: "الكوفيون", qurra: [hamzah, asim, kisai, khalaf_ashir], basis: defined, cite: "v1 p11"}
+  - {form: "الأصحاب", qurra: [hamzah, kisai, khalaf_ashir], basis: defined, cite: "v1 p11"}
+  - {form: "أصحاب الصلة", ruwat: [qalun], qurra: [ibn_kathir, abu_jafar], basis: defined, cite: "v1 p11 (قالون وابن كثير وأبو جعفر)"}
+  - {form: "أصحاب السكت", ruwat: [idris], qurra: [hamzah], basis: defined, cite: "v1 p11 (إدريس وحمزة)"}
+  - {form: "أصحاب الإبدال", ruwat: [warsh, susi], qurra: [abu_jafar], basis: defined, cite: "v1 p11 (ورش والسوسي وأبو جعفر)"}
+  # Contextual: "whoever has a qasr/tawassut/ishba' wajh" (v1 p11) depends on the madd in the
+  # passage; never guessed, reported as contextual with its kind.
+  - {form: "أصحاب القصر", contextual: madd_qasr, basis: contextual, cite: "v1 p11 (من له وجه قصر)"}
+  - {form: "أصحاب التوسط", contextual: madd_tawassut, basis: contextual, cite: "v1 p11 (من له وجه توسط)"}
+  - {form: "أصحاب الإشباع", contextual: madd_ishba, basis: contextual, cite: "v1 p11 (من له وجه إشباع)"}
+  # Not in the terms table: reported unresolved, never guessed.
+  - {form: "أصحاب بالقصر", contextual: madd_qasr, basis: usage, note: "typo for أصحاب القصر"}
+  - {form: "أصحاب بالتوسط", contextual: madd_tawassut, basis: usage, note: "typo for أصحاب التوسط"}
+  - {form: "أصحاب بالإشباع", contextual: madd_ishba, basis: usage, note: "typo for أصحاب الإشباع"}
+  - {form: "أصحاب توسط", contextual: madd_tawassut, basis: usage, note: "e.g. أصحاب توسط المتصل"}
+  - {form: "أصحاب قصر", contextual: madd_qasr, basis: usage}
+  - {form: "أصحاب إشباع", contextual: madd_ishba, basis: usage}
+  - {form: "توسط", contextual: madd_tawassut, basis: usage, note: "bare madd wajh as a label"}
+  - {form: "إشباع", contextual: madd_ishba, basis: usage, note: "bare madd wajh as a label"}
+  - {form: "قصر", contextual: madd_qasr, basis: usage, note: "bare madd wajh as a label"}
+  - {form: "أصحاب بالإبدال", ruwat: [warsh, susi], qurra: [abu_jafar], basis: usage, note: "typo for أصحاب الإبدال (v1 p11)"}
+  - {form: "دوري أبو عمر", ruwat: [duri_abuamr], basis: usage, note: "typo, final waw missing"}
+  - {form: "خلف", contextual: ambiguous_khalaf, basis: contextual, note: "Hamzah's rawi or al-'Ashir; the book otherwise writes خلف حمزة / خلف العاشر"}
+  - {form: "صحبة", contextual: unknown_symbol, basis: contextual, note: "a Shatibiyya symbol; not defined in this book"}
+  - {form: "الدوري", contextual: ambiguous_duri, basis: contextual, note: "Abu 'Amr's or al-Kisa'i's"}
+
+# Phrases (normalized keys are derived in code). Order matters: longest first.
+phrases:
+  all: ["الجميع", "جميع القراء", "للجميع"]
+  except: ["عدا", "عد"]  # "الجميع عدا ..." / "عد" is a typo seen in the book
+  following: ["من سيأتي", "من سياتي"]  # "عدا من سيأتي": the rows after this one in the segment
+  rest: ["الباقون", "الباقين", "وصل الباقين"]
+  # "X واندرج Y": Y's reading here is folded into X's row (standard jam' usage)
+  include: ["واندرج", "اندرج", "واندرح", "واندج"]
+  # "X واندرج من اندرج": X with whoever was folded in with X earlier in the passage
+  include_previous: ["من اندرج"]
+  with: ["ومعه", "معه"]
+  khulf: ["بخلف عنه", "بخلاف عنه", "بخلف", "بخلاف"]
+  waqf_only: ["وقفا", "ووقفا"]  # "ورش واندرج حمزة وقفا": Hamzah only when pausing
+
+# The book's madd schools, used to resolve أصحاب القصر/التوسط/الإشباع (v1 p11: "من له وجه …")
+# for the madd type found in the row's text (futuh/madd.py). Both are stated "in all the Qur'an".
+madd_tables:
+  munfasil:
+    cite: "v1 p52, footnote 1: the four schools in the separated madd, stated for the whole Quran"
+    qasr: {qurra: [ibn_kathir, abu_jafar, yaqub], ruwat: [susi, qalun, duri_abuamr]}
+    tawassut: {qurra: [ibn_amir, asim, kisai, khalaf_ashir], ruwat: [qalun, duri_abuamr]}
+    ishba: {qurra: [hamzah], ruwat: [warsh]}
+  muttasil:
+    cite: "v1 p53, footnote 1: the two schools in the connected madd (summary)"
+    tawassut: {all_except: {qurra: [hamzah], ruwat: [warsh]}}
+    ishba: {qurra: [hamzah], ruwat: [warsh]}
