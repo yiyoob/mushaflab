@@ -8,9 +8,10 @@ from pathlib import Path
 import pytest
 
 from pipeline import compile_db, ingest_layout, spine
-from pipeline.tests.markers import needs_sources
+from pipeline.tests.markers import full_only, needs_sources
 
 
+@full_only
 @needs_sources
 def test_build_is_byte_identical(tmp_path: Path) -> None:
     a, b = tmp_path / "a.db", tmp_path / "b.db"
@@ -19,6 +20,7 @@ def test_build_is_byte_identical(tmp_path: Path) -> None:
     assert hashlib.sha256(a.read_bytes()).digest() == hashlib.sha256(b.read_bytes()).digest()
 
 
+@full_only
 @needs_sources
 def test_db_round_trips_to_the_tracked_files(tmp_path: Path) -> None:
     db = tmp_path / "m.db"
@@ -27,6 +29,7 @@ def test_db_round_trips_to_the_tracked_files(tmp_path: Path) -> None:
     assert compile_db.read_layout(db) == ingest_layout.load_layout()
 
 
+@full_only
 @needs_sources
 def test_schema_version_and_keys(tmp_path: Path) -> None:
     db = tmp_path / "m.db"

@@ -5,7 +5,7 @@ pages with the **1441H digital layout** (KFGQPC's digital pages, QUL V4, qcf4), 
 1421H-style print: the two differ on 1,666 lines (D6 addendum, G-031).
 
 **Result: GATE G1 passed (owner, 2026-10-22)** on the pinned DigitalKhatt Madina font, line pitch
-1,900 and the committed goldens; surah headers plain for Stage 1 (record in `docs/decisions.md`).
+1,900 and the committed goldens; surah headers plain for Stage 1 (record in `docs/adr/GATE-G1.md`).
 
 **Known deviation from the print (G-045, open):** after a non-joining letter (و, ذ, ر, د, ز, ء, ا),
 the superscript alef U+0670 is drawn as a spacing upright alef in a gap, where the print draws a

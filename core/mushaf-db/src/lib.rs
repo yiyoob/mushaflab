@@ -24,6 +24,22 @@ pub fn load_dir(root: &Path) -> Result<DataSet, Error> {
     DataSet::from_files(&read_tree(root)?)
 }
 
+/// The data root, from `<root>/../build/mushaf.db` when that DB was compiled from exactly the
+/// root's current files (`check_current`: same paths, same sha256), else parsed from the files.
+/// Both paths give the same `DataSet` (the parity tests check this, D12), so this only saves
+/// time: reading the DB takes ~2 s, parsing ~80 MB of patch YAML ~15 s (optimized build).
+/// A missing, stale or older-schema DB falls back to `load_dir` without an error.
+pub fn load(root: &Path) -> Result<DataSet, Error> {
+    if let Some(db) = root.parent().map(|p| p.join("build/mushaf.db"))
+        && db.is_file()
+        && check_current(&db, root).is_ok()
+        && let Ok(ds) = load_db(&db)
+    {
+        return Ok(ds);
+    }
+    load_dir(root)
+}
+
 fn open(db: &Path) -> Result<Connection, Error> {
     let con =
         Connection::open_with_flags(db, OpenFlags::SQLITE_OPEN_READ_ONLY).map_err(|e| io(db, e))?;

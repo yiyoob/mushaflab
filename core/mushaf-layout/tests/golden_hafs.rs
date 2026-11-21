@@ -114,7 +114,7 @@ fn int(v: &Value) -> u32 {
 #[test]
 fn resolved_hafs_pages_equal_the_kfgqpc_source() {
     let Some(rows) = kfgqpc_rows() else { return };
-    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let ds = mushaf_db::load(&repo().join("data")).unwrap();
     let (spine, layout) = (&ds.spines["hafs/v1"], &ds.layouts["uthmani-1441h"]);
     let resolved = resolve_patches(spine, &[], Mode::Data).unwrap();
     let mapping = map_lines(layout, spine, &resolved).unwrap();

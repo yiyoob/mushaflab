@@ -1,7 +1,7 @@
 """T1.5: integrity verification and the page-boundary golden file."""
 
 from pipeline import verify
-from pipeline.tests.markers import needs_sources
+from pipeline.tests.markers import full_only, needs_sources
 
 
 def test_failures_are_reported_not_raised() -> None:
@@ -14,6 +14,7 @@ def test_failures_are_reported_not_raised() -> None:
     assert verify.run_checks({"ok": ok, "bad": bad}) == {"bad": ["x"]}
 
 
+@full_only
 @needs_sources
 def test_all_integrity_checks_pass() -> None:
     assert verify.run_checks(verify.CHECKS) == {}

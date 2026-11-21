@@ -563,7 +563,7 @@ const KFGQPC_PENDING: &str = "tests/golden/shape/kfgqpc-rule6-pending.json";
 #[test]
 #[ignore = "run by `just golden` (release)"]
 fn kfgqpc_riwayat_words_pass_rule_6() {
-    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let ds = mushaf_db::load(&repo().join("data")).unwrap();
     let exceptions = mushaf_shape::Exceptions::from_json(
         &fs::read_to_string(repo().join("data/render/kfgqpc-rule6-exceptions.json")).unwrap(),
     )
@@ -620,7 +620,7 @@ const DK_PENDING: &str = "tests/golden/shape/dk-riwayat-rule6-pending.json";
 #[test]
 #[ignore = "run by `just golden` (release)"]
 fn dk_riwayat_words_pass_rule_6() {
-    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let ds = mushaf_db::load(&repo().join("data")).unwrap();
     let r = Renderer::load(&repo(), "hafs").unwrap();
     let mut table = r.table.clone();
     table
@@ -1071,7 +1071,7 @@ const SHOWN_FORMS: usize = 10;
 #[ignore = "run by `just golden` (release)"]
 fn style_availability_audit() {
     use std::collections::BTreeMap;
-    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let ds = mushaf_db::load(&repo().join("data")).unwrap();
     let conv = fs::read_to_string(repo().join("data/encodings/style-conversion.json")).unwrap();
     let hafs = Renderer::load(&repo(), "hafs").unwrap();
     let mut entries = Vec::new();

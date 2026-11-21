@@ -284,7 +284,7 @@ proptest! {
 
 #[test]
 fn hafs_identity_maps_every_line_to_its_anchors() {
-    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let ds = mushaf_db::load(&repo().join("data")).unwrap();
     let spine = &ds.spines["hafs/v1"];
     let layout = &ds.layouts["uthmani-1441h"];
     let r = resolve_patches(spine, &[], Mode::Data).unwrap();
