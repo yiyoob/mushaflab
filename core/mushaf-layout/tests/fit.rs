@@ -34,7 +34,7 @@ fn env() -> Env {
     let read = |p: &str| fs::read_to_string(repo().join(p)).unwrap();
     let profile = Profile::from_json(&read("data/render/hafs-uthmani-1441h.json")).unwrap();
     Env {
-        ds: mushaf_db::load_dir(&repo().join("data")).unwrap(),
+        ds: mushaf_db::load(&repo().join("data")).unwrap(),
         table: profile.encoding_table(|p| Ok(read(p))).unwrap(),
         widths: LineWidths::from_json(&read(&profile.line_widths)).unwrap(),
         names: SurahNames::from_json(&read(&profile.surah_names)).unwrap(),

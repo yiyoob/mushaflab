@@ -70,7 +70,7 @@ def render() -> str:
         "Bazzi, Qunbul or al-Susi; the `Douri` book is another printing. Fitted lines (G-105) "
         "have no verdict. The reference still needed is KFGQPC's own Warsh/Qalun printing.\n",
         "4. **GATE G3 passed (2026-10-23)**: D29, D30, D31, D32 accepted and D33 confirmed "
-        "(record in `docs/decisions.md`). The owner then went through the encoding groups one by "
+        "(record in `docs/adr/GATE-G3.md`). The owner then went through the encoding groups one by "
         "one (D28): 169 places stay blocked by the owner's choice (G-102; sheet "
         "`build/review/phase5/encoding.html` from `just review-phase5`). Still open: G-103 and "
         "G-101 (flagged), the Warsh/Qalun reference print (G-106).\n",

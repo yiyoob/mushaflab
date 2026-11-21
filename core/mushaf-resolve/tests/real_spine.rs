@@ -8,7 +8,7 @@ use mushaf_resolve::{Mode, resolve_patches};
 
 #[test]
 fn no_patches_gives_the_hafs_spine() {
-    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let ds = mushaf_db::load(&repo().join("data")).unwrap();
     let spine = &ds.spines["hafs/v1"];
     let r = resolve_patches(spine, &[], Mode::Data).unwrap();
     assert_eq!(r.items.len(), 6236 + 199 + 77430);
