@@ -3,10 +3,10 @@ sources:
   - id: al-budur
     title: "al-Budur al-Zahirah fi al-Qira'at al-'Ashr al-Mutawatirah min Tariqay al-Shatibiyyah wa-al-Durrah"
     author: "'Abd al-Fattah al-Qadi"
-    edition: "Dar al-Kitab al-'Arabi, Beirut, 1401/1981 (turath.io book 57)"
+    edition: "Dar al-Kitab al-'Arabi, Beirut, 1401/1981; Aljam3 book 3480 (scan and OCR text, file page = printed page)"
     role: truth
     locator: "p<printed page>"
-    pins: [book-al-budur-al-zahirah]
+    pins: [book-al-budur-aljam3-pdf, book-al-budur-aljam3-txt, book-al-budur-al-zahirah]
   - id: al-futuh
     title: "al-Futuh al-Bahirah fi Jam' al-Qira'at al-'Ashr al-Mutawatirah"
     role: truth
