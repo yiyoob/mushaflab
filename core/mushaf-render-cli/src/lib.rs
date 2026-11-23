@@ -53,7 +53,9 @@ fn strings<'a>(v: &'a serde_json::Value, out: &mut BTreeSet<&'a str>) {
 ///   patches are the round-trip's input, D22; the engine never resolves them);
 /// - `data/render/*`, `data/encodings/*` and `data/approvals/*` (read-only, for the
 ///   provenance screen);
-/// - every font a render profile or the style audit names.
+/// - every font a render profile or the style audit names;
+/// - `corpus/` (README files excluded), from which the engine takes the Ḥafṣ spine and the
+///   layouts (D73).
 pub fn bundle_files(repo: &Path) -> Result<BTreeMap<String, Vec<u8>>, Error> {
     let read =
         |rel: &str| std::fs::read(repo.join(rel)).map_err(|e| Error::new(format!("{rel}: {e}")));
@@ -98,6 +100,11 @@ pub fn bundle_files(repo: &Path) -> Result<BTreeMap<String, Vec<u8>>, Error> {
     }
     for f in named {
         out.insert(f.clone(), read(&f)?);
+    }
+    let mut corpus = mushaf_corpus::read_tree(repo).map_err(Error::new)?;
+    corpus.remove(mushaf_corpus::APPROVALS);
+    for (k, v) in corpus {
+        out.insert(k, v.into_bytes());
     }
     Ok(out)
 }

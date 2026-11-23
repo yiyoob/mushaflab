@@ -255,7 +255,7 @@ writing_style: style_a
 font: font_a
 sources:
   - source: text-x
-    pins: [pin-x]
+    pins: {layout: pin-x}
     status: raw-derived
 ";
 

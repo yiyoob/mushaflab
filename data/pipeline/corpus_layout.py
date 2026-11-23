@@ -132,7 +132,7 @@ def render_layout_yaml() -> str:
         f"render_profile: {_q(_rel(RENDER_PROFILE))}",
         "sources:",
         "  - source: qul-layout-1441h",
-        f"    pins: [{d['sources']['layout']}, {d['sources']['words']}]",
+        f"    pins: {{layout: {d['sources']['layout']}, words: {d['sources']['words']}}}",
         f"    via: {_q(_rel(LEGACY_LAYOUT))}",
         "    status: raw-derived",
         "corrections:",

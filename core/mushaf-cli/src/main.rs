@@ -9,11 +9,10 @@
 //! state of each approved table, and exits 1 on any error. `build` runs the same check, then
 //! writes a fresh SQLite file: same inputs, same rows, in the same order (rule 8; no timestamps).
 
-use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-use mushaf_corpus::{APPROVALS, Corpus, Files};
+use mushaf_corpus::{Corpus, Files};
 use rusqlite::{Connection, params};
 
 fn usage() -> ExitCode {
@@ -91,42 +90,8 @@ fn main() -> ExitCode {
     }
 }
 
-/// Every file under `<root>/corpus/` (README files excluded) and the approvals file, by
-/// repository-relative path, in sorted order.
 fn read_files(root: &Path) -> Result<Files, String> {
-    let mut files = BTreeMap::new();
-    let mut stack = vec![root.join("corpus")];
-    while let Some(dir) = stack.pop() {
-        let rd = std::fs::read_dir(&dir).map_err(|e| format!("{}: {e}", dir.display()))?;
-        for entry in rd {
-            let p = entry.map_err(|e| e.to_string())?.path();
-            let name = p.file_name().and_then(|n| n.to_str()).unwrap_or_default();
-            if name.starts_with('.') || name == "README.md" {
-                continue;
-            }
-            if p.is_dir() {
-                stack.push(p);
-            } else {
-                let rel = p
-                    .strip_prefix(root)
-                    .map_err(|e| e.to_string())?
-                    .components()
-                    .map(|c| c.as_os_str().to_string_lossy().into_owned())
-                    .collect::<Vec<_>>()
-                    .join("/");
-                let text =
-                    std::fs::read_to_string(&p).map_err(|e| format!("{}: {e}", p.display()))?;
-                files.insert(rel, text);
-            }
-        }
-    }
-    let approvals = root.join(APPROVALS);
-    if approvals.is_file() {
-        let text = std::fs::read_to_string(&approvals)
-            .map_err(|e| format!("{}: {e}", approvals.display()))?;
-        files.insert(APPROVALS.to_string(), text);
-    }
-    Ok(files)
+    mushaf_corpus::read_tree(root)
 }
 
 const SCHEMA: &str = "

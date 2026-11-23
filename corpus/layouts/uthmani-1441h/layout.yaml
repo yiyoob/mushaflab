@@ -11,7 +11,7 @@ font: "fonts/digitalkhatt/hb-madina.otf"
 render_profile: "data/render/hafs-uthmani-1441h.json"
 sources:
   - source: qul-layout-1441h
-    pins: [qul-layout-19-v4-1441h, qul-script-312-kfgqpc-hafs-wbw]
+    pins: {layout: qul-layout-19-v4-1441h, words: qul-script-312-kfgqpc-hafs-wbw}
     via: "data/layouts/uthmani-1441h.json"
     status: raw-derived
 corrections:

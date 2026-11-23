@@ -8,6 +8,7 @@ description = "Platform-neutral page engine over a Source (D56): used by the CLI
 
 [dependencies]
 mushaf-model.workspace = true
+mushaf-corpus.workspace = true
 mushaf-resolve.workspace = true
 mushaf-layout.workspace = true
 mushaf-shape.workspace = true

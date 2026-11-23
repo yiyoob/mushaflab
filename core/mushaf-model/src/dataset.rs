@@ -396,7 +396,8 @@ impl DataSet {
 
     /// Cross-references: every layout, patch file, ayah map and profile names a loaded spine,
     /// every layout is ordered, and a profile's patch files and ayah map exist on its spine.
-    fn validate(&self) -> Result<(), Error> {
+    /// Checks references between the parts (patch targets, layout spines, …).
+    pub fn validate(&self) -> Result<(), Error> {
         let known = |s: &str, what: &str| {
             if self.spines.contains_key(s) {
                 Ok(())

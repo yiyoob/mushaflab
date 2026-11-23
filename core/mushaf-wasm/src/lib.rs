@@ -7,9 +7,9 @@
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
+use mushaf_engine::Renderer;
 use mushaf_engine::bundle::Bundle;
 use mushaf_engine::session::{EditOp, HighlightMark, Session};
-use mushaf_engine::{Renderer, Source};
 use mushaf_model::DataSet;
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
@@ -52,7 +52,7 @@ pub struct Api {
 impl Api {
     pub fn new(bytes: &[u8]) -> Res<Api> {
         let bundle = Bundle::parse(bytes).map_err(err)?;
-        let data = Arc::new(DataSet::from_files(&bundle.data_files().map_err(err)?).map_err(err)?);
+        let data = Arc::new(mushaf_engine::load_data(&bundle).map_err(err)?);
         Ok(Api {
             bundle,
             data,

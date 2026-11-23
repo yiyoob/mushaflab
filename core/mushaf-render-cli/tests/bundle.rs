@@ -29,6 +29,8 @@ fn bundle_matches_the_checkout_and_draws_the_same_pages() {
     for (path, bytes) in &bundle.files {
         assert_eq!(*bytes, std::fs::read(repo.join(path)).unwrap(), "{path}");
     }
+    // the corpus: the checkout's, file for file (D73)
+    assert_eq!(bundle.corpus_files().unwrap(), repo.corpus_files().unwrap());
     // data files: the checkout's, less only patch files no profile stacks
     let disk = repo.data_files().unwrap();
     let web = bundle.data_files().unwrap();

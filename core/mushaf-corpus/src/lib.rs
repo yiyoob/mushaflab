@@ -6,6 +6,7 @@
 //! uṣūl, ayah counting, layout lines) and the approvals file; farsh, riwāyah profiles and writing
 //! styles arrive with the Warsh prototype (M0.6).
 
+pub mod legacy;
 mod tsv;
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -184,6 +185,44 @@ pub struct SignRow {
     pub note: String,
 }
 
+/// Every file under `<root>/corpus/` (README files excluded) and the approvals file, by
+/// repository-relative path. Host use (`mushaf check`, the engine on a checkout).
+pub fn read_tree(root: &std::path::Path) -> Result<Files, String> {
+    let mut files = BTreeMap::new();
+    let mut stack = vec![root.join("corpus")];
+    while let Some(dir) = stack.pop() {
+        let rd = std::fs::read_dir(&dir).map_err(|e| format!("{}: {e}", dir.display()))?;
+        for entry in rd {
+            let p = entry.map_err(|e| e.to_string())?.path();
+            let name = p.file_name().and_then(|n| n.to_str()).unwrap_or_default();
+            if name.starts_with('.') || name == "README.md" {
+                continue;
+            }
+            if p.is_dir() {
+                stack.push(p);
+            } else {
+                let rel = p
+                    .strip_prefix(root)
+                    .map_err(|e| e.to_string())?
+                    .components()
+                    .map(|c| c.as_os_str().to_string_lossy().into_owned())
+                    .collect::<Vec<_>>()
+                    .join("/");
+                let text =
+                    std::fs::read_to_string(&p).map_err(|e| format!("{}: {e}", p.display()))?;
+                files.insert(rel, text);
+            }
+        }
+    }
+    let approvals = root.join(APPROVALS);
+    if approvals.is_file() {
+        let text = std::fs::read_to_string(&approvals)
+            .map_err(|e| format!("{}: {e}", approvals.display()))?;
+        files.insert(APPROVALS.to_string(), text);
+    }
+    Ok(files)
+}
+
 /// `U+XXXX` to a char.
 pub fn parse_cp(s: &str) -> Option<char> {
     s.strip_prefix("U+")
@@ -302,8 +341,8 @@ pub struct Layout {
 pub struct LayoutSource {
     /// A source id registered in `corpus/sources.yaml`.
     pub source: String,
-    /// The `MANIFEST.json` pins the lines were read from.
-    pub pins: Vec<String>,
+    /// The `MANIFEST.json` pins the lines were read from, by role (`layout`, `words`).
+    pub pins: BTreeMap<String, String>,
     /// The tracked file the lines were converted from, if any.
     #[serde(default)]
     pub via: Option<String>,

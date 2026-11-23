@@ -86,6 +86,7 @@ Consequences: what follows, what it rules out
 | [D70](D70.md) | Owner sign-off is per table, with excepted rows | accepted (Yusuf and Eisa, 2026-11-23) |
 | [D71](D71.md) | GitHub Actions CI stays off; the full gate runs locally before every merge | accepted (Eisa, 2026-11-23) |
 | [D72](D72.md) | Letters with features: what a reading changes and a writing style draws | accepted (Yusuf, GATE M0, 2026-11-23) |
+| [D73](D73.md) | The engine takes the Ḥafṣ spine and the layouts from the corpus, through the existing types | proposed |
 | [GATE-G1](GATE-G1.md) | GATE G1 — Phase 3 review: passed (2026-10-22) |  |
 | [GATE-G2](GATE-G2.md) | GATE G2 — Phase 4 review: passed (2026-10-22) |  |
 | [GATE-G3](GATE-G3.md) | GATE G3 — Phase 5 review: passed (2026-10-23) |  |

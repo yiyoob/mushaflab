@@ -129,7 +129,7 @@ in each surah without gaps, and ranges run forward without overlapping.
 
 `layout.yaml` (M1.3): `layout_id` (equal to the directory name), `script_id`, `edition`, `pages`,
 `lines_per_page`, `writing_style`, `font`, optional `render_profile`; `sources`, a list of
-`{source: <source id>, pins: [<MANIFEST ids>], via: <tracked file converted>, status}`; and
+`{source: <source id>, pins: {<role>: <MANIFEST id>, …}, via: <tracked file converted>, status}`; and
 `corrections`, owner corrections already applied to the lines, each with `page`, `line`, `end`,
 `was`, `set`, `evidence`.
 
