@@ -1,3 +1,5 @@
+# Switched off in the repository's Actions settings (owner, 2026-11-23): `just gate`, run
+# locally before every merge, is the full check. Kept current so it can be switched back on.
 name: ci
 
 on:

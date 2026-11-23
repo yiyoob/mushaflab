@@ -113,8 +113,9 @@ just render PAGE=1 RIWAYAH=hafs
   (after `just data-build`), and the few whole-corpus tests check a sample of riwāyāt.
 - `just gate`: the full gate. It runs every riwāyah (`MUSHAF_FULL=1`) and adds all platform
   targets, the golden pages, the round-trip against KFGQPC and the web checks
-  (`just web-gate`). It prints each step's time and keeps logs in `build/gate/`. CI runs the
-  same checks on every push and pull request, so run it locally only before a GATE review.
+  (`just web-gate`). It prints each step's time and keeps logs in `build/gate/`. Run it
+  before every merge to `main`: GitHub Actions CI is switched off (2026-11-23), so this is
+  the only full check.
 - `just data-build` skips itself when nothing under `data/`, `core/`, `fonts/` or
   `docs/review/` changed since its last successful run; `FORCE=1 just data-build` rebuilds.
 

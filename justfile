@@ -62,7 +62,7 @@ data-verify:
     {{uv}} run python -m pipeline.verify
 
 # Python pipeline tests on every core (pytest-xdist). The whole-data checks that repeat
-# data-verify or compile the full DB run only under MUSHAF_FULL=1 (`just gate`, CI).
+# data-verify or compile the full DB run only under MUSHAF_FULL=1 (`just gate`).
 data-test:
     {{uv}} run pytest -n auto --dist loadscope
 
@@ -73,7 +73,7 @@ core-fixtures:
 # Rust tests. cargo-nextest runs every test in parallel when installed
 # (`cargo install --locked cargo-nextest`); otherwise cargo test. Tests read the real data from
 # build/mushaf.db while it is current (`mushaf_db::load`) and parse the YAML otherwise, and a
-# few whole-corpus tests sample riwayat unless MUSHAF_FULL=1 (set by `just gate` and CI).
+# few whole-corpus tests sample riwayat unless MUSHAF_FULL=1 (set by `just gate`).
 core-test: core-fixtures
     #!/usr/bin/env bash
     set -euo pipefail
