@@ -45,3 +45,33 @@ fn unknown_codepoints_marks_without_base_and_spaces_are_errors() {
     );
     assert!(clusterize("a b").unwrap_err().to_string().contains("space"));
 }
+
+#[test]
+fn every_mark_and_joiner_in_the_table_has_a_slot() {
+    // Read the class column of the table itself, so a new mark added there must get a slot.
+    let file = include_str!("../../../data/pipeline/codepoint_classes.tsv");
+    for line in file.lines().skip(1) {
+        let cols: Vec<&str> = line.split('\t').collect();
+        if matches!(cols.get(1), Some(&"mark") | Some(&"joiner")) {
+            let cp = u32::from_str_radix(cols[0].trim_start_matches("U+"), 16).unwrap();
+            let c = char::from_u32(cp).unwrap();
+            assert!(mushaf_text::slot_of(c).is_some(), "{} has no slot", cols[0]);
+        }
+    }
+}
+
+#[test]
+fn decode_encode_and_place_on_synthetic_text() {
+    use mushaf_text::{Unit, decode, encode, in_order, place};
+    let text = "a\u{0651}\u{064E}b1";
+    let units = decode(text).unwrap();
+    assert_eq!(encode(&units), text);
+    assert!(matches!(units[2], Unit::Standalone { .. }));
+    let order = ['\u{0652}', '\u{0651}', '\u{064E}'];
+    let Unit::Letter(l) = &units[0] else { panic!() };
+    assert!(in_order(&l.marks, &order));
+    let mut marks = vec!['\u{064E}'];
+    place(&mut marks, '\u{0651}', &order).unwrap();
+    assert_eq!(marks, ['\u{0651}', '\u{064E}']);
+    assert!(place(&mut marks, '\u{0653}', &order).is_err());
+}

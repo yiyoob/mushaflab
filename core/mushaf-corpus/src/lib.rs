@@ -123,6 +123,70 @@ pub struct Approval {
     pub except: Vec<String>,
 }
 
+/// A writing style (`corpus/dabt/<id>.yaml`, D72).
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Style {
+    pub id: String,
+    pub title: String,
+    /// Letters the order was derived from (informational).
+    #[serde(default)]
+    pub letters: Option<u64>,
+    pub mark_order: MarkOrder,
+    /// Sign meanings (D72 level b); each row cited (G-226). Empty until rows are added.
+    #[serde(default)]
+    pub signs: Vec<SignRow>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MarkOrder {
+    pub source: String,
+    pub status: String,
+    #[serde(default)]
+    pub note: String,
+    pub order: Vec<String>,
+    #[serde(default)]
+    pub exceptions: Vec<OrderException>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct OrderException {
+    pub letter: String,
+    pub marks: Vec<String>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SignRow {
+    pub codepoint: String,
+    pub features: Vec<String>,
+    pub source: String,
+    pub status: String,
+    #[serde(default)]
+    pub note: String,
+}
+
+/// `U+XXXX` to a char.
+pub fn parse_cp(s: &str) -> Option<char> {
+    s.strip_prefix("U+")
+        .filter(|h| (4..=6).contains(&h.len()))
+        .and_then(|h| u32::from_str_radix(h, 16).ok())
+        .and_then(char::from_u32)
+}
+
+impl Style {
+    /// The mark order as chars (unparsable entries are reported by `Corpus::check`).
+    pub fn order(&self) -> Vec<char> {
+        self.mark_order
+            .order
+            .iter()
+            .filter_map(|c| parse_cp(c))
+            .collect()
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Word {
     pub id: WordId,
@@ -187,6 +251,8 @@ pub struct Corpus {
     pub usul: Vec<UsulRow>,
     pub adad: Vec<AdadRow>,
     pub layout_lines: Vec<LayoutLine>,
+    /// Writing styles by path.
+    pub styles: BTreeMap<String, Style>,
     pub approvals: Vec<Approval>,
     /// sha256 of every corpus file, by path (for approvals and the build's meta table).
     pub hashes: BTreeMap<String, String>,
@@ -273,6 +339,15 @@ impl Corpus {
             }
         }
         for (path, text) in files {
+            if path.starts_with("corpus/dabt/") && path.ends_with(".yaml") {
+                match mushaf_model::from_yaml::<Style>(text) {
+                    Ok(st) => {
+                        c.styles.insert(path.clone(), st);
+                    }
+                    Err(e) => fatal.push(Diag::new(path, None, e.to_string())),
+                }
+                continue;
+            }
             let table = |header: &[&str]| tsv::parse(path, text, header);
             let res = if path == WORDS {
                 table(&WORD_HEADER).map(|t| c.load_words(&t))
@@ -556,6 +631,47 @@ impl Corpus {
             }
         }
 
+        // Writing styles (D72).
+        for (path, st) in &self.styles {
+            let mo = &st.mark_order;
+            check_sources(&mut r, &sources, path, 0, &mo.source);
+            check_status(&mut r, path, 0, &mo.status);
+            let order = st.order();
+            if order.len() != mo.order.len() {
+                r.errors.push(Diag::new(
+                    path,
+                    None,
+                    "mark_order has an unreadable codepoint",
+                ));
+            }
+            for x in &mo.exceptions {
+                let lid = x.letter.rsplit_once(':');
+                let ok = lid.and_then(|(w, n)| Some((WordId::parse(w)?, number(n)?)));
+                match ok {
+                    Some((w, n))
+                        if letters
+                            .get(&w)
+                            .is_some_and(|k| usize::from(n) <= *k && n > 0) => {}
+                    _ => r.errors.push(Diag::new(
+                        path,
+                        None,
+                        format!("exception {:?} names no letter", x.letter),
+                    )),
+                }
+            }
+            for row in &st.signs {
+                check_sources(&mut r, &sources, path, 0, &row.source);
+                check_status(&mut r, path, 0, &row.status);
+                if parse_cp(&row.codepoint).is_none() {
+                    r.errors.push(Diag::new(
+                        path,
+                        None,
+                        format!("bad codepoint {:?}", row.codepoint),
+                    ));
+                }
+            }
+        }
+
         // Approvals (D70).
         for a in &self.approvals {
             match self.hashes.get(&a.table) {
@@ -591,13 +707,13 @@ fn check_status(r: &mut Report, file: &str, line: usize, status: &str) {
     if OWNER_STATUSES.contains(&status) {
         r.errors.push(Diag::new(
             file,
-            Some(line),
+            at(line),
             format!("status {status:?} is set only in data/approvals/ (rule 4)"),
         ));
     } else if !STATUSES.contains(&status) {
         r.errors.push(Diag::new(
             file,
-            Some(line),
+            at(line),
             format!("unknown status {status:?}"),
         ));
     }
@@ -605,28 +721,28 @@ fn check_status(r: &mut Report, file: &str, line: usize, status: &str) {
 
 fn check_sources(r: &mut Report, known: &BTreeSet<&str>, file: &str, line: usize, cell: &str) {
     if cell.is_empty() {
-        r.errors.push(Diag::new(file, Some(line), "no source"));
+        r.errors.push(Diag::new(file, at(line), "no source"));
         return;
     }
     for part in cell.split(" ; ") {
         match part.split_once(':') {
             None => r.errors.push(Diag::new(
                 file,
-                Some(line),
+                at(line),
                 format!("source {part:?} has no locator"),
             )),
             Some((id, loc)) => {
                 if !known.contains(id) {
                     r.errors.push(Diag::new(
                         file,
-                        Some(line),
+                        at(line),
                         format!("source {id:?} is not in {SOURCES}"),
                     ));
                 }
                 if loc.is_empty() {
                     r.errors.push(Diag::new(
                         file,
-                        Some(line),
+                        at(line),
                         format!("source {id:?} has an empty locator"),
                     ));
                 }
@@ -641,8 +757,13 @@ fn check_prov(r: &mut Report, known: &BTreeSet<&str>, file: &str, line: usize, p
     if !p.support.is_empty() && !SUPPORT.contains(&p.support.as_str()) {
         r.errors.push(Diag::new(
             file,
-            Some(line),
+            at(line),
             format!("unknown support {:?}", p.support),
         ));
     }
+}
+
+/// A 1-based line, or none for a whole-file fact (YAML files, line 0).
+fn at(line: usize) -> Option<usize> {
+    (line > 0).then_some(line)
 }
