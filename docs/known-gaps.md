@@ -3,6 +3,12 @@
 Everything unmatched, unaligned, unverified or deferred is listed here. Never hide a gap
 by omission. Remove an entry only when its resolution is committed, and cite the commit.
 
+**Since the architecture reset (D67, 2026-11-23):** gaps about the patch model (raw, curated
+and residual patches, mined rules, option groups as patches, the resolver, the legacy
+`data-build`, the patch round-trip) are **legacy**: frozen with it, not worked on, and closed
+when M3 deletes it. Gaps about sources, fonts, rendering, layouts, the books and the web app stay
+live and carry over to the new model. New gaps use milestone task ids (`M<n>.<k>`).
+
 | ID | Area | Gap | Since | Resolve by |
 |---|---|---|---|---|
 | G-001 | Approvals | **Resolved (2026-10-22).** CI runs `.github/scripts/check-approvals.sh`: any commit touching `data/approvals/`, `.github/allowed_signers` or the guard script must be signed by a key in `.github/allowed_signers` as of its parent commit (the owner's SSH signing key, passphrase-protected, not in ssh-agent). Bootstrap commit signed by the owner. Residual risk: an edit to the workflow file itself could remove the check; GitHub branch protection would close that. | T0.1 | Done |
@@ -100,3 +106,6 @@ by omission. Remove an entry only when its resolution is committed, and cite the
 | G-222 | Book text | al-Futūḥ (D66): reader labels not fully determined in 12.0% of rows. `X واندرج من اندرج` names X but not who else shares the reading; madd groups are bounded by the book's madd schools (v1 pp52-53) but placement within a segment is certain only by elimination. 411 rows (0.8%) stay contextual (no separated/connected madd in the row's Ḥafṣ text); 93 labels are typos in the book. | D66 | Owner or muqriʾ, if needed for T6.0 |
 | G-223 | Book text | al-Futūḥ (D66): reader conventions `واندرج`, `كالسابق`, `عدا من سيأتي` are read by usage (standard jamʿ conventions the book uses but does not define). | D66 | Owner confirms |
 | G-224 | Book text | al-Futūḥ (D66): colour meanings (`data/books/al-futuh-al-bahira/colors.yaml`) map the text colours to the book's key (v1 p12) by hue; three oranges and two greens are each one class; 35 rare colours (~0.2% of glyphs) are unmapped (`class: null`). | D66 | Owner (accepted by hue for human readers, 2026-11-20, by the contributor) |
+| G-225 | Sources | The owner-supplied files are not on the current development machine: al-Futūḥ PDFs (`book-al-futuh-al-bahira-vol1..6`), the al-Budūr EPUB (`book-al-budur-al-zahirah`), Sakkal Majalla (`font-sakkal-majalla`). Their checksums are pinned. | M0.1 | Owner places them under `data/sources/raw/` before M0.6 |
+| G-226 | Writing styles | What each sign means in a style table (D72 level b) is qirāʾāt knowledge. Until a row cites KFGQPC's sign explanation pages or a book, it is `hypothesis`. | M0.1 | Rows cited before M1's gate |
+| G-227 | Process | GitHub Actions CI is off (D71). Nothing checks a push automatically; `just gate` before every merge is the only full check. | M0.1 | Permanent unless CI is switched back on |
