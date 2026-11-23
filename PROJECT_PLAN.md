@@ -14,8 +14,11 @@ The architecture is in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). The plan 
 References to `PROJECT_PLAN §n`, phases or `T<phase>.<n>` tasks in legacy code and
 review documents mean v2.
 
-**Status (2026-11-23):** M0 passed (`docs/adr/GATE-M0.md`). **Next: M1**, starting in plan mode
-from the outline in §1. Open owner decisions are listed at the end of `GATE-M0.md`.
+**Status (2026-11-23):** M0 passed (`docs/adr/GATE-M0.md`). **M1 in progress** on branch
+`claude/m1-hafs`, in the order M1.3 → M1.4 → M1.5, then M1.1 → M1.2: the last two need the sign
+explanation pages at the back of the printed KFGQPC Ḥafṣ muṣḥaf (photos of a printed copy, or
+KFGQPC's official PDF), and drawing Ḥafṣ unchanged does not. Done: M1.3. Open owner decisions are
+listed at the end of `GATE-M0.md`.
 
 ## 0. Scope
 

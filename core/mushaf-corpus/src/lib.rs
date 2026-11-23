@@ -243,6 +243,51 @@ pub struct LayoutLine {
     pub centered: bool,
 }
 
+/// A layout's description (`corpus/layouts/<id>/layout.yaml`, docs/formats.md).
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Layout {
+    pub layout_id: String,
+    pub script_id: String,
+    pub edition: String,
+    pub pages: u16,
+    pub lines_per_page: u16,
+    pub writing_style: String,
+    pub font: String,
+    #[serde(default)]
+    pub render_profile: Option<String>,
+    pub sources: Vec<LayoutSource>,
+    /// Owner corrections already applied to the lines, kept with their evidence.
+    #[serde(default)]
+    pub corrections: Vec<LayoutCorrection>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LayoutSource {
+    /// A source id registered in `corpus/sources.yaml`.
+    pub source: String,
+    /// The `MANIFEST.json` pins the lines were read from.
+    pub pins: Vec<String>,
+    /// The tracked file the lines were converted from, if any.
+    #[serde(default)]
+    pub via: Option<String>,
+    pub status: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LayoutCorrection {
+    pub page: u16,
+    pub line: u16,
+    pub end: String,
+    pub was: String,
+    pub set: String,
+    pub evidence: String,
+    #[serde(default)]
+    pub via: Option<String>,
+}
+
 /// Everything loaded from `corpus/` (plus the approvals file).
 #[derive(Debug, Default)]
 pub struct Corpus {
@@ -251,6 +296,8 @@ pub struct Corpus {
     pub usul: Vec<UsulRow>,
     pub adad: Vec<AdadRow>,
     pub layout_lines: Vec<LayoutLine>,
+    /// Layout descriptions by path (`corpus/layouts/<id>/layout.yaml`).
+    pub layouts: BTreeMap<String, Layout>,
     /// Writing styles by path.
     pub styles: BTreeMap<String, Style>,
     pub approvals: Vec<Approval>,
@@ -303,6 +350,8 @@ const LINES_HEADER: [&str; 6] = [
     "last_word",
     "centered",
 ];
+const ROLES: [&str; 4] = ["truth", "check", "text", "layout"];
+const LINE_TYPES: [&str; 3] = ["text", "surah_name", "basmalah"];
 const WORD_KINDS: [&str; 3] = ["word", "ayah_end", "hizb"];
 const CONTEXTS: [&str; 3] = ["wasl", "waqf", "both"];
 
@@ -343,6 +392,15 @@ impl Corpus {
                 match mushaf_model::from_yaml::<Style>(text) {
                     Ok(st) => {
                         c.styles.insert(path.clone(), st);
+                    }
+                    Err(e) => fatal.push(Diag::new(path, None, e.to_string())),
+                }
+                continue;
+            }
+            if path.starts_with("corpus/layouts/") && path.ends_with("/layout.yaml") {
+                match mushaf_model::from_yaml::<Layout>(text) {
+                    Ok(l) => {
+                        c.layouts.insert(path.clone(), l);
                     }
                     Err(e) => fatal.push(Diag::new(path, None, e.to_string())),
                 }
@@ -533,7 +591,7 @@ impl Corpus {
                     format!("duplicate source id {:?}", s.id),
                 ));
             }
-            if !["truth", "check", "text"].contains(&s.role.as_str()) {
+            if !ROLES.contains(&s.role.as_str()) {
                 r.errors.push(Diag::new(
                     SOURCES,
                     None,
@@ -604,32 +662,14 @@ impl Corpus {
         }
 
         // Ayah counting rows.
-        for a in &self.adad {
-            check_status(&mut r, &a.file, a.line, &a.status);
-            check_sources(&mut r, &sources, &a.file, a.line, &a.source);
-            for w in [a.first, a.last] {
-                if !letters.contains_key(&w) {
-                    r.errors.push(Diag::new(
-                        &a.file,
-                        Some(a.line),
-                        format!("word {w} is not in the word table"),
-                    ));
-                }
-            }
-        }
+        let kinds: BTreeMap<WordId, &str> =
+            self.words.iter().map(|w| (w.id, w.kind.as_str())).collect();
+        self.check_adad(&mut r, &sources, &kinds);
 
-        // Layout lines.
-        for l in &self.layout_lines {
-            for w in [l.first, l.last].into_iter().flatten() {
-                if !letters.contains_key(&w) {
-                    r.errors.push(Diag::new(
-                        &l.file,
-                        Some(l.line),
-                        format!("word {w} is not in the word table"),
-                    ));
-                }
-            }
-        }
+        // Layouts.
+        let order: Vec<(WordId, &str)> =
+            self.words.iter().map(|w| (w.id, w.kind.as_str())).collect();
+        self.check_layouts(&mut r, &sources, &order);
 
         // Writing styles (D72).
         for (path, st) in &self.styles {
@@ -694,6 +734,234 @@ impl Corpus {
             }
         }
         r
+    }
+}
+
+impl Corpus {
+    fn check_adad(&self, r: &mut Report, sources: &BTreeSet<&str>, kinds: &BTreeMap<WordId, &str>) {
+        let mut prev: BTreeMap<&str, &AdadRow> = BTreeMap::new();
+        for a in &self.adad {
+            let here = |msg: String| Diag::new(&a.file, Some(a.line), msg);
+            check_status(r, &a.file, a.line, &a.status);
+            check_sources(r, sources, &a.file, a.line, &a.source);
+            for w in [a.first, a.last] {
+                match kinds.get(&w) {
+                    None => r
+                        .errors
+                        .push(here(format!("word {w} is not in the word table"))),
+                    Some(&"word") => {}
+                    Some(k) => r.errors.push(here(format!("{w} is not a word item ({k})"))),
+                }
+            }
+            if a.last < a.first {
+                r.errors.push(here(format!(
+                    "{}:{} ends before it starts ({} > {})",
+                    a.surah, a.ayah, a.first, a.last
+                )));
+            }
+            match prev.get(a.file.as_str()) {
+                Some(p) if (p.surah, p.ayah) >= (a.surah, a.ayah) => {
+                    r.errors.push(here(format!(
+                        "{}:{} out of order or duplicate",
+                        a.surah, a.ayah
+                    )));
+                }
+                p => {
+                    let want = match p {
+                        Some(p) if p.surah == a.surah => p.ayah + 1,
+                        _ => 1,
+                    };
+                    if a.ayah != want {
+                        r.errors.push(here(format!(
+                            "ayahs not contiguous: {}:{} where {}:{want} was expected",
+                            a.surah, a.ayah, a.surah
+                        )));
+                    }
+                    if let Some(p) = p.filter(|p| a.first <= p.last) {
+                        r.errors.push(here(format!(
+                            "{}:{} overlaps {}:{} ({} <= {})",
+                            a.surah, a.ayah, p.surah, p.ayah, a.first, p.last
+                        )));
+                    }
+                }
+            }
+            prev.insert(a.file.as_str(), a);
+        }
+    }
+
+    fn check_layouts(&self, r: &mut Report, sources: &BTreeSet<&str>, order: &[(WordId, &str)]) {
+        let index: BTreeMap<WordId, usize> = order
+            .iter()
+            .enumerate()
+            .map(|(i, (w, _))| (*w, i))
+            .collect();
+        let mut by_dir: BTreeMap<&str, Vec<&LayoutLine>> = BTreeMap::new();
+        for l in &self.layout_lines {
+            let dir = l.file.strip_suffix("lines.tsv").unwrap_or(&l.file);
+            by_dir.entry(dir).or_default().push(l);
+        }
+        for (path, lay) in &self.layouts {
+            let dir = path.strip_suffix("layout.yaml").unwrap_or(path);
+            let name = dir
+                .trim_end_matches('/')
+                .rsplit('/')
+                .next()
+                .unwrap_or_default();
+            if lay.layout_id != name {
+                r.errors.push(Diag::new(
+                    path,
+                    None,
+                    format!(
+                        "layout_id {:?} differs from its directory {name:?}",
+                        lay.layout_id
+                    ),
+                ));
+            }
+            for s in &lay.sources {
+                if !sources.contains(s.source.as_str()) {
+                    r.errors.push(Diag::new(
+                        path,
+                        None,
+                        format!("source {:?} is not in {SOURCES}", s.source),
+                    ));
+                }
+                check_status(r, path, 0, &s.status);
+            }
+            if !by_dir.contains_key(dir) {
+                r.errors
+                    .push(Diag::new(path, None, format!("no {dir}lines.tsv")));
+            }
+        }
+        for (dir, lines) in &by_dir {
+            let yaml = format!("{dir}layout.yaml");
+            let Some(lay) = self.layouts.get(&yaml) else {
+                r.errors.push(Diag::new(
+                    &lines[0].file,
+                    None,
+                    format!("no {yaml} for this lines table"),
+                ));
+                continue;
+            };
+            check_lines(r, lay, lines, order, &index);
+        }
+    }
+}
+
+/// One layout's lines: numbering, types, and coverage of the word table in order.
+fn check_lines(
+    r: &mut Report,
+    lay: &Layout,
+    lines: &[&LayoutLine],
+    order: &[(WordId, &str)],
+    index: &BTreeMap<WordId, usize>,
+) {
+    let mut prev: Option<(u16, u16)> = None;
+    let mut pages = BTreeSet::new();
+    // Next item of the word table a text line must start at.
+    let mut next = 0usize;
+    for (k, l) in lines.iter().enumerate() {
+        let here = |msg: String| Diag::new(&l.file, Some(l.line), msg);
+        let key = (l.page, l.line_no);
+        if prev.is_some_and(|p| p >= key) {
+            r.errors.push(here(format!(
+                "page {} line {} out of order",
+                l.page, l.line_no
+            )));
+        }
+        prev = Some(key);
+        pages.insert(l.page);
+        if l.page == 0 || l.page > lay.pages {
+            r.errors.push(here(format!(
+                "page {} outside 1..={} (pages)",
+                l.page, lay.pages
+            )));
+        }
+        if l.line_no == 0 || l.line_no > lay.lines_per_page {
+            r.errors.push(here(format!(
+                "line {} outside 1..={} (lines_per_page)",
+                l.line_no, lay.lines_per_page
+            )));
+        }
+        if !LINE_TYPES.contains(&l.kind.as_str()) {
+            r.errors
+                .push(here(format!("unknown line type {:?}", l.kind)));
+            continue;
+        }
+        if l.kind != "text" {
+            if l.first.is_some() || l.last.is_some() {
+                r.errors
+                    .push(here(format!("a {} line has no word range", l.kind)));
+            }
+            if l.kind == "surah_name" {
+                let starts = lines[k + 1..]
+                    .iter()
+                    .take_while(|m| m.page == l.page && m.kind != "surah_name")
+                    .find(|m| m.kind == "text")
+                    .and_then(|m| m.first);
+                if !starts.is_some_and(|w| w.ayah == 1 && w.word == 1) {
+                    r.errors.push(here(format!(
+                        "surah_name on page {} line {} is not followed on its page by a line \
+                         starting a surah",
+                        l.page, l.line_no
+                    )));
+                }
+            }
+            continue;
+        }
+        let (Some(first), Some(last)) = (l.first, l.last) else {
+            r.errors.push(here("a text line needs a word range".into()));
+            continue;
+        };
+        let (Some(&i), Some(&j)) = (index.get(&first), index.get(&last)) else {
+            for w in [first, last] {
+                if !index.contains_key(&w) {
+                    r.errors
+                        .push(here(format!("word {w} is not in the word table")));
+                }
+            }
+            continue;
+        };
+        // A ḥizb sign belongs with the word after it, so a line may start just after one.
+        while next < order.len() && order[next].1 == "hizb" && next < i {
+            next += 1;
+        }
+        if i != next {
+            let want = order[next.min(order.len())..]
+                .iter()
+                .find(|(_, k)| *k != "hizb")
+                .map_or("the end".into(), |w| w.0.to_string());
+            r.errors.push(here(format!(
+                "line starts at {first}, expected {want} (gap or overlap)"
+            )));
+        }
+        if j < i {
+            r.errors.push(here(format!(
+                "line ends before it starts ({first} > {last})"
+            )));
+        }
+        next = next.max(j + 1);
+    }
+    if let Some((w, _)) = order[next.min(order.len())..]
+        .iter()
+        .find(|(_, k)| *k != "hizb")
+    {
+        r.errors.push(Diag::new(
+            &lines[lines.len() - 1].file,
+            None,
+            format!("words from {w} on are on no line"),
+        ));
+    }
+    if let Some(&last) = pages.last()
+        && (pages.len() != usize::from(last) || last != lay.pages)
+    {
+        r.errors.push(Diag::new(
+            &lines[0].file,
+            None,
+            format!(
+                "pages are not 1..={} without gaps (pages in layout.yaml)",
+                lay.pages
+            ),
+        ));
     }
 }
 

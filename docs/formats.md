@@ -117,10 +117,26 @@ it marks, position rules, `source`, `status`. KFGQPC's own conventions are style
 Ayah boundaries per counting system. Key: (`surah`, `ayah`). Columns: `surah`, `ayah`,
 `first_word`, `last_word`, `source`, `status`.
 
+`first_word` and `last_word` are `word` items of the word table: a position-0 ḥizb sign and the
+ayah-end marker are not part of the range (M1.3). The marker is how a printing shows a boundary;
+another counting system ends ayahs where the Ḥafṣ text has no marker. Ayahs are numbered from 1
+in each surah without gaps, and ranges run forward without overlapping.
+
 ## `corpus/layouts/<layout_id>/`
 
-`layout.yaml` (edition, page geometry, lines per page, writing style, font, sources) and
-`lines.tsv` (key `page`, `line`; columns `type`, `first_word`, `last_word`, `centered`).
+`layout.yaml` and `lines.tsv` (key `page`, `line`; columns `type`, `first_word`, `last_word`,
+`centered`).
+
+`layout.yaml` (M1.3): `layout_id` (equal to the directory name), `script_id`, `edition`, `pages`,
+`lines_per_page`, `writing_style`, `font`, optional `render_profile`; `sources`, a list of
+`{source: <source id>, pins: [<MANIFEST ids>], via: <tracked file converted>, status}`; and
+`corrections`, owner corrections already applied to the lines, each with `page`, `line`, `end`,
+`was`, `set`, `evidence`.
+
+`lines.tsv`: `type` is `text`, `surah_name` or `basmalah`. A `text` line has both words; other
+lines have none. A `surah_name` line is followed on its page by a text line that starts a surah
+(`<surah>:1:1`), which gives the header its surah. Taken in order, text lines cover every item of
+the word table exactly once, except ḥizb signs, which go with the word after them.
 
 ## Approvals: `data/approvals/corpus.yaml`
 

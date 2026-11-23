@@ -11,8 +11,8 @@ The data of the muṣḥaf, as text tables people review and sign (D67, D69). Fo
 | `usul/` | one table per uṣūl category: every place it applies | M0.6 (prototype), M2+ |
 | `riwayat/` | qāriʾ and riwāyah profiles: wujūh, combination tables | M0.6 (prototype), M2+ |
 | `dabt/` | writing styles: how features become signs | M0.6, M1 |
-| `adad/` | ayah counting systems | M1–M2 |
-| `layouts/` | muṣḥaf layouts as word ranges per line | M1, M4 |
+| `adad/` | ayah counting systems: `kufi.tsv` (M1.3), others M2 |
+| `layouts/` | muṣḥaf layouts as word ranges per line: `uthmani-1441h/` (M1.3), others M4 |
 
 Every fact row carries `source` and `status` (rule 4). Nothing here is written from memory
 (rule 1).

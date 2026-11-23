@@ -52,3 +52,8 @@ sources:
     role: check
     locator: "<member>#<key>"
     pins: [kfgqpc-mirror-bazzi-data]
+  - id: qul-layout-1441h
+    title: "KFGQPC V4 layout, 15 lines, 1441H print (QUL export), with the KFGQPC Hafs word-by-word script it keys to"
+    role: layout
+    locator: "p<page>l<line>"
+    pins: [qul-layout-19-v4-1441h, qul-script-312-kfgqpc-hafs-wbw]

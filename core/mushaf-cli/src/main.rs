@@ -140,6 +140,8 @@ CREATE TABLE adad (file TEXT NOT NULL, surah INTEGER NOT NULL, ayah INTEGER NOT 
   source TEXT NOT NULL, status TEXT NOT NULL, PRIMARY KEY (file, surah, ayah));
 CREATE TABLE layout_lines (file TEXT NOT NULL, page INTEGER NOT NULL, line INTEGER NOT NULL, type TEXT NOT NULL, first_word TEXT, last_word TEXT,
   centered INTEGER NOT NULL, PRIMARY KEY (file, page, line));
+CREATE TABLE layouts (layout_id TEXT PRIMARY KEY, file TEXT NOT NULL, script_id TEXT NOT NULL, edition TEXT NOT NULL, pages INTEGER NOT NULL,
+  lines_per_page INTEGER NOT NULL, writing_style TEXT NOT NULL, font TEXT NOT NULL, sources TEXT NOT NULL);
 CREATE TABLE approvals (table_path TEXT PRIMARY KEY, sha256 TEXT NOT NULL, status TEXT NOT NULL, by_whom TEXT NOT NULL, date TEXT NOT NULL,
   except_rows TEXT NOT NULL, state TEXT NOT NULL);
 ";
@@ -232,6 +234,24 @@ fn build(c: &Corpus, out: &Path) -> Result<(), String> {
                 l.first.map(|w| w.to_string()),
                 l.last.map(|w| w.to_string()),
                 l.centered
+            ],
+        )
+        .map_err(e)?;
+    }
+    for (path, l) in &c.layouts {
+        let sources: Vec<&str> = l.sources.iter().map(|s| s.source.as_str()).collect();
+        tx.execute(
+            "INSERT INTO layouts VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+            params![
+                l.layout_id,
+                path,
+                l.script_id,
+                l.edition,
+                l.pages,
+                l.lines_per_page,
+                l.writing_style,
+                l.font,
+                sources.join(" ")
             ],
         )
         .map_err(e)?;
