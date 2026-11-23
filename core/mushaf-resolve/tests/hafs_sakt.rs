@@ -12,7 +12,7 @@ use common::repo;
 use mushaf_resolve::{Mode, Resolved, Selection, resolve_profile};
 
 fn run(choice: Option<&str>) -> Resolved {
-    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let ds = mushaf_db::load(&repo().join("data")).unwrap();
     let choices: BTreeMap<String, String> = choice
         .map(|c| [("hafs.maliyah".to_string(), c.to_string())].into())
         .unwrap_or_default();

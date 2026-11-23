@@ -17,9 +17,18 @@ fn sel(riwayah: &str) -> Selection {
     }
 }
 
+/// Per commit (`just gate-fast`) a sample of riwāyāt is resolved: Ḥafṣ, a Maghribi riwāyah
+/// with its own layout and ayah map, and one more. `MUSHAF_FULL=1` (`just gate`, CI) resolves
+/// all eight.
+const SAMPLE: [&str; 3] = ["hafs", "warsh", "duri_abuamr"];
+
+fn sampled(id: &str) -> bool {
+    std::env::var_os("MUSHAF_FULL").is_some() || SAMPLE.contains(&id)
+}
+
 #[test]
 fn all_eight_profiles_load_and_resolve_in_data_mode() {
-    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let ds = mushaf_db::load(&repo().join("data")).unwrap();
     let ids: Vec<_> = ds.profiles.keys().cloned().collect();
     assert_eq!(
         ids,
@@ -34,7 +43,7 @@ fn all_eight_profiles_load_and_resolve_in_data_mode() {
             "warsh"
         ]
     );
-    for (id, p) in &ds.profiles {
+    for (id, p) in ds.profiles.iter().filter(|(id, _)| sampled(id)) {
         let r = resolve_profile(&ds, &sel(id), None, Mode::Data).unwrap();
         let spine = &ds.spines[&p.spine];
         let expanded: Vec<_> = p

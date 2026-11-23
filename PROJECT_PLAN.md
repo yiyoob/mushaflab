@@ -95,7 +95,7 @@ mushaf-project/
 ├── PROJECT_PLAN.md
 ├── justfile
 ├── docs/
-│   ├── decisions.md            # ADRs (D1…)
+│   ├── adr/                    # ADRs, one file each (D1.md…), index in README.md
 │   ├── known-gaps.md
 │   ├── font-coverage.md
 │   └── review/                 # generated human-review sheets
@@ -309,7 +309,7 @@ Goal: prove rendering and justification end to end on desktop before any mobile 
 - **T3.6 Perf harness.** Resolve + shape + justify per page, with caching keyed by `(word, state hash)`. Record desktop numbers. The 16 ms/page budget is verified on a device in Phase 8.
 - **T3.7 Edit demo.** Insert a mark (small sīn) and a letter, widen a word, and confirm the line still closes. *Accept:* golden images and line-fit tests.
 
-**GATE G1:** owner reviews 10 rendered pages against the printed muṣḥaf. (D5 is already decided: website first.) **Passed 2026-10-22 (owner); see the G1 record in `docs/decisions.md`. Known deviation from the print: G-045.**
+**GATE G1:** owner reviews 10 rendered pages against the printed muṣḥaf. (D5 is already decided: website first.) **Passed 2026-10-22 (owner); see `docs/adr/GATE-G1.md`. Known deviation from the print: G-045.**
 
 ---
 
@@ -328,7 +328,7 @@ Runs after Phase 2 and before Phase 3 (see execution order). Order: `shuba` → 
 - **T4.7 Stats.** Per riwāyah: counts by op type, by surah, and by "mark-only" vs "consonant change". These show how much is uṣūl and how much is farsh/rasm.
 - **T4.8 Review sheets.** Generate HTML sheets for the owner to review per surah. Include known-tricky cases: 3:133 (Warsh drops the initial wāw of *sāriʿū*), 2:184 and 2:10 (Ḥafṣ vs Warsh word differences, with Warsh numbering shifts). These are `hypothesis` until the owner confirms them against a cited source; the sheet shows what the data says, it does not assert it.
 
-**GATE G2:** owner reviews the stats and a sample of patches for each riwāyah. Raw patches are not yet claimed to be correct qirāʾāt knowledge. They are exact mirrors of KFGQPC. **Passed 2026-10-22 (owner); see the G2 record in `docs/decisions.md`.**
+**GATE G2:** owner reviews the stats and a sample of patches for each riwāyah. Raw patches are not yet claimed to be correct qirāʾāt knowledge. They are exact mirrors of KFGQPC. **Passed 2026-10-22 (owner); see `docs/adr/GATE-G2.md`.**
 
 ---
 
@@ -340,7 +340,7 @@ Runs after Phase 2 and before Phase 3 (see execution order). Order: `shuba` → 
 - **T5.4 Goldens per riwāyah.** Include 3:133, 2:10, 2:184 and the Fātiḥah numbering for Warsh.
 - **T5.5 Fidelity review.** Render all pages for each riwāyah as contact sheets in `docs/review/`.
 
-**GATE G3:** owner reviews contact sheets and the overflow report; D1 is finalized. **Passed 2026-10-23 (owner); see the G3 record in `docs/decisions.md`. Open: the undecided encoding groups (G-102), the Warsh/Qālūn reference print (G-106).**
+**GATE G3:** owner reviews contact sheets and the overflow report; D1 is finalized. **Passed 2026-10-23 (owner); see `docs/adr/GATE-G3.md`. Open: the undecided encoding groups (G-102), the Warsh/Qālūn reference print (G-106).**
 
 ---
 
@@ -474,4 +474,4 @@ Stage 2 adds the other 12 riwāyāt, starting with Kisāʾī, then Ḥamzah/Khal
 > Do T0.3 to T0.7 as spikes. Clone third-party reference repos to /tmp, not into this repo. Produce the ADRs and `docs/font-coverage.md`, then stop at GATE G0 and summarize the options and your recommendation for each decision.
 
 **Prompt 3 (Phase 1)**
-> G0 is approved with decisions recorded in docs/decisions.md. Do Phase 1 task by task. After each task run its acceptance command and commit. Stop at the end of the phase and list anything in known-gaps.md.
+> G0 is approved with decisions recorded in docs/adr/. Do Phase 1 task by task. After each task run its acceptance command and commit. Stop at the end of the phase and list anything in known-gaps.md.

@@ -26,11 +26,11 @@ Stage 1 covers the 8 riwāyāt for which KFGQPC publishes full text, in the **15
 ## Working method
 - Enter plan mode at the start of each phase. State the task IDs you will do and the acceptance command for each.
 - Do one task at a time. Run its acceptance command. Commit with message `T<id>: <summary>`.
-- Before each commit run `just gate-fast` (lint, Rust tests, Python tests). Run the full gate (`just gate`: all platform targets, goldens, round-trip) only once per phase, right before the phase's final push. Do not re-run it for later doc-only or status changes.
+- Before each commit run `just gate-fast` (lint, Rust tests on a sample of riwāyāt, Python tests; a few minutes with cargo-nextest). Before every merge to `main` run the full gate locally, `just gate` (all riwāyāt via `MUSHAF_FULL=1`, platform targets, goldens, round-trip, web checks): GitHub Actions CI is switched off (owner decision, 2026-11-23). Do not re-run it for doc-only or status changes.
 - Test first for anything in `core/` and the data pipeline.
 - Phases run in the order given in PROJECT_PLAN §5 (Phase 4 before Phase 3), not in numeric order.
 - Stop at every `GATE` in the plan and summarize results. Do not start the next phase without the owner's go-ahead.
-- When a decision (D-number) is needed, write an ADR in `docs/decisions.md` with options, evidence and choice. Never decide silently.
+- When a decision (D-number) is needed, write an ADR as `docs/adr/D<n>.md` (and add its row to the index in `docs/adr/README.md`) with options, evidence and choice. Never decide silently.
 - Keep a running `docs/known-gaps.md`. Anything unmatched, unaligned or unverified is listed there. Never hide a gap by omission.
 
 ## Commands (created in T0.1; keep them working)
@@ -58,8 +58,8 @@ just web-test        # Playwright: every screen, offline cache
 just web-bench       # page-turn budget (16 ms), Chromium CPU /4
 just web-golden      # app drawing vs core golden PNGs
 just web-gate        # all web checks (run by `just gate`)
-just gate-fast       # per-commit check: lint, core-test, data-test
-just gate            # full gate, once before a phase's final push; prints step times
+just gate-fast       # per-commit check: lint, core-test (riwayah sample), data-test
+just gate            # full gate (MUSHAF_FULL=1), before every merge to main; prints step times
 ```
 
 ## Conventions

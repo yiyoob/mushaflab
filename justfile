@@ -25,8 +25,17 @@ data-archive *DEST:
     {{uv}} run python -m pipeline.archive {{DEST}}
 
 # Run the full ETL: check codepoint table, rebuild spine + layout files and the font-encoding
-# table (T3.1), riwayah profiles and native layouts (T5.1, T5.2), compile build/mushaf.db
+# table (T3.1), riwayah profiles and native layouts (T5.1, T5.2), compile build/mushaf.db.
+# Skipped when nothing under data/, core/ (except tests), fonts/ or docs/review/ changed since
+# the last successful build (build/data-build.stamp); FORCE=1 rebuilds anyway.
 data-build:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -z "${FORCE:-}" ] && {{uv}} run python -m pipeline.build_stamp check; then exit 0; fi
+    just _data-build
+    {{uv}} run python -m pipeline.build_stamp write
+
+_data-build:
     {{uv}} run python -m pipeline.codepoints check
     {{uv}} run python -m pipeline.spine build
     {{uv}} run python -m pipeline.ingest_layout build
@@ -52,17 +61,28 @@ data-build:
 data-verify:
     {{uv}} run python -m pipeline.verify
 
-# Python pipeline unit tests
+# Python pipeline tests on every core (pytest-xdist). The whole-data checks that repeat
+# data-verify or compile the full DB run only under MUSHAF_FULL=1 (`just gate`).
 data-test:
-    {{uv}} run pytest
+    {{uv}} run pytest -n auto --dist loadscope
 
 # Compile the synthetic fixture root into build/fixtures/synthetic.db (for the T2.2 parity test)
 core-fixtures:
     {{uv}} run python -m pipeline.compile_db --root "{{justfile_directory()}}/tests/fixtures/synthetic" "{{justfile_directory()}}/build/fixtures/synthetic.db"
 
-# cargo test --workspace
+# Rust tests. cargo-nextest runs every test in parallel when installed
+# (`cargo install --locked cargo-nextest`); otherwise cargo test. Tests read the real data from
+# build/mushaf.db while it is current (`mushaf_db::load`) and parse the YAML otherwise, and a
+# few whole-corpus tests sample riwayat unless MUSHAF_FULL=1 (set by `just gate`).
 core-test: core-fixtures
-    cargo test {{manifest}} --workspace
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if cargo nextest --version >/dev/null 2>&1; then
+        cargo nextest run {{manifest}} --workspace --no-fail-fast --status-level fail --final-status-level slow
+    else
+        echo "core-test: cargo-nextest not installed, running cargo test (slower)" >&2
+        cargo test {{manifest}} --workspace
+    fi
 
 # Check the core builds for every platform target (web now, iOS/Android later).
 # mushaf-db (bundled SQLite), the CLI and the round-trip tool are host-only (D12, D22, G-032).
@@ -231,6 +251,7 @@ gate:
     set -euo pipefail
     logs="{{justfile_directory()}}/build/gate"; mkdir -p "$logs"
     step() { local s=$SECONDS; if just "$1" >"$logs/$1.log" 2>&1; then echo "ok   $1 ($((SECONDS-s))s)"; else echo "FAIL $1 ($((SECONDS-s))s), see $logs/$1.log"; return 1; fi; }
+    export MUSHAF_FULL=1
     ( step data-test && step data-verify ) & py=$!
     rust=0; for s in lint core-test core-targets golden roundtrip web-gate; do step "$s" || { rust=1; break; }; done
     wait $py || rust=1

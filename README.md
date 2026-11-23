@@ -10,7 +10,7 @@ Stage 1 covers the 8 riwāyāt for which KFGQPC publishes full text (`hafs`, `sh
 - `data/`: the Python data pipeline (`uv`). It builds the spine, layouts, patches and rules
   from pinned sources.
 - `apps/web/`: the web app (Vite + TypeScript). It only paints what the core returns.
-- `docs/`: decisions (`decisions.md`) and known gaps (`known-gaps.md`).
+- `docs/`: decisions (`adr/`, one file per ADR, index in `adr/README.md`) and known gaps (`known-gaps.md`).
 
 Read `CLAUDE.md` for the project rules and `PROJECT_PLAN.md` for the phases.
 
@@ -108,10 +108,16 @@ just render PAGE=1 RIWAYAH=hafs
 ## Checks
 
 - `just gate-fast`: run before every commit. It covers lint, the Rust tests and the Python
-  tests.
-- `just gate`: the full gate, run once per phase before its final push. It adds all platform
+  tests. Install cargo-nextest (`cargo install --locked cargo-nextest`) so the Rust tests run
+  in parallel. The Rust tests read the data from `build/mushaf.db` while it is current
+  (after `just data-build`), and the few whole-corpus tests check a sample of riwāyāt.
+- `just gate`: the full gate. It runs every riwāyah (`MUSHAF_FULL=1`) and adds all platform
   targets, the golden pages, the round-trip against KFGQPC and the web checks
-  (`just web-gate`). It prints each step's time and keeps logs in `build/gate/`.
+  (`just web-gate`). It prints each step's time and keeps logs in `build/gate/`. Run it
+  before every merge to `main`: GitHub Actions CI is switched off (2026-11-23), so this is
+  the only full check.
+- `just data-build` skips itself when nothing under `data/`, `core/`, `fonts/` or
+  `docs/review/` changed since its last successful run; `FORCE=1 just data-build` rebuilds.
 
 Other web checks, each also listed in `CLAUDE.md`:
 - `just web-parity`: the WebAssembly engine draws every golden page byte-identically.

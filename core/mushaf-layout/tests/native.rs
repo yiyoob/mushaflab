@@ -18,7 +18,7 @@ fn repo() -> PathBuf {
 
 #[test]
 fn hafs_ayah_lines_reproduce_the_1441h_layout() {
-    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let ds = mushaf_db::load(&repo().join("data")).unwrap();
     let hafs = &ds.layouts["uthmani-1441h"];
     let sel = Selection {
         riwayah: "hafs".into(),
@@ -52,12 +52,18 @@ fn hafs_ayah_lines_reproduce_the_1441h_layout() {
     assert_eq!(kinds(&fitted.layout.lines), kinds(&hafs.lines));
 }
 
+/// Per commit (`just gate-fast`) two of the seven native layouts are checked; `MUSHAF_FULL=1`
+/// (`just gate`, CI) checks all of them.
+fn sampled(riwayah: &str) -> bool {
+    std::env::var_os("MUSHAF_FULL").is_some() || ["warsh", "susi"].contains(&riwayah)
+}
+
 /// Every tracked native layout puts each ayah's first item on the line where its KFGQPC file
 /// starts it and its last item on the line where it ends it, and maps the riwāyah's text.
 #[test]
 fn native_layouts_keep_every_ayah_on_its_kfgqpc_lines() {
     use mushaf_layout::map_lines_on;
-    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let ds = mushaf_db::load(&repo().join("data")).unwrap();
     for riwayah in [
         "shuba",
         "warsh",
@@ -66,7 +72,10 @@ fn native_layouts_keep_every_ayah_on_its_kfgqpc_lines() {
         "qunbul",
         "duri_abuamr",
         "susi",
-    ] {
+    ]
+    .into_iter()
+    .filter(|r| sampled(r))
+    {
         let layout = &ds.layouts[&format!("uthmani-{riwayah}-kfgqpc")];
         assert_eq!(layout.riwayah.as_deref(), Some(riwayah));
         let sel = Selection {

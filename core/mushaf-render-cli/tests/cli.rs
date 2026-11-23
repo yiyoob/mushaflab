@@ -1,7 +1,9 @@
 //! T3.4: the reference renderer runs end to end; its SVG parses with usvg and rasterises.
 
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, OnceLock};
 
+use mushaf_model::DataSet;
 use mushaf_render::{Renderer, png, svg};
 
 fn repo() -> PathBuf {
@@ -11,9 +13,20 @@ fn repo() -> PathBuf {
         .unwrap()
 }
 
+/// The data root, parsed once for every test in this file (`mushaf_db::load`).
+fn data() -> Arc<DataSet> {
+    static DATA: OnceLock<Arc<DataSet>> = OnceLock::new();
+    DATA.get_or_init(|| Arc::new(mushaf_db::load(&repo().join("data")).unwrap()))
+        .clone()
+}
+
+fn load(riwayah: &str, style: &str) -> Result<Renderer, mushaf_model::Error> {
+    Renderer::load_with(&repo(), data(), riwayah, style)
+}
+
 #[test]
 fn pages_render_to_svg_that_parses_and_to_png() {
-    let r = Renderer::load(&repo(), "hafs").unwrap();
+    let r = load("hafs", "hijazi").unwrap();
     for page in [1, 604] {
         let d = r.render(page, None).unwrap();
         let s = svg(&d);
@@ -33,7 +46,7 @@ fn an_unknown_riwayah_is_refused_with_a_reason() {
 /// T5.2: a riwāyah on its native layout, in its own KFGQPC font (D27, D29).
 #[test]
 fn warsh_renders_on_its_native_layout() {
-    let r = Renderer::load(&repo(), "warsh").unwrap();
+    let r = load("warsh", "maghribi").unwrap();
     let d = r.render(1, None).unwrap();
     assert_eq!(d.layout_id, "uthmani-warsh-kfgqpc");
     assert!(d.canonical);
@@ -62,18 +75,16 @@ fn render_profiles_are_keyed_by_riwayah_and_style() {
         .unwrap();
         assert_eq!((p.riwayah.as_str(), p.style.as_str()), (r, style));
     }
-    let err = Renderer::load_style(&repo(), "hafs", "maghribi")
-        .err()
-        .unwrap();
+    let err = load("hafs", "maghribi").err().unwrap();
     assert!(err.to_string().contains("not available (D44"), "{err}");
     assert!(err.to_string().contains("fail rule 6"), "{err}");
     // D46: Warsh and Qālūn are offered in the Ḥijāzī style (their profile exists).
     for r in ["warsh", "qalun"] {
-        let h = Renderer::load_style(&repo(), r, "hijazi").unwrap();
+        let h = load(r, "hijazi").unwrap();
         assert_eq!(
             (h.profile.riwayah.as_str(), h.profile.style.as_str()),
             (r, "hijazi")
         );
     }
-    assert!(Renderer::load_style(&repo(), "hafs", "naskh").is_err());
+    assert!(load("hafs", "naskh").is_err());
 }

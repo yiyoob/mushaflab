@@ -8,7 +8,7 @@ use common::{hafs_table, repo, sha256};
 
 #[test]
 fn every_spine_item_converts_like_the_pipeline() {
-    let ds = mushaf_db::load_dir(&repo().join("data")).unwrap();
+    let ds = mushaf_db::load(&repo().join("data")).unwrap();
     let spine = &ds.spines["hafs/v1"];
     let table = hafs_table();
     assert_eq!(table.spine, spine.id);
