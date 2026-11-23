@@ -374,10 +374,16 @@ async function showOptions() {
 ui.options.onclick = toggle("options", showOptions);
 
 // Free-edit editor (Phase 7 EditSession). Never refuses a non-canonical edit (rule 11).
+// Bumped by every showEditor call: an older call that resumes after a newer one has drawn the
+// panel stops, so it never writes into the newer panel (G-228).
+let editorGen = 0;
+
 async function showEditor() {
+  const gen = ++editorGen;
   openPanel("edit", "Free edit");
   const st = await callJson<EditState>("edit_state");
   const lint = await callJson<{ item: string; change: string; matches: string[] }[]>("lint");
+  if (gen !== editorGen) return;
   const sel = state.selected;
   ui.panelBody.innerHTML = `
     <p>${sel ? `Selected cluster <code id="sel">${esc(sel)}</code>` : "Tap a letter on the page, or pick a word below."}</p>
@@ -433,40 +439,19 @@ async function showEditor() {
     // a word id (s:a:w) selects its first cluster
     pick(v.split(":").length === 3 ? `${v}:1` : v);
   };
-  // The page's words, from the core's inspector: line by line, each word's clusters. The
-  // labels are the core's codepoints shown as characters, only to help pick one.
-  const insp = await callJson<{ clusters: { line: number; id: string; text: string }[] }>("inspect", state.page);
-  const chars = (u: string) => u.split(" ").map((x) => String.fromCodePoint(parseInt(x.slice(2), 16))).join("");
-  const byWord = new Map<string, { line: number; clusters: { id: string; text: string }[] }>();
-  for (const c of insp.clusters) {
-    const w = c.id.replace(/:\d+(\+ins\.\d+)*$/, "");
-    if (!byWord.has(w)) byWord.set(w, { line: c.line, clusters: [] });
-    byWord.get(w)!.clusters.push({ id: c.id, text: c.text });
-  }
-  const lines = new Map<number, string[]>();
-  for (const [w, x] of byWord) lines.set(x.line, [...(lines.get(x.line) ?? []), w]);
-  $("word-list").innerHTML = [...lines]
-    .map(
-      ([l, ws]) => `<div class="wl"><span class="wl-n">${l}</span>${ws
-        .map((w) => {
-          const x = byWord.get(w)!;
-          const open = sel !== null && x.clusters.some((c) => c.id === sel);
-          return `<span class="w${open ? " open" : ""}"><button class="w-btn" data-w="${esc(w)}" title="${esc(w)}" dir="rtl">${esc(x.clusters.map((c) => chars(c.text)).join(""))}</button>${
-            open ? x.clusters.map((c) => `<button class="c-btn${c.id === sel ? " on" : ""}" data-c="${esc(c.id)}" title="${esc(c.id)} ${esc(c.text)}">${esc(chars(c.text))}</button>`).join("") : ""
-          }</span>`;
-        })
-        .join("")}</div>`,
-    )
-    .join("");
-  $("word-list").querySelectorAll<HTMLButtonElement>(".w-btn").forEach((b) => (b.onclick = () => pick(byWord.get(b.dataset.w!)!.clusters[0].id)));
-  $("word-list").querySelectorAll<HTMLButtonElement>(".c-btn").forEach((b) => (b.onclick = () => pick(b.dataset.c!)));
   // The owner's highlight marks (D64): display and feedback only, computed by the core.
-  const marks = await callJson<{ cluster: string; show: boolean; note: string }[]>("highlight_marks");
-  $("hm-list").innerHTML = marks.length
-    ? `<ul>${marks.map((m) => `<li><code>${esc(m.cluster)}</code> ${m.show ? "should be highlighted" : "not a difference"}${m.note ? ` — ${esc(m.note)}` : ""}</li>`).join("")}</ul>`
-    : "<p>No highlight marks.</p>";
+  // Every handler is attached here, before the awaits below, so no button on the panel is
+  // ever clickable without one (G-228).
+  const showMarks = async () => {
+    const marks = await callJson<{ cluster: string; show: boolean; note: string }[]>("highlight_marks");
+    if (gen !== editorGen) return;
+    $("hm-list").innerHTML = marks.length
+      ? `<ul>${marks.map((m) => `<li><code>${esc(m.cluster)}</code> ${m.show ? "should be highlighted" : "not a difference"}${m.note ? ` — ${esc(m.note)}` : ""}</li>`).join("")}</ul>`
+      : "<p>No highlight marks.</p>";
+  };
   const mark = async (m: { show: boolean; note: string } | null) => {
     await call("set_highlight_mark", sel, JSON.stringify(m));
+    await showMarks();
     if (!ui.hl.checked) {
       ui.hl.checked = true;
       store.set(hlKey(), "1");
@@ -509,6 +494,35 @@ async function showEditor() {
     invalidate();
     await render();
   };
+  // The page's words, from the core's inspector: line by line, each word's clusters. The
+  // labels are the core's codepoints shown as characters, only to help pick one.
+  const insp = await callJson<{ clusters: { line: number; id: string; text: string }[] }>("inspect", state.page);
+  if (gen !== editorGen) return;
+  const chars = (u: string) => u.split(" ").map((x) => String.fromCodePoint(parseInt(x.slice(2), 16))).join("");
+  const byWord = new Map<string, { line: number; clusters: { id: string; text: string }[] }>();
+  for (const c of insp.clusters) {
+    const w = c.id.replace(/:\d+(\+ins\.\d+)*$/, "");
+    if (!byWord.has(w)) byWord.set(w, { line: c.line, clusters: [] });
+    byWord.get(w)!.clusters.push({ id: c.id, text: c.text });
+  }
+  const lines = new Map<number, string[]>();
+  for (const [w, x] of byWord) lines.set(x.line, [...(lines.get(x.line) ?? []), w]);
+  $("word-list").innerHTML = [...lines]
+    .map(
+      ([l, ws]) => `<div class="wl"><span class="wl-n">${l}</span>${ws
+        .map((w) => {
+          const x = byWord.get(w)!;
+          const open = sel !== null && x.clusters.some((c) => c.id === sel);
+          return `<span class="w${open ? " open" : ""}"><button class="w-btn" data-w="${esc(w)}" title="${esc(w)}" dir="rtl">${esc(x.clusters.map((c) => chars(c.text)).join(""))}</button>${
+            open ? x.clusters.map((c) => `<button class="c-btn${c.id === sel ? " on" : ""}" data-c="${esc(c.id)}" title="${esc(c.id)} ${esc(c.text)}">${esc(chars(c.text))}</button>`).join("") : ""
+          }</span>`;
+        })
+        .join("")}</div>`,
+    )
+    .join("");
+  $("word-list").querySelectorAll<HTMLButtonElement>(".w-btn").forEach((b) => (b.onclick = () => pick(byWord.get(b.dataset.w!)!.clusters[0].id)));
+  $("word-list").querySelectorAll<HTMLButtonElement>(".c-btn").forEach((b) => (b.onclick = () => pick(b.dataset.c!)));
+  await showMarks();
 }
 
 const cpsList = (s: string) => s.trim().split(/\s+/).filter(Boolean);
