@@ -57,6 +57,26 @@ the owner corrects them. A category's exact membership and wujūh always come fr
 Madd lengths as wujūh: `qasr`, `tawassut`, `tul` (also called `madd` / `ishba` in the books; the
 profile records the book's own term in its row).
 
+## Sign features (D72 level b, M1.2)
+
+What a mark means in a writing style; rows in `corpus/dabt/<style>.yaml`, each with a citation.
+Names from the uṣūl table above are reused (`sakt`, `tashil`, `imalah`, `ishmam`).
+
+| Feature | Meaning (KFGQPC Madinah explanation pages) |
+| --- | --- |
+| `not_pronounced` | a letter added in the rasm, not pronounced in waṣl or waqf (round zero) |
+| `dropped_in_wasl` | an alif dropped in waṣl and pronounced in waqf (oblong zero) |
+| `vowelless`, `izhar` | the sukūn sign: the letter is vowelless and pronounced clearly |
+| `tanwin_fath`, `tanwin_damm`, `tanwin_kasr` | which tanwīn |
+| `tanwin_izhar`, `tanwin_not_izhar` | stacked tanwīn (iẓhār) or consecutive (idghām or ikhfāʾ, by the next letter) |
+| `iqlab` | the small mīm: iqlāb before bāʾ |
+| `small_letter_alef`, `small_letter_yeh`, `small_letter_noon` | a small letter: left out of the rasm, pronounced |
+| `madd_beyond_natural` | the madd sign: longer than the natural madd |
+| `sin_for_sad`, `sad_preferred` | sīn over a ṣād (read with sīn) / under it (ṣād the better known) |
+| `sajdah_word`, `sajdah_place`, `hizb_start` | the line over a sajdah word, the sajdah sign, the ḥizb sign |
+| `waqf_lazim`, `waqf_jaiz`, `wasl_awla`, `waqf_awla`, `waqf_muanaqah` | the stop signs |
+| `fatha`, `damma`, `kasra`, `shadda`, `hamza_above`, `hamza_below` | `hypothesis`: not defined on the pages |
+
 ## Sources
 
 | Book | Code | Role (D68) |

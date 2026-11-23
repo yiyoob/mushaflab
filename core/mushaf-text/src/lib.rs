@@ -1,7 +1,7 @@
 //! Letters, signs and features of the Qurʾānic text (D72).
 //!
 //! Codepoint classes and clusters (M0.3), and letters with their signs (`letters`, M0.5), ported from the legacy `data/pipeline/clusterize.py`
-//! (same rules). A cluster is one base codepoint plus the marks and joiners that follow it, or a
+//! (same rules). Features through a writing style's sign rules (`features`, M1.2). A cluster is one base codepoint plus the marks and joiners that follow it, or a
 //! standalone sign, ayah number, digit or control. A mark with no base, a space inside an item,
 //! or a codepoint missing from the table is an error. Classes come only from the explicit table
 //! `data/pipeline/codepoint_classes.tsv` (CLAUDE.md conventions), embedded at build time.
@@ -10,8 +10,10 @@
 //! only, rule 1) can be clustered. The real text never contains them: its import checks every
 //! codepoint against the table.
 
+mod features;
 mod letters;
 
+pub use features::{Rule, features_of, marks_for};
 pub use letters::{Letter, Slot, Unit, decode, encode, in_order, place, slot_of};
 
 use std::collections::BTreeMap;

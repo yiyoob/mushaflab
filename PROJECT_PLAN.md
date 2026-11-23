@@ -16,8 +16,8 @@ review documents mean v2.
 
 **Status (2026-11-23):** M0 passed (`docs/adr/GATE-M0.md`). **M1 in progress** on branch
 `claude/m1-hafs`. Done: M1.3, M1.1 (the sign explanation pages, pinned from screenshots of
-the QuranFlash reader: KFGQPC's own 1441H digital copy has no back matter, G-230). Next: M1.2, then
-M1.4 and M1.5. Open owner decisions are listed at the end of `GATE-M0.md`.
+the QuranFlash reader: KFGQPC's own 1441H digital copy has no back matter, G-230), M1.2 (sign
+rows, links for the owner in `docs/review/m1/sign-links.md`). Next: M1.4, then M1.5. Open owner decisions are listed at the end of `GATE-M0.md`.
 
 ## 0. Scope
 

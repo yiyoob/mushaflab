@@ -160,8 +160,24 @@ pub struct OrderException {
 #[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SignRow {
+    /// Unique within the style.
+    pub id: String,
     pub codepoint: String,
     pub features: Vec<String>,
+    /// Bases (`U+XXXX`) the mark sits on; empty means any.
+    #[serde(default)]
+    pub bases: Vec<String>,
+    /// Word ids the row applies to; empty means every word.
+    #[serde(default)]
+    pub at: Vec<String>,
+    /// Features the letter must also have / must not have (D72 level b, M1.2).
+    #[serde(default)]
+    pub with: Vec<String>,
+    #[serde(default)]
+    pub without: Vec<String>,
+    /// Words the cited page gives as examples; each must carry the codepoint.
+    #[serde(default)]
+    pub evidence: Vec<String>,
     pub source: String,
     pub status: String,
     #[serde(default)]
@@ -177,6 +193,25 @@ pub fn parse_cp(s: &str) -> Option<char> {
 }
 
 impl Style {
+    /// The sign rows as `mushaf_text` rules (rows with unreadable codepoints are skipped; they
+    /// are reported by `Corpus::check`).
+    pub fn rules(&self) -> Vec<mushaf_text::Rule> {
+        self.signs
+            .iter()
+            .filter_map(|r| {
+                Some(mushaf_text::Rule {
+                    id: r.id.clone(),
+                    cp: parse_cp(&r.codepoint)?,
+                    features: r.features.clone(),
+                    bases: r.bases.iter().filter_map(|b| parse_cp(b)).collect(),
+                    at: r.at.clone(),
+                    with: r.with.clone(),
+                    without: r.without.clone(),
+                })
+            })
+            .collect()
+    }
+
     /// The mark order as chars (unparsable entries are reported by `Corpus::check`).
     pub fn order(&self) -> Vec<char> {
         self.mark_order
@@ -671,6 +706,9 @@ impl Corpus {
             self.words.iter().map(|w| (w.id, w.kind.as_str())).collect();
         self.check_layouts(&mut r, &sources, &order);
 
+        let texts: BTreeMap<WordId, &str> =
+            self.words.iter().map(|w| (w.id, w.text.as_str())).collect();
+
         // Writing styles (D72).
         for (path, st) in &self.styles {
             let mo = &st.mark_order;
@@ -699,15 +737,50 @@ impl Corpus {
                     )),
                 }
             }
+            let mut ids = BTreeSet::new();
             for row in &st.signs {
+                let here = |msg: String| Diag::new(path, None, format!("sign {}: {msg}", row.id));
                 check_sources(&mut r, &sources, path, 0, &row.source);
                 check_status(&mut r, path, 0, &row.status);
-                if parse_cp(&row.codepoint).is_none() {
-                    r.errors.push(Diag::new(
-                        path,
-                        None,
-                        format!("bad codepoint {:?}", row.codepoint),
-                    ));
+                if !ids.insert(row.id.as_str()) {
+                    r.errors.push(here("duplicate id".into()));
+                }
+                let cp = parse_cp(&row.codepoint);
+                if cp.is_none() {
+                    r.errors
+                        .push(here(format!("bad codepoint {:?}", row.codepoint)));
+                }
+                if row.features.is_empty() {
+                    r.errors.push(here("no features".into()));
+                }
+                for b in &row.bases {
+                    if parse_cp(b).is_none() {
+                        r.errors.push(here(format!("bad base {b:?}")));
+                    }
+                }
+                let bases: Vec<char> = row.bases.iter().filter_map(|b| parse_cp(b)).collect();
+                for w in row.at.iter().chain(&row.evidence) {
+                    let Some(id) = WordId::parse(w).filter(|id| letters.contains_key(id)) else {
+                        r.errors
+                            .push(here(format!("word {w:?} is not in the word table")));
+                        continue;
+                    };
+                    // Evidence words must carry the codepoint (on one of the bases, if given).
+                    if !row.evidence.contains(w) {
+                        continue;
+                    }
+                    let text = texts.get(&id).copied().unwrap_or_default();
+                    let ok = cp.is_some_and(|cp| carries(text, cp, &bases));
+                    if !ok {
+                        r.errors.push(here(format!(
+                            "evidence {w} does not carry {}",
+                            row.codepoint
+                        )));
+                    }
+                    if !row.at.is_empty() && !row.at.contains(w) {
+                        r.errors
+                            .push(here(format!("evidence {w} is outside the row's words")));
+                    }
                 }
             }
         }
@@ -963,6 +1036,20 @@ fn check_lines(
             ),
         ));
     }
+}
+
+/// Whether `text` has `cp` as a standalone sign or as a mark on one of `bases` (any base when
+/// empty).
+fn carries(text: &str, cp: char, bases: &[char]) -> bool {
+    let Ok(units) = mushaf_text::decode(text) else {
+        return false;
+    };
+    units.iter().any(|u| match u {
+        mushaf_text::Unit::Letter(l) => {
+            l.marks.contains(&cp) && (bases.is_empty() || bases.contains(&l.base))
+        }
+        mushaf_text::Unit::Standalone { cp: c, .. } => *c == cp,
+    })
 }
 
 fn tsv_under<'a>(path: &'a str, dir: &str) -> Option<&'a str> {

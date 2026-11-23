@@ -381,3 +381,88 @@ fn a_surah_header_is_followed_on_its_page_by_that_surah() {
     let e = errors(&layout_files(LAYOUT_YAML, &bad));
     assert!(e.iter().any(|m| m.contains("surah_name")), "{e:?}");
 }
+
+// M1.2: sign rows of a writing style.
+
+/// Words with marks (U+064E and U+0651 are marks of the table; text is synthetic).
+const WORDS_MARKED: &str = "word_id\tkind\ttext\tsep_before\tsep_after\tsource
+1:1:1\tword\ta\u{064E}b\t\tU+0020\ttext-x:1
+1:1:2\tword\tc\u{0651}\t\tU+0020\ttext-x:2
+";
+
+const STYLE: &str = "id: style_a
+title: Style A
+mark_order:
+  source: text-x:all
+  status: raw-derived
+  order: [\"U+0651\", \"U+064E\"]
+signs:
+  - id: mark_a
+    codepoint: \"U+064E\"
+    features: [feat_a]
+    evidence: [\"1:1:1\"]
+    source: book-a:p1
+    status: raw-derived
+  - id: mark_b
+    codepoint: \"U+0651\"
+    features: [feat_b]
+    bases: [\"U+0063\"]
+    at: [\"1:1:2\"]
+    evidence: [\"1:1:2\"]
+    source: book-a:p2
+    status: raw-derived
+";
+
+fn style_files(style: &str) -> Files {
+    let mut f = files(&[("corpus/dabt/style_a.yaml", style)]);
+    f.insert("corpus/text/words.tsv".into(), WORDS_MARKED.into());
+    f
+}
+
+#[test]
+fn well_formed_sign_rows_have_no_errors() {
+    let e = errors(&style_files(STYLE));
+    assert!(e.is_empty(), "{e:?}");
+    let c = Corpus::load(&style_files(STYLE)).unwrap();
+    assert_eq!(c.styles["corpus/dabt/style_a.yaml"].rules().len(), 2);
+}
+
+#[test]
+fn evidence_must_carry_the_sign() {
+    let bad = STYLE.replacen("evidence: [\"1:1:1\"]", "evidence: [\"1:1:2\"]", 1);
+    let e = errors(&style_files(&bad));
+    assert!(
+        e.iter().any(|m| m.contains("does not carry U+064E")),
+        "{e:?}"
+    );
+
+    let wrong_base = STYLE.replace("bases: [\"U+0063\"]", "bases: [\"U+0061\"]");
+    let e = errors(&style_files(&wrong_base));
+    assert!(
+        e.iter().any(|m| m.contains("does not carry U+0651")),
+        "{e:?}"
+    );
+}
+
+#[test]
+fn sign_row_words_ids_and_codepoints_are_checked() {
+    let e = errors(&style_files(
+        &STYLE.replace("at: [\"1:1:2\"]", "at: [\"9:9:9\"]"),
+    ));
+    assert!(e.iter().any(|m| m.contains("9:9:9")), "{e:?}");
+    assert!(
+        e.iter().any(|m| m.contains("outside the row's words")),
+        "{e:?}"
+    );
+    let e = errors(&style_files(&STYLE.replace("id: mark_b", "id: mark_a")));
+    assert!(e.iter().any(|m| m.contains("duplicate id")), "{e:?}");
+    let e = errors(&style_files(
+        &STYLE.replace("codepoint: \"U+0651\"", "codepoint: \"x\""),
+    ));
+    assert!(e.iter().any(|m| m.contains("bad codepoint")), "{e:?}");
+    let e = errors(&style_files(&STYLE.replace(
+        "status: raw-derived\n  - id",
+        "status: muqri-verified\n  - id",
+    )));
+    assert!(e.iter().any(|m| m.contains("muqri-verified")), "{e:?}");
+}
