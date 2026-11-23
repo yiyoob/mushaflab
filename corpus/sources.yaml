@@ -13,9 +13,9 @@ sources:
     locator: "v<volume>p<pdf page>r<row>"
     pins: [book-al-futuh-al-bahira-vol1, book-al-futuh-al-bahira-vol2, book-al-futuh-al-bahira-vol3, book-al-futuh-al-bahira-vol4, book-al-futuh-al-bahira-vol5, book-al-futuh-al-bahira-vol6]
   - id: kfgqpc-hafs
-    title: "KFGQPC Hafs text, v2.0"
+    title: "KFGQPC Hafs text, v2.0 (member hafsData_v2-0.json), via the Hafs spine data/spine/hafs/v1"
     role: text
-    locator: "<member>#<key>"
+    locator: "<word id>"
     pins: [kfgqpc-official-hafs]
   - id: kfgqpc-shuba
     title: "KFGQPC shuba text"
