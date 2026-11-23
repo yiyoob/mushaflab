@@ -56,6 +56,17 @@ Run everything from the repository root.
    ```bash
    just data-fetch
    ```
+   Some sources cannot be downloaded and are copied in by hand (`"acquire": "manual"` in the
+   manifest). Without them their tests **skip** rather than fail, so check they are there:
+
+   | File under `data/sources/raw/` | What it is |
+   | --- | --- |
+   | `books/al-futuh-al-bahira/vol1.pdf` … `vol6.pdf` | al-Futūḥ al-Bāhira, the owner's PDFs (source of truth, D68) |
+   | `owner-fonts/majalla.ttf` | Sakkal Majalla, used to verify al-Futūḥ's prose text |
+   | `books/al-budur-al-zahirah/al-budur.epub` | the owner's al-Budūr EPUB; missing (G-225), so the pipeline uses Aljam3's copy, which `data-fetch` downloads |
+
+   `just data-fetch` then reports `verify: N/N sources ok`; a manual file that is present but
+   different from its pin is reported, never used.
 2. **Build the data.** This runs the full pipeline and writes `build/mushaf.db`:
    ```bash
    just data-build
@@ -131,6 +142,17 @@ Other web checks, each also listed in `CLAUDE.md`:
 - `just web-golden`: the app's drawing compared with the golden PNGs.
 - `just web-bench`: the 16 ms page-turn budget, with Chromium's CPU slowed 4×.
 
+## Book extractions (untracked)
+
+The book importers write to `build/books/`, which is never committed because it holds book
+text (rule 10). Some tests need it and skip without it. To rebuild what they use:
+```bash
+just book-futuh --vol 1 --pages 47-63 --surah 1 --tag m0
+```
+That is al-Futūḥ for al-Fātiḥah and al-Baqarah 1–20, which the Warsh prototype
+(`python -m pipeline.m0_warsh`, `docs/review/m0/warsh-residuals.md`) reads. A whole volume
+takes about 3 minutes: `just book-futuh --vol 1`.
+
 ## Note on the Rust build cache
 
 The justfile shares one Rust build directory between the main checkout and every worktree
@@ -139,4 +161,9 @@ errors like "cannot find function … in crate mushaf_model". To avoid that, giv
 own build directory:
 ```bash
 export CARGO_TARGET_DIR=$PWD/build/cargo-target
+```
+A worktree also has an empty `data/sources/raw/` (the sources are untracked). Link the main
+checkout's folders into it, or its source-dependent tests skip:
+```bash
+for d in /path/to/main/data/sources/raw/*/; do ln -s "$d" data/sources/raw/; done
 ```
