@@ -49,7 +49,7 @@ model reproduces each of them, and is deleted in M3 (D67).
 
 | Milestone | Delivers | Gate |
 | --- | --- | --- |
-| **M0** Agree the model | plan, rules, glossary; `corpus/` formats; `mushaf-corpus` (load, check, build); Ḥafṣ words table; letter-feature round trip; Warsh prototype for al-Fātiḥa + al-Baqarah 1–20 | owner approves the formats (D69, D70, D72) and reviews the Warsh residual report |
+| **M0** Agree the model (**passed 2026-11-23**, `docs/adr/GATE-M0.md`) | plan, rules, glossary; `corpus/` formats; `mushaf-corpus` (load, check, build); Ḥafṣ words table; letter-feature round trip; Warsh prototype for al-Fātiḥa + al-Baqarah 1–20 | owner approves the formats (D69, D70, D72) and reviews the Warsh residual report |
 | **M1** Ḥafṣ from the new model | letter features for the whole text; Madinah writing style; the current renderer draws from the new model | byte-identical to KFGQPC Ḥafṣ on all 604 pages; goldens unchanged |
 | **M2** Warsh and Qālūn | farsh and uṣūl of Nāfiʿ from the books; Maghribī style; reader toggles with combination tables | at KFGQPC's wajh, output matches KFGQPC; every other wajh cited |
 | **M3** The other five KFGQPC riwāyāt | Shuʿbah, al-Bazzī, Qunbul, al-Dūrī ʿan Abī ʿAmr, al-Sūsī | all 8 match at KFGQPC's wajh; legacy patch model deleted |

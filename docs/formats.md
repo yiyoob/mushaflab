@@ -1,8 +1,8 @@
 # Corpus formats
 
 The files under `corpus/` are the source of truth (D69). `mushaf check` validates them and
-`mushaf build` compiles them into `build/corpus.db`. Status: proposed for GATE M0 (the owner
-approves these formats); fields marked *(M0.6)* may still change with the Warsh prototype.
+`mushaf build` compiles them into `build/corpus.db`. Status: accepted at GATE M0 (Yusuf,
+2026-11-23); fields marked *(M0.6)* may still change as M2 fills farsh, uṣūl and profiles.
 
 ## Common rules
 
