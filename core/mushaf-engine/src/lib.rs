@@ -60,19 +60,23 @@ impl Source for PathBuf {
     }
 }
 
-/// The data set the engine runs on (D73): the legacy data files, with the Ḥafṣ spine and the
-/// layouts taken from the corpus when the source has one. The corpus's own row checks are
-/// `mushaf check`'s job; a corpus that does not load is an error here.
+/// The data set the engine runs on (D73): the Ḥafṣ spine and the layouts from the corpus when
+/// the source has one, and the other legacy data files (patches, the other riwāyāt's layouts,
+/// options, profiles). The legacy files the corpus replaces are not read (M1.5). The corpus's
+/// own row checks are `mushaf check`'s job; a corpus that does not load is an error here.
 pub fn load_data<S: Source + ?Sized>(repo: &S) -> Result<DataSet, Error> {
-    let mut ds = DataSet::from_files(&repo.data_files()?)?;
     let files = repo.corpus_files()?;
-    if !files.is_empty() {
-        let c = mushaf_corpus::Corpus::load(&files).map_err(|d| {
-            let msgs: Vec<String> = d.iter().map(ToString::to_string).collect();
-            Error::new(format!("corpus: {}", msgs.join("; ")))
-        })?;
-        mushaf_corpus::legacy::apply(&c, &mut ds)?;
+    if files.is_empty() {
+        return DataSet::from_files(&repo.data_files()?);
     }
+    let c = mushaf_corpus::Corpus::load(&files).map_err(|d| {
+        let msgs: Vec<String> = d.iter().map(ToString::to_string).collect();
+        Error::new(format!("corpus: {}", msgs.join("; ")))
+    })?;
+    let mut data = repo.data_files()?;
+    data.retain(|k, _| !mushaf_corpus::legacy::replaces(&c, k));
+    let mut ds = DataSet::parse_files(&data)?;
+    mushaf_corpus::legacy::apply(&c, &mut ds)?;
     Ok(ds)
 }
 

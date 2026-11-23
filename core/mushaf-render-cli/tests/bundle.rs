@@ -31,7 +31,17 @@ fn bundle_matches_the_checkout_and_draws_the_same_pages() {
     }
     // the corpus: the checkout's, file for file (D73)
     assert_eq!(bundle.corpus_files().unwrap(), repo.corpus_files().unwrap());
-    // data files: the checkout's, less only patch files no profile stacks
+    // data files: the checkout's, less patch files no profile stacks and the legacy files the
+    // corpus replaces (M1.5, D73), none of which is shipped
+    let corpus = mushaf_corpus::Corpus::load(&repo.corpus_files().unwrap()).unwrap();
+    let replaced = |k: &str| mushaf_corpus::legacy::replaces(&corpus, k);
+    assert!(
+        !bundle
+            .files
+            .keys()
+            .any(|p| p.starts_with("data/spine/hafs/")
+                || p.starts_with("data/layouts/uthmani-1441h."))
+    );
     let disk = repo.data_files().unwrap();
     let web = bundle.data_files().unwrap();
     let stacked: Vec<String> = web
@@ -48,7 +58,7 @@ fn bundle_matches_the_checkout_and_draws_the_same_pages() {
         match web.get(k) {
             Some(w) => assert_eq!(w, v, "{k}"),
             None => assert!(
-                k.starts_with("patches/") && !stacked.contains(k),
+                (k.starts_with("patches/") && !stacked.contains(k)) || replaced(k),
                 "{k} missing from the bundle"
             ),
         }

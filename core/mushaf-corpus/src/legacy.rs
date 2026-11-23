@@ -144,13 +144,27 @@ pub fn layouts(c: &Corpus) -> Result<BTreeMap<String, Layout>, Error> {
     Ok(out)
 }
 
+/// Whether a data-root file (key relative to `data/`) is one the corpus replaces: the legacy
+/// spine `hafs/v1` and the legacy files of every corpus layout (M1.5, D73).
+pub fn replaces(c: &Corpus, data_key: &str) -> bool {
+    if c.words.is_empty() {
+        return false;
+    }
+    if data_key.starts_with(&format!("spine/{SPINE_ID}/")) {
+        return true;
+    }
+    c.layouts.values().any(|l| {
+        data_key == format!("layouts/{}.json", l.layout_id)
+            || data_key == format!("layouts/{}.corrections.json", l.layout_id)
+    })
+}
+
 /// Put the corpus's spine and layouts into a data set, replacing the legacy ones of the same
 /// ids, and validate the result (patch targets, layout references).
 pub fn apply(c: &Corpus, ds: &mut mushaf_model::DataSet) -> Result<(), Error> {
-    if c.words.is_empty() {
-        return Ok(());
+    if !c.words.is_empty() {
+        ds.spines.insert(SPINE_ID.into(), spine(c)?);
+        ds.layouts.extend(layouts(c)?);
     }
-    ds.spines.insert(SPINE_ID.into(), spine(c)?);
-    ds.layouts.extend(layouts(c)?);
     ds.validate()
 }

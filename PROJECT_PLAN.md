@@ -18,7 +18,8 @@ review documents mean v2.
 `claude/m1-hafs`. Done: M1.3, M1.1 (the sign explanation pages, pinned from screenshots of
 the QuranFlash reader: KFGQPC's own 1441H digital copy has no back matter, G-230), M1.2 (sign
 rows, links for the owner in `docs/review/m1/sign-links.md`), M1.4 (the engine takes the Ḥafṣ
-spine and layouts from the corpus, D73; goldens and web parity byte-identical). Next: M1.5. Open owner decisions are listed at the end of `GATE-M0.md`.
+spine and layouts from the corpus, D73; goldens and web parity byte-identical), M1.5 (the
+legacy Ḥafṣ spine and layout are off the engine's path and out of the bundle). Next: GATE M1. Open owner decisions are listed at the end of `GATE-M0.md`.
 
 ## 0. Scope
 
