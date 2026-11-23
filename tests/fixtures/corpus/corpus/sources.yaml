@@ -1,0 +1,12 @@
+# Synthetic source registry (Latin letters only, CLAUDE.md rule 1).
+sources:
+  - id: book-a
+    title: Book A
+    role: truth
+    locator: p<n>
+    pins: [pin-a]
+  - id: text-x
+    title: Text X
+    role: text
+    locator: <key>
+    pins: [pin-x]

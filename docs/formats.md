@@ -14,7 +14,8 @@ approves these formats); fields marked *(M0.6)* may still change with the Warsh 
   small diff.
 - **YAML:** only for small files written by hand (profiles, writing styles, source registry) and
   for farsh entries, which nest.
-- **Ids.** Word: `surah:ayah:word` (Kūfī count, 1-based), as in `text/words.tsv`. Letter:
+- **Ids.** Word: `surah:ayah:word` (Kūfī count, 1-based), as in `text/words.tsv`; position `0`
+  is used only by a ḥizb sign that precedes an ayah's first word (as in the Ḥafṣ spine, D11). Letter:
   `surah:ayah:word:letter`. Inserted items: `<anchor>+ins.<n>`. Riwāyah, qāriʾ and category ids:
   `CLAUDE.md` and `docs/GLOSSARY.md`.
 
@@ -127,12 +128,12 @@ Written only on the owner's instruction (rule 4); Claude never edits it.
 
 ```yaml
 - table: corpus/usul/badal.tsv
-  blob: <git blob sha of the approved version>
+  sha256: "<sha256 of the approved file content>"   # quoted
   status: cross-checked | muqri-verified
   by: Yusuf
   date: YYYY-MM-DD
   except: ["<row key>", …]        # rows not covered by this approval
 ```
 
-An approval whose `blob` no longer matches the file is stale: the rows fall back to their own
+An approval whose `sha256` no longer matches the file is stale: the rows fall back to their own
 `status` until the table is approved again (D70).

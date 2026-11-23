@@ -1,0 +1,12 @@
+[package]
+name = "mushaf-text"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+description = "Letters, signs and features of the Qur'anic text (D72); builds for every target"
+
+[dependencies]
+
+[lints]
+workspace = true

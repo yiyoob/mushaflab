@@ -66,6 +66,14 @@ data-verify:
 data-test:
     {{uv}} run pytest -n auto --dist loadscope
 
+# Validate corpus/ (sources, statuses, references, approvals; D69, D70)
+corpus-check:
+    cargo run --release -q {{manifest}} -p mushaf-cli --bin mushaf -- check --root "{{justfile_directory()}}"
+
+# Compile corpus/ into build/corpus.db (never edited by hand)
+corpus-build:
+    cargo run --release -q {{manifest}} -p mushaf-cli --bin mushaf -- build --root "{{justfile_directory()}}"
+
 # Compile the synthetic fixture root into build/fixtures/synthetic.db (for the T2.2 parity test)
 core-fixtures:
     {{uv}} run python -m pipeline.compile_db --root "{{justfile_directory()}}/tests/fixtures/synthetic" "{{justfile_directory()}}/build/fixtures/synthetic.db"
@@ -85,9 +93,9 @@ core-test: core-fixtures
     fi
 
 # Check the core builds for every platform target (web now, iOS/Android later).
-# mushaf-db (bundled SQLite), the CLI and the round-trip tool are host-only (D12, D22, G-032).
+# mushaf-db (bundled SQLite), the CLIs and the round-trip tool are host-only (D12, D22, G-032).
 core-targets:
-    cargo check {{manifest}} --workspace --exclude mushaf-render-cli --exclude mushaf-db --exclude mushaf-roundtrip --exclude mushaf-wasm \
+    cargo check {{manifest}} --workspace --exclude mushaf-render-cli --exclude mushaf-db --exclude mushaf-roundtrip --exclude mushaf-cli --exclude mushaf-wasm \
         --target wasm32-unknown-unknown --target aarch64-apple-ios --target aarch64-apple-ios-sim \
         --target aarch64-linux-android --target x86_64-linux-android
     cargo check {{manifest}} -p mushaf-wasm --target wasm32-unknown-unknown
@@ -241,8 +249,8 @@ _todo task:
     @echo "not implemented yet ({{task}})" >&2
     @exit 1
 
-# Per-commit check: lint, Rust tests, Python tests
-gate-fast: lint core-test data-test
+# Per-commit check: lint, Rust tests, Python tests, corpus check
+gate-fast: lint core-test data-test corpus-check
 
 # Full gate, required before a push, a merge or a GATE. The Python checks run alongside the
 # Rust chain; each step's time is printed, and logs are kept in build/gate/.
@@ -253,7 +261,7 @@ gate:
     step() { local s=$SECONDS; if just "$1" >"$logs/$1.log" 2>&1; then echo "ok   $1 ($((SECONDS-s))s)"; else echo "FAIL $1 ($((SECONDS-s))s), see $logs/$1.log"; return 1; fi; }
     export MUSHAF_FULL=1
     ( step data-test && step data-verify ) & py=$!
-    rust=0; for s in lint core-test core-targets golden roundtrip web-gate; do step "$s" || { rust=1; break; }; done
+    rust=0; for s in lint core-test corpus-check core-targets golden roundtrip web-gate; do step "$s" || { rust=1; break; }; done
     wait $py || rust=1
     exit $rust
 
