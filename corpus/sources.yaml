@@ -1,0 +1,54 @@
+# Citable sources (docs/formats.md). `pins` are source ids in data/sources/MANIFEST.json.
+sources:
+  - id: al-budur
+    title: "al-Budur al-Zahirah fi al-Qira'at al-'Ashr al-Mutawatirah min Tariqay al-Shatibiyyah wa-al-Durrah"
+    author: "'Abd al-Fattah al-Qadi"
+    edition: "Dar al-Kitab al-'Arabi, Beirut, 1401/1981 (turath.io book 57)"
+    role: truth
+    locator: "p<printed page>"
+    pins: [book-al-budur-al-zahirah]
+  - id: al-futuh
+    title: "al-Futuh al-Bahirah fi Jam' al-Qira'at al-'Ashr al-Mutawatirah"
+    role: truth
+    locator: "v<volume>p<pdf page>r<row>"
+    pins: [book-al-futuh-al-bahira-vol1, book-al-futuh-al-bahira-vol2, book-al-futuh-al-bahira-vol3, book-al-futuh-al-bahira-vol4, book-al-futuh-al-bahira-vol5, book-al-futuh-al-bahira-vol6]
+  - id: kfgqpc-hafs
+    title: "KFGQPC Hafs text, v2.0"
+    role: text
+    locator: "<member>#<key>"
+    pins: [kfgqpc-official-hafs]
+  - id: kfgqpc-shuba
+    title: "KFGQPC shuba text"
+    role: check
+    locator: "<member>#<key>"
+    pins: [kfgqpc-official-shuba]
+  - id: kfgqpc-warsh
+    title: "KFGQPC warsh text"
+    role: check
+    locator: "<member>#<key>"
+    pins: [kfgqpc-official-warsh]
+  - id: kfgqpc-qalun
+    title: "KFGQPC qalun text"
+    role: check
+    locator: "<member>#<key>"
+    pins: [kfgqpc-official-qalun]
+  - id: kfgqpc-qunbul
+    title: "KFGQPC qunbul text"
+    role: check
+    locator: "<member>#<key>"
+    pins: [kfgqpc-official-qunbul]
+  - id: kfgqpc-duri_abuamr
+    title: "KFGQPC duri_abuamr text"
+    role: check
+    locator: "<member>#<key>"
+    pins: [kfgqpc-official-duri_abuamr]
+  - id: kfgqpc-susi
+    title: "KFGQPC susi text"
+    role: check
+    locator: "<member>#<key>"
+    pins: [kfgqpc-official-susi]
+  - id: kfgqpc-bazzi
+    title: "KFGQPC al-Bazzi text (2022 mirror, D13)"
+    role: check
+    locator: "<member>#<key>"
+    pins: [kfgqpc-mirror-bazzi-data]
