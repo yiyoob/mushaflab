@@ -57,3 +57,9 @@ sources:
     role: layout
     locator: "p<page>l<line>"
     pins: [qul-layout-19-v4-1441h, qul-script-312-kfgqpc-hafs-wbw]
+  - id: kfgqpc-hafs-explanation
+    title: "KFGQPC Madinah Hafs mushaf, back matter: riwayat hadha al-mushaf wa-mustalahat rasmihi wa-dabtihi wa-'add ayihi (pp. alif-kaf) and the stop signs (p. lam)"
+    edition: "Screenshots of the QuranFlash reader, book Medina1 (approval dated 1420/1/26 AH; print year not shown, G-230)"
+    role: check
+    locator: "p<page letter, transliterated: alif ba jim dal ha waw zay hha tta ya kaf lam>"
+    pins: [kfgqpc-hafs-explanation-alif, kfgqpc-hafs-explanation-ba, kfgqpc-hafs-explanation-jim, kfgqpc-hafs-explanation-dal, kfgqpc-hafs-explanation-ha, kfgqpc-hafs-explanation-waw, kfgqpc-hafs-explanation-zay, kfgqpc-hafs-explanation-hha, kfgqpc-hafs-explanation-tta, kfgqpc-hafs-explanation-ya, kfgqpc-hafs-explanation-kaf, kfgqpc-hafs-explanation-lam, kfgqpc-hafs-explanation-approval]
