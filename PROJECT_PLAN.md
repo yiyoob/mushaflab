@@ -14,6 +14,9 @@ The architecture is in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). The plan 
 References to `PROJECT_PLAN §n`, phases or `T<phase>.<n>` tasks in legacy code and
 review documents mean v2.
 
+**Status (2026-11-23):** M0 passed (`docs/adr/GATE-M0.md`). **Next: M1**, starting in plan mode
+from the outline in §1. Open owner decisions are listed at the end of `GATE-M0.md`.
+
 ## 0. Scope
 
 **In scope.**
@@ -70,6 +73,19 @@ measure.
 | M0.4 | `corpus/text/words.tsv` from the Ḥafṣ spine | words ↔ spine identical, item for item |
 | M0.5 | `core/mushaf-text`: letter features, `decode` / `encode` | byte-identical round trip on every word |
 | M0.6 | Warsh prototype for 1:1–2:20 from the books | `docs/review/m0/warsh-residuals.md`, every residual classified |
+
+### M1 outline (proposed; refine in plan mode)
+
+M1 makes the new model the source of the Ḥafṣ text the app draws. The legacy spine's output is
+the check: nothing the renderer draws may change.
+
+| Task | Delivers | Accept |
+| --- | --- | --- |
+| M1.1 | Pin KFGQPC's "explanation of signs" pages for the Ḥafṣ muṣḥaf (owner-supplied; cited in D41 and `data/options/hafs.yaml` as p. ح but never pinned), so sign meanings can cite them (G-226) | `just data-fetch` verifies the new pin |
+| M1.2 | `corpus/dabt/kfgqpc-madinah.yaml` sign rows (D72 level b), each cited or `hypothesis`; `mushaf-text` encodes letters with features back to signs through the style | every word of `words.tsv` round-trips through features, byte for byte |
+| M1.3 | `corpus/adad/kufi.tsv` and `corpus/layouts/<id>/` for the Madinah 15-line layout, converted from the legacy spine's ayah ends and `data/layouts/uthmani-1441h.json` (pinned-source provenance kept) | `just corpus-check`; ayah and line ranges equal the legacy ones |
+| M1.4 | The engine reads Ḥafṣ from the corpus (`build/corpus.db` / the web bundle) through `mushaf-text`, behind the existing `Source` (D56) | `just golden` (all 604 pages) and `just web-parity` (the golden pages in WASM): byte-identical |
+| M1.5 | Remove the legacy spine from the Ḥafṣ path (it stays for the 7 other riwāyāt until M3) | `just gate` |
 
 ## 2. Test matrix
 
