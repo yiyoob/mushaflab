@@ -1,0 +1,3 @@
+word_id	letter	category	context	exception	source	status	support	note
+1:1:1	2	cat_a	both		book-a:p3	raw-derived	single-source	
+1:2:1	1	cat_a	waqf	excluded	book-a:p4 ; text-x:4	rule-derived	cross-source	an exception

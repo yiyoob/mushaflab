@@ -14,6 +14,9 @@ members = [
     "mushaf-ffi",
     "mushaf-wasm",
     "mushaf-roundtrip",
+    "mushaf-text",
+    "mushaf-corpus",
+    "mushaf-cli",
 ]
 
 [workspace.package]
@@ -32,6 +35,8 @@ mushaf-justify = { path = "mushaf-justify" }
 mushaf-draw = { path = "mushaf-draw" }
 mushaf-db = { path = "mushaf-db" }
 mushaf-engine = { path = "mushaf-engine" }
+mushaf-text = { path = "mushaf-text" }
+mushaf-corpus = { path = "mushaf-corpus" }
 # Third-party versions are pinned exactly (determinism, reproducible builds).
 serde = { version = "=1.0.229", features = ["derive"] }
 serde_json = "=1.0.154"

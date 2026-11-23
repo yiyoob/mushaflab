@@ -461,6 +461,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "743fb55ba31b18fb1ecef6bdc9aa2743314978ac084044301a7eee33fb99a20d"
 
 [[package]]
+name = "mushaf-cli"
+version = "0.0.0"
+dependencies = [
+ "mushaf-corpus",
+ "rusqlite",
+]
+
+[[package]]
+name = "mushaf-corpus"
+version = "0.0.0"
+dependencies = [
+ "mushaf-model",
+ "mushaf-text",
+ "serde",
+ "sha2",
+]
+
+[[package]]
 name = "mushaf-db"
 version = "0.0.0"
 dependencies = [
@@ -609,6 +627,10 @@ dependencies = [
  "serde_json",
  "sha2",
 ]
+
+[[package]]
+name = "mushaf-text"
+version = "0.0.0"
 
 [[package]]
 name = "mushaf-wasm"

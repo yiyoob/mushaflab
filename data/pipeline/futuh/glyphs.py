@@ -96,7 +96,7 @@ class InkBounds:
     def load_page(self, page: pymupdf.Page) -> None:
         import io
 
-        from fontTools.ttLib import TTFont
+        from fontTools.ttLib import TTFont, TTLibError
 
         for f in page.get_fonts(full=True):
             xref, name = f[0], font_base(f[3])
@@ -108,7 +108,9 @@ class InkBounds:
                 tt = TTFont(io.BytesIO(buf), lazy=True)
                 glyf = tt["glyf"]
                 upem = tt["head"].unitsPerEm
-            except (RuntimeError, ValueError, KeyError) as e:  # font not readable
+            # Any font fontTools cannot read is skipped, as in the original extractor; TTLibError
+            # is not one of the builtin exceptions, and narrowing to them crashed volume 1.
+            except (TTLibError, RuntimeError, ValueError, KeyError) as e:  # font not readable
                 print(f"futuh: font xref {xref} skipped: {e}", file=sys.stderr)
                 continue
             d = self.bounds.setdefault(name, {})

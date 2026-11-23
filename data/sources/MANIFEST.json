@@ -1,5 +1,6 @@
 {
   "allowed_domains": [
+    "huggingface.co",
     "raw.githubusercontent.com",
     "registry.npmjs.org",
     "s3.us-east-1.wasabisys.com",
@@ -599,6 +600,32 @@
       "sha256": "2602b7a98a0f10bf765dea99c43e7cab39d2c98a77733c5acd598ff7c7cf173d",
       "size": 370084,
       "url": ""
+    },
+    {
+      "acquire": "http",
+      "file": "books/al-budur-al-zahirah/aljam3-3480.pdf",
+      "group": "books",
+      "id": "book-al-budur-aljam3-pdf",
+      "note": "al-Budur al-Zahirah, 'Abd al-Fattah al-Qadi, Dar al-Kitab al-'Arabi print (360 pp.), as Aljam3 book 3480 (https://aljam3.com/ar/3480, file 8362, collection al-Maktabah al-Shamilah al-Waqfiyyah), hosted on Hugging Face (dataset ieasybooks-org/shamela-waqfeya-library). Used in place of the owner's EPUB (book-al-budur-al-zahirah), which is not available (G-225; owner decision 2026-11-23, D68). The scanned PDF: the page images every citation is checked against.",
+      "optional": true,
+      "pinned_on": "2026-11-23",
+      "role": "rules-reference",
+      "sha256": "37cfdcfaa33408a5c58b00015f37f507e03ce2044ab925ccf474f448d1b06fef",
+      "size": 6239108,
+      "url": "https://huggingface.co/datasets/ieasybooks-org/shamela-waqfeya-library/resolve/main/pdf/%D8%B9%D9%84%D9%88%D9%85%20%D8%A7%D9%84%D9%82%D8%B1%D8%A2%D9%86/%D8%A7%D9%84%D8%A8%D8%AF%D9%88%D8%B1%20%D8%A7%D9%84%D8%B2%D8%A7%D9%87%D8%B1%D8%A9%20%D9%81%D9%8A%20%D8%A7%D9%84%D9%82%D8%B1%D8%A7%D8%A1%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B9%D8%B4%D8%B1%20%D8%A7%D9%84%D9%85%D8%AA%D9%88%D8%A7%D8%AA%D8%B1%D8%A9%20-%20%D8%A7%D9%84%D9%82%D8%A7%D8%B6%D9%8A%20-%20%D8%B7%20%D8%A7%D9%84%D9%83%D8%AA%D8%A7%D8%A8%20%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A/5571.pdf"
+    },
+    {
+      "acquire": "http",
+      "file": "books/al-budur-al-zahirah/aljam3-3480.txt",
+      "group": "books",
+      "id": "book-al-budur-aljam3-txt",
+      "note": "al-Budur al-Zahirah, 'Abd al-Fattah al-Qadi, Dar al-Kitab al-'Arabi print (360 pp.), as Aljam3 book 3480 (https://aljam3.com/ar/3480, file 8362, collection al-Maktabah al-Shamilah al-Waqfiyyah), hosted on Hugging Face (dataset ieasybooks-org/shamela-waqfeya-library). Used in place of the owner's EPUB (book-al-budur-al-zahirah), which is not available (G-225; owner decision 2026-11-23, D68). The OCR text of the same scan (it has OCR errors: never Quranic text, rule 1; a cited row is checked against the PDF page).",
+      "optional": true,
+      "pinned_on": "2026-11-23",
+      "role": "rules-reference",
+      "sha256": "34fb0d0928bb6766561ccd08fbb45b76eead84ac0319dfaa61a7771605f68521",
+      "size": 1023868,
+      "url": "https://huggingface.co/datasets/ieasybooks-org/shamela-waqfeya-library/resolve/main/txt/%D8%B9%D9%84%D9%88%D9%85%20%D8%A7%D9%84%D9%82%D8%B1%D8%A2%D9%86/%D8%A7%D9%84%D8%A8%D8%AF%D9%88%D8%B1%20%D8%A7%D9%84%D8%B2%D8%A7%D9%87%D8%B1%D8%A9%20%D9%81%D9%8A%20%D8%A7%D9%84%D9%82%D8%B1%D8%A7%D8%A1%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B9%D8%B4%D8%B1%20%D8%A7%D9%84%D9%85%D8%AA%D9%88%D8%A7%D8%AA%D8%B1%D8%A9%20-%20%D8%A7%D9%84%D9%82%D8%A7%D8%B6%D9%8A%20-%20%D8%B7%20%D8%A7%D9%84%D9%83%D8%AA%D8%A7%D8%A8%20%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A/5571.txt"
     }
   ]
 }

@@ -1,0 +1,21 @@
+[package]
+name = "mushaf-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+description = "Host-only `mushaf` command: check and build the corpus (SQLite); excluded from core-targets"
+
+[[bin]]
+name = "mushaf"
+path = "src/main.rs"
+
+[dependencies]
+mushaf-corpus.workspace = true
+rusqlite.workspace = true
+
+[dev-dependencies]
+rusqlite.workspace = true
+
+[lints]
+workspace = true

@@ -1,18 +1,24 @@
 # Multi-Qirāʾāt Muṣḥaf
 
-A muṣḥaf with fixed-line pages, qirāʾāt that can be changed at runtime, and calligraphic
-justification. It is a website first; native iOS and Android apps come later.
-Stage 1 covers the 8 riwāyāt for which KFGQPC publishes full text (`hafs`, `shuba`, `warsh`,
-`qalun`, `bazzi`, `qunbul`, `duri_abuamr`, `susi`), in the 15-line Madinah ʿUthmānī script.
+A muṣḥaf with fixed-line pages and calligraphic justification that displays any of the 20
+riwāyāt of al-Shāṭibiyyah and al-Durrah, with every wajh the books allow as a reader option.
+It is a website first; native iOS and Android apps come later.
 
-- `core/`: the Rust engine (resolver, rules, shaping, fixed-point justification, drawing). The
-  same code runs in the CLI and, compiled to WebAssembly, in the browser.
-- `data/`: the Python data pipeline (`uv`). It builds the spine, layouts, patches and rules
-  from pinned sources.
+The project is being rebuilt on a new data model (D67, milestones M0–M6). The current app
+(the 8 riwāyāt KFGQPC publishes, on the legacy patch model) is frozen and keeps working until
+the new model reproduces each riwāyah.
+
+- `corpus/`: the data, as text tables people review: words, farsh, uṣūl, riwāyah profiles,
+  writing styles, ayah counting, layouts (`docs/formats.md`).
+- `core/`: the Rust engine: letter features (`mushaf-text`), corpus check and build
+  (`mushaf-corpus`), shaping, fixed-point justification and drawing. The same code runs in the
+  CLI and, compiled to WebAssembly, in the browser.
+- `data/`: pinned sources, Python importers (books, KFGQPC), and the legacy pipeline.
 - `apps/web/`: the web app (Vite + TypeScript). It only paints what the core returns.
-- `docs/`: decisions (`adr/`, one file per ADR, index in `adr/README.md`) and known gaps (`known-gaps.md`).
+- `docs/`: the architecture (`ARCHITECTURE.md`), glossary (`GLOSSARY.md`), decisions (`adr/`)
+  and known gaps (`known-gaps.md`).
 
-Read `CLAUDE.md` for the project rules and `PROJECT_PLAN.md` for the phases.
+Read `CLAUDE.md` for the project rules and `PROJECT_PLAN.md` for the milestones.
 
 ## Prerequisites
 

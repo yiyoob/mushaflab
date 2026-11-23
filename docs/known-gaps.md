@@ -3,6 +3,12 @@
 Everything unmatched, unaligned, unverified or deferred is listed here. Never hide a gap
 by omission. Remove an entry only when its resolution is committed, and cite the commit.
 
+**Since the architecture reset (D67, 2026-11-23):** gaps about the patch model (raw, curated
+and residual patches, mined rules, option groups as patches, the resolver, the legacy
+`data-build`, the patch round-trip) are **legacy**: frozen with it, not worked on, and closed
+when M3 deletes it. Gaps about sources, fonts, rendering, layouts, the books and the web app stay
+live and carry over to the new model. New gaps use milestone task ids (`M<n>.<k>`).
+
 | ID | Area | Gap | Since | Resolve by |
 |---|---|---|---|---|
 | G-001 | Approvals | **Resolved (2026-10-22).** CI runs `.github/scripts/check-approvals.sh`: any commit touching `data/approvals/`, `.github/allowed_signers` or the guard script must be signed by a key in `.github/allowed_signers` as of its parent commit (the owner's SSH signing key, passphrase-protected, not in ssh-agent). Bootstrap commit signed by the owner. Residual risk: an edit to the workflow file itself could remove the check; GitHub branch protection would close that. | T0.1 | Done |
@@ -100,4 +106,8 @@ by omission. Remove an entry only when its resolution is committed, and cite the
 | G-222 | Book text | al-Futūḥ (D66): reader labels not fully determined in 12.0% of rows. `X واندرج من اندرج` names X but not who else shares the reading; madd groups are bounded by the book's madd schools (v1 pp52-53) but placement within a segment is certain only by elimination. 411 rows (0.8%) stay contextual (no separated/connected madd in the row's Ḥafṣ text); 93 labels are typos in the book. | D66 | Owner or muqriʾ, if needed for T6.0 |
 | G-223 | Book text | al-Futūḥ (D66): reader conventions `واندرج`, `كالسابق`, `عدا من سيأتي` are read by usage (standard jamʿ conventions the book uses but does not define). | D66 | Owner confirms |
 | G-224 | Book text | al-Futūḥ (D66): colour meanings (`data/books/al-futuh-al-bahira/colors.yaml`) map the text colours to the book's key (v1 p12) by hue; three oranges and two greens are each one class; 35 rare colours (~0.2% of glyphs) are unmapped (`class: null`). | D66 | Owner (accepted by hue for human readers, 2026-11-20, by the contributor) |
+| G-225 | Sources | **Partly resolved (2026-11-23).** al-Futūḥ (`book-al-futuh-al-bahira-vol1..6`) and Sakkal Majalla (`font-sakkal-majalla`) are back under `data/sources/raw/`, checksums verified. The owner's al-Budūr EPUB (`book-al-budur-al-zahirah`) is not available; Aljam3's copy of the same print replaces it (PDF and OCR text, D68). The OCR text has errors, unlike the EPUB's typed text, so each al-Budūr citation is checked against the PDF page. | M0.1 | Permanent unless the EPUB turns up |
+| G-226 | Writing styles | What each sign means in a style table (D72 level b) is qirāʾāt knowledge. Until a row cites KFGQPC's sign explanation pages or a book, it is `hypothesis`. | M0.1 | Rows cited before M1's gate |
+| G-227 | Process | GitHub Actions CI is off (D71). Nothing checks a push automatically; `just gate` before every merge is the only full check. | M0.1 | Permanent unless CI is switched back on |
 | G-228 | Web app | **Resolved (2026-11-23).** The editor panel (`showEditor`, `apps/web/src/main.ts`) drew its buttons, then awaited the engine before attaching the highlight-mark handlers; a cluster picked by id redrew the panel, and a click on "Not a difference" before the handlers existed was lost. Handlers are now attached before any await, an older panel render stops once a newer one starts, and the marks list refreshes after a mark. Playwright `highlight marks` test passes (3 of 3 repeats); it had failed on `main` since PRs 8 and 9 were merged with CI off. | PR 12 | Done (PR fixing G-228) |
+| G-229 | Book text | **Resolved (2026-11-23).** The al-Futūḥ extractor as ported in D66 stopped on volume 1 (`TTLibError: bad sfntVersion` on an embedded font): a lint clean-up had narrowed the original `except Exception` around the font loader to builtin exceptions, so a font fontTools cannot read crashed the run instead of being skipped. `TTLibError` is caught again; pages 47–63 give the same 213 rows (readers, words, anchors, grades) as the original extraction of 2026-11-20. | M0.6 | Done |
