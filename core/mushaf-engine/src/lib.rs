@@ -19,12 +19,15 @@ use mushaf_resolve::{EditLint, Mode, Resolved, Selection, lint_overlay, resolve_
 use mushaf_shape::{EncodingTable, Exceptions, FontData, Violation, check_word};
 
 /// Where the engine reads its inputs: files by repository-relative path (`data/render/...`,
-/// `fonts/...`) and the data root's files (`DataSet::from_files`). A directory on disk for the
-/// CLI; the static bundle on the web (D57).
+/// `fonts/...`), the data root's files (`DataSet::from_files`) and the corpus (D73). A
+/// directory on disk for the CLI; the static bundle on the web (D57).
 pub trait Source {
     fn read(&self, rel: &str) -> Result<Vec<u8>, Error>;
     /// Every file under the data root's data directories, keyed relative to `data/`.
     fn data_files(&self) -> Result<DataFiles, Error>;
+    /// Every file under `corpus/`, keyed by repository-relative path (`corpus/...`); empty when
+    /// the source has no corpus.
+    fn corpus_files(&self) -> Result<mushaf_corpus::Files, Error>;
 }
 
 /// A repository checkout on disk.
@@ -35,6 +38,14 @@ impl Source for Path {
     fn data_files(&self) -> Result<DataFiles, Error> {
         mushaf_model::read_tree(&self.join("data"))
     }
+    fn corpus_files(&self) -> Result<mushaf_corpus::Files, Error> {
+        if !self.join("corpus").is_dir() {
+            return Ok(mushaf_corpus::Files::new());
+        }
+        let mut f = mushaf_corpus::read_tree(self).map_err(Error::new)?;
+        f.remove(mushaf_corpus::APPROVALS);
+        Ok(f)
+    }
 }
 
 impl Source for PathBuf {
@@ -44,6 +55,29 @@ impl Source for PathBuf {
     fn data_files(&self) -> Result<DataFiles, Error> {
         self.as_path().data_files()
     }
+    fn corpus_files(&self) -> Result<mushaf_corpus::Files, Error> {
+        self.as_path().corpus_files()
+    }
+}
+
+/// The data set the engine runs on (D73): the Ḥafṣ spine and the layouts from the corpus when
+/// the source has one, and the other legacy data files (patches, the other riwāyāt's layouts,
+/// options, profiles). The legacy files the corpus replaces are not read (M1.5). The corpus's
+/// own row checks are `mushaf check`'s job; a corpus that does not load is an error here.
+pub fn load_data<S: Source + ?Sized>(repo: &S) -> Result<DataSet, Error> {
+    let files = repo.corpus_files()?;
+    if files.is_empty() {
+        return DataSet::from_files(&repo.data_files()?);
+    }
+    let c = mushaf_corpus::Corpus::load(&files).map_err(|d| {
+        let msgs: Vec<String> = d.iter().map(ToString::to_string).collect();
+        Error::new(format!("corpus: {}", msgs.join("; ")))
+    })?;
+    let mut data = repo.data_files()?;
+    data.retain(|k, _| !mushaf_corpus::legacy::replaces(&c, k));
+    let mut ds = DataSet::parse_files(&data)?;
+    mushaf_corpus::legacy::apply(&c, &mut ds)?;
+    Ok(ds)
 }
 
 pub mod bundle;
@@ -185,7 +219,7 @@ impl Renderer {
         riwayah: &str,
         style: &str,
     ) -> Result<Self, Error> {
-        let data = Arc::new(DataSet::from_files(&repo.data_files()?)?);
+        let data = Arc::new(load_data(repo)?);
         Self::load_with(repo, data, riwayah, style)
     }
 

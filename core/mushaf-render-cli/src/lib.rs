@@ -53,11 +53,26 @@ fn strings<'a>(v: &'a serde_json::Value, out: &mut BTreeSet<&'a str>) {
 ///   patches are the round-trip's input, D22; the engine never resolves them);
 /// - `data/render/*`, `data/encodings/*` and `data/approvals/*` (read-only, for the
 ///   provenance screen);
-/// - every font a render profile or the style audit names.
+/// - every font a render profile or the style audit names;
+/// - `corpus/` (README files excluded), from which the engine takes the Ḥafṣ spine and the
+///   layouts (D73); the legacy files it replaces are left out (M1.5).
 pub fn bundle_files(repo: &Path) -> Result<BTreeMap<String, Vec<u8>>, Error> {
     let read =
         |rel: &str| std::fs::read(repo.join(rel)).map_err(|e| Error::new(format!("{rel}: {e}")));
-    let data = mushaf_model::read_tree(&repo.join("data"))?;
+    let mut corpus = mushaf_corpus::read_tree(repo).map_err(Error::new)?;
+    corpus.remove(mushaf_corpus::APPROVALS);
+    let loaded = mushaf_corpus::Corpus::load(&corpus).map_err(|d| {
+        Error::new(format!(
+            "corpus: {}",
+            d.iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+                .join("; ")
+        ))
+    })?;
+    let mut data = mushaf_model::read_tree(&repo.join("data"))?;
+    // The legacy files the corpus replaces are not shipped (M1.5, D73).
+    data.retain(|k, _| !mushaf_corpus::legacy::replaces(&loaded, k));
     let mut stacked = BTreeSet::new();
     for (k, v) in data.iter().filter(|(k, _)| k.starts_with("profiles/")) {
         let p: RiwayahProfile =
@@ -98,6 +113,9 @@ pub fn bundle_files(repo: &Path) -> Result<BTreeMap<String, Vec<u8>>, Error> {
     }
     for f in named {
         out.insert(f.clone(), read(&f)?);
+    }
+    for (k, v) in corpus {
+        out.insert(k, v.into_bytes());
     }
     Ok(out)
 }

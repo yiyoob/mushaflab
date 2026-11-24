@@ -9,7 +9,6 @@ use std::sync::Arc;
 use mushaf_draw::{DrawItem, Role};
 use mushaf_engine::session::{EditOp, Session};
 use mushaf_engine::{HighlightPolicy, Renderer, Source};
-use mushaf_model::DataSet;
 
 fn repo() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -57,7 +56,7 @@ fn page_of(r: &Renderer, id: &str) -> u32 {
 #[ignore = "run by `just golden` (release)"]
 fn session_draws_what_the_cli_draws() {
     let repo = repo();
-    let data = Arc::new(DataSet::from_files(&repo.data_files().unwrap()).unwrap());
+    let data = Arc::new(mushaf_engine::load_data(&repo).unwrap());
     for riwayah in ["hafs", "warsh"] {
         let style = mushaf_engine::default_style(riwayah).unwrap();
         let cli = Renderer::load_with(&repo, data.clone(), riwayah, style).unwrap();
@@ -208,7 +207,7 @@ fn inspector_and_provenance_resolve_every_id() {
 #[ignore = "run by `just golden` (release)"]
 fn styles_offer_only_audited_combinations() {
     let repo = repo();
-    let data = DataSet::from_files(&repo.data_files().unwrap()).unwrap();
+    let data = mushaf_engine::load_data(&repo).unwrap();
     let styles = mushaf_engine::styles(&repo, &data).unwrap();
     let audit: serde_json::Value =
         serde_json::from_slice(&repo.read(mushaf_engine::STYLE_AVAILABILITY).unwrap()).unwrap();

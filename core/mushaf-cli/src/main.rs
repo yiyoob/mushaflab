@@ -9,11 +9,10 @@
 //! state of each approved table, and exits 1 on any error. `build` runs the same check, then
 //! writes a fresh SQLite file: same inputs, same rows, in the same order (rule 8; no timestamps).
 
-use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-use mushaf_corpus::{APPROVALS, Corpus, Files};
+use mushaf_corpus::{Corpus, Files};
 use rusqlite::{Connection, params};
 
 fn usage() -> ExitCode {
@@ -91,42 +90,8 @@ fn main() -> ExitCode {
     }
 }
 
-/// Every file under `<root>/corpus/` (README files excluded) and the approvals file, by
-/// repository-relative path, in sorted order.
 fn read_files(root: &Path) -> Result<Files, String> {
-    let mut files = BTreeMap::new();
-    let mut stack = vec![root.join("corpus")];
-    while let Some(dir) = stack.pop() {
-        let rd = std::fs::read_dir(&dir).map_err(|e| format!("{}: {e}", dir.display()))?;
-        for entry in rd {
-            let p = entry.map_err(|e| e.to_string())?.path();
-            let name = p.file_name().and_then(|n| n.to_str()).unwrap_or_default();
-            if name.starts_with('.') || name == "README.md" {
-                continue;
-            }
-            if p.is_dir() {
-                stack.push(p);
-            } else {
-                let rel = p
-                    .strip_prefix(root)
-                    .map_err(|e| e.to_string())?
-                    .components()
-                    .map(|c| c.as_os_str().to_string_lossy().into_owned())
-                    .collect::<Vec<_>>()
-                    .join("/");
-                let text =
-                    std::fs::read_to_string(&p).map_err(|e| format!("{}: {e}", p.display()))?;
-                files.insert(rel, text);
-            }
-        }
-    }
-    let approvals = root.join(APPROVALS);
-    if approvals.is_file() {
-        let text = std::fs::read_to_string(&approvals)
-            .map_err(|e| format!("{}: {e}", approvals.display()))?;
-        files.insert(APPROVALS.to_string(), text);
-    }
-    Ok(files)
+    mushaf_corpus::read_tree(root)
 }
 
 const SCHEMA: &str = "
@@ -140,6 +105,8 @@ CREATE TABLE adad (file TEXT NOT NULL, surah INTEGER NOT NULL, ayah INTEGER NOT 
   source TEXT NOT NULL, status TEXT NOT NULL, PRIMARY KEY (file, surah, ayah));
 CREATE TABLE layout_lines (file TEXT NOT NULL, page INTEGER NOT NULL, line INTEGER NOT NULL, type TEXT NOT NULL, first_word TEXT, last_word TEXT,
   centered INTEGER NOT NULL, PRIMARY KEY (file, page, line));
+CREATE TABLE layouts (layout_id TEXT PRIMARY KEY, file TEXT NOT NULL, script_id TEXT NOT NULL, edition TEXT NOT NULL, pages INTEGER NOT NULL,
+  lines_per_page INTEGER NOT NULL, writing_style TEXT NOT NULL, font TEXT NOT NULL, sources TEXT NOT NULL);
 CREATE TABLE approvals (table_path TEXT PRIMARY KEY, sha256 TEXT NOT NULL, status TEXT NOT NULL, by_whom TEXT NOT NULL, date TEXT NOT NULL,
   except_rows TEXT NOT NULL, state TEXT NOT NULL);
 ";
@@ -232,6 +199,24 @@ fn build(c: &Corpus, out: &Path) -> Result<(), String> {
                 l.first.map(|w| w.to_string()),
                 l.last.map(|w| w.to_string()),
                 l.centered
+            ],
+        )
+        .map_err(e)?;
+    }
+    for (path, l) in &c.layouts {
+        let sources: Vec<&str> = l.sources.iter().map(|s| s.source.as_str()).collect();
+        tx.execute(
+            "INSERT INTO layouts VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+            params![
+                l.layout_id,
+                path,
+                l.script_id,
+                l.edition,
+                l.pages,
+                l.lines_per_page,
+                l.writing_style,
+                l.font,
+                sources.join(" ")
             ],
         )
         .map_err(e)?;

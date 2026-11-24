@@ -69,3 +69,69 @@ fn every_word_round_trips_and_follows_the_mark_order() {
         assert!(x.marks.iter().all(|m| parse_cp(m).is_some()));
     }
 }
+
+/// M1.2 acceptance: every letter of the word table decodes into features through the KFGQPC
+/// Madinah sign rows and encodes back to the same marks, in the same order, byte for byte.
+#[test]
+fn every_word_round_trips_through_features() {
+    use std::collections::BTreeMap;
+
+    use mushaf_text::{features_of, marks_for};
+
+    let c = corpus();
+    let style = &c.styles["corpus/dabt/kfgqpc-madinah.yaml"];
+    let rules = style.rules();
+    assert_eq!(rules.len(), style.signs.len());
+    let order = style.order();
+    let exceptions: BTreeMap<&str, Vec<char>> = style
+        .mark_order
+        .exceptions
+        .iter()
+        .map(|x| {
+            let marks = x.marks.iter().filter_map(|m| parse_cp(m)).collect();
+            (x.letter.as_str(), marks)
+        })
+        .collect();
+    let mut used: BTreeMap<String, usize> = BTreeMap::new();
+    let mut failures = Vec::new();
+    for w in &c.words {
+        let word = w.id.to_string();
+        let mut units = decode(&w.text).unwrap();
+        for (n, u) in units.iter_mut().enumerate() {
+            let Unit::Letter(l) = u else { continue };
+            let lid = format!("{word}:{}", n + 1);
+            let res = features_of(l, &word, &lid, &rules).and_then(|(f, ids)| {
+                for id in ids {
+                    *used.entry(id).or_default() += 1;
+                }
+                let x = exceptions.get(lid.as_str()).map(Vec::as_slice);
+                marks_for(l.base, &f, &word, &lid, &rules, &order, x)
+            });
+            match res {
+                Ok(m) => l.marks = m,
+                Err(e) => failures.push(e.to_string()),
+            }
+        }
+        if failures.len() > 20 {
+            break;
+        }
+        assert_eq!(encode(&units), w.text, "{}", w.id);
+    }
+    assert!(
+        failures.is_empty(),
+        "{} failures: {failures:?}",
+        failures.len()
+    );
+    // Every mark row explains at least one mark (sign rows for standalone signs excepted).
+    let unused: Vec<&str> = style
+        .signs
+        .iter()
+        .filter(|r| !used.contains_key(&r.id))
+        .map(|r| r.id.as_str())
+        .collect();
+    assert_eq!(
+        unused,
+        ["sajdah_place", "hizb_start"],
+        "rows that explain no mark"
+    );
+}

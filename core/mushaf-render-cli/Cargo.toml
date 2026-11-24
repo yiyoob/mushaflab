@@ -31,6 +31,7 @@ path = "src/contact.rs"
 
 [dependencies]
 mushaf-model.workspace = true
+mushaf-corpus.workspace = true
 mushaf-db.workspace = true
 mushaf-engine.workspace = true
 mushaf-resolve.workspace = true

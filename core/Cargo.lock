@@ -507,6 +507,7 @@ dependencies = [
 name = "mushaf-engine"
 version = "0.0.0"
 dependencies = [
+ "mushaf-corpus",
  "mushaf-draw",
  "mushaf-justify",
  "mushaf-layout",
@@ -571,6 +572,7 @@ dependencies = [
 name = "mushaf-render-cli"
 version = "0.0.0"
 dependencies = [
+ "mushaf-corpus",
  "mushaf-db",
  "mushaf-draw",
  "mushaf-engine",

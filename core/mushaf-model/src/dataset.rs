@@ -183,6 +183,14 @@ fn insert_unique<V>(
 
 impl DataSet {
     pub fn from_files(files: &DataFiles) -> Result<DataSet, Error> {
+        let ds = Self::parse_files(files)?;
+        ds.validate()?;
+        Ok(ds)
+    }
+
+    /// `from_files` without the final cross-reference check, for a caller that adds parts
+    /// first (the corpus's spine and layouts, D73) and then calls `validate`.
+    pub fn parse_files(files: &DataFiles) -> Result<DataSet, Error> {
         let mut ds = DataSet::default();
         let mut spine_parts: BTreeMap<String, (Option<&str>, Option<&str>)> = BTreeMap::new();
         for (path, text) in files {
@@ -244,7 +252,6 @@ impl DataSet {
             ds.spines
                 .insert(id.clone(), spine_from_files(&id, manifest, items)?);
         }
-        ds.validate()?;
         Ok(ds)
     }
 
@@ -396,7 +403,8 @@ impl DataSet {
 
     /// Cross-references: every layout, patch file, ayah map and profile names a loaded spine,
     /// every layout is ordered, and a profile's patch files and ayah map exist on its spine.
-    fn validate(&self) -> Result<(), Error> {
+    /// Checks references between the parts (patch targets, layout spines, …).
+    pub fn validate(&self) -> Result<(), Error> {
         let known = |s: &str, what: &str| {
             if self.spines.contains_key(s) {
                 Ok(())

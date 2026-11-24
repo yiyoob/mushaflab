@@ -98,6 +98,19 @@ impl Source for Bundle {
         }
         Ok(out)
     }
+
+    fn corpus_files(&self) -> Result<mushaf_corpus::Files, Error> {
+        let mut out = mushaf_corpus::Files::new();
+        for (path, data) in &self.files {
+            if !path.starts_with("corpus/") {
+                continue;
+            }
+            let text =
+                String::from_utf8(data.clone()).map_err(|e| Error::new(format!("{path}: {e}")))?;
+            out.insert(path.clone(), text);
+        }
+        Ok(out)
+    }
 }
 
 #[cfg(test)]
@@ -111,6 +124,8 @@ mod tests {
             .insert("data/options/x.yaml".into(), b"a: 1\n".to_vec());
         b.files.insert("data/render/p.json".into(), b"{}".to_vec());
         b.files.insert("fonts/f.otf".into(), vec![0, 1, 2, 255]);
+        b.files
+            .insert("corpus/sources.yaml".into(), b"sources: []\n".to_vec());
         let bytes = b.to_bytes().unwrap();
         assert_eq!(Bundle::parse(&bytes).unwrap(), b);
         assert!(Bundle::parse(&bytes[..bytes.len() - 1]).is_err());
@@ -121,6 +136,8 @@ mod tests {
         // only the data root's data directories are data files, keyed under `data/`
         let files = b.data_files().unwrap();
         assert_eq!(files.keys().collect::<Vec<_>>(), ["options/x.yaml"]);
+        let corpus = b.corpus_files().unwrap();
+        assert_eq!(corpus.keys().collect::<Vec<_>>(), ["corpus/sources.yaml"]);
         assert_eq!(b.read("fonts/f.otf").unwrap(), [0, 1, 2, 255]);
         assert!(b.read("fonts/missing.otf").is_err());
     }
